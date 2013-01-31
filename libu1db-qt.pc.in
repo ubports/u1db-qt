@@ -1,0 +1,12 @@
+prefix=@PREFIX@
+exec_prefix=@EXEC_PREFIX@
+libdir=${exec_prefix}/lib
+includedir=${prefix}/@INCLUDE_INSTALL_DIR@
+
+Name: @U1DB_QT_LIBNAME@
+Description: Qt binding and QML plugin for U1DB.
+Version: 1.0
+
+Requires: @QT_PKGCONFIG_DEPENDENCIES@
+Libs: -L${libdir} -l@U1DB_QT_LIBNAME@
+Cflags: -I${includedir}

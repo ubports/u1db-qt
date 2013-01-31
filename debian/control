@@ -1,0 +1,31 @@
+Source: u1db-qt
+Section: libs
+Priority: optional
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Build-Depends: debhelper (>= 9),
+               cmake (>= 2.8.6),
+               qtbase,
+               qtdeclarative,
+               dbus-test-runner,
+Standards-Version: 3.9.3
+Vcs-Bzr: https://launchpad.net/u1db-qt/trunk
+
+Package: libu1db-qt5-1
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: Qt5 binding and QtQuick2 plugin for U1DB - shared library
+ Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
+
+Package: libu1db-qt5-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         libu1db-qt5-1 (= ${binary:Version}),
+         qtbase,
+         qtdeclarative,
+         libu1db-dev (>= 1.0.0),
+Description: Qt5 binding and QtQuick2 plugin for U1DB - development files
+ Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
+ .
+ This package contains the developer headers for the Qt binding for U1DB

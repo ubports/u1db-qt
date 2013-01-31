@@ -1,0 +1,17 @@
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+libu1db-qt5.so*
+libQtU1db.so*
+moc_*.cpp
+*.moc
+*_automoc.cpp
+*.pc
+CTestTestfile.cmake
+*Test.log
+Testing
+*-xunit.xml
+libu1db-qt.pc.in
+tests/test-database
