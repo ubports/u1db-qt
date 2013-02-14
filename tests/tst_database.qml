@@ -25,9 +25,15 @@ TestCase {
     name: "U1dbDatabase"
 
     function test_1_databasePopulated () {
-        myDatabase.path = "notes"
+        var myPath = "/tmp/u1db-qt.db"
+        myDatabase.path = myPath
         spyPathChanged.wait()
-        compare(myDatabase.path, "notes")
+        compare(myDatabase.path, myPath)
+        var docId = myDatabase.putDoc("hijklmn", {"foo": "bar"})
+        console.log("putDoc: " + docId)
+        console.log("getDoc(0): " + myDatabase.getDoc(docId, false))
+        console.log("getDoc(1): " + myDatabase.getDoc(docId, true))
+        console.log("listDocs: " + myDatabase.listDocs())
     }
 
     SignalSpy {

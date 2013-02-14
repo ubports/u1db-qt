@@ -60,22 +60,25 @@ namespace U1dbDatabase {
 class Q_DECL_EXPORT Database : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString path READ getPath WRITE setPath NOTIFY pathChanged)
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
 public:
     Database(QObject* parent = 0);
     ~Database() { }
 
     QString getPath();
     void setPath(const QString& path);
-    int getCount();
+    Q_INVOKABLE QVariant getDoc(const QString& docId, bool checkConflicts);
+    Q_INVOKABLE int putDoc(const QString& docID, QVariant newDoc);
+    Q_INVOKABLE QList<QVariant> listDocs();
 Q_SIGNALS:
     void pathChanged(const QString& path);
-    void countChanged(int count);
 private:
     Q_DISABLE_COPY(Database)
     QString m_path;
-    int m_count;
     QSqlDatabase m_db;
+
+    QString getReplicaUid();
+    bool isInitialized();
+    void initializeIfNeeded();
 };
 
 } // namespace U1dbDatabase

@@ -38,9 +38,12 @@ private Q_SLOTS:
         while(false)
             qApp->processEvents();
 
-        Database model_qt;
-        QCOMPARE(model_qt.getPath(), QString(""));
-        QSignalSpy modelReset(&model_qt, SIGNAL(pathChanged()));
+        Database db;
+        QCOMPARE(db.getPath(), QString(""));
+        QSignalSpy modelReset(&db, SIGNAL(pathChanged()));
+        QTemporaryFile file;
+        db.setPath(file.fileName());
+        QCOMPARE(db.getPath(), file.fileName());
     }
 
     void cleanupTestCase()

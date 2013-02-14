@@ -18,6 +18,12 @@
  */
 
 #include <QDebug>
+#include <QSqlQuery>
+#include <QFile>
+#include <QSqlError>
+#include <QUuid>
+#include <QStringList>
+#include <QJsonDocument>
 
 #include "database.h"
 #include "private.h"
@@ -26,12 +32,167 @@ QT_BEGIN_NAMESPACE
 
 namespace U1dbDatabase {
 
-Database::Database(QObject *parent) :
-    m_path(""),
-    m_count(0)
+QString
+Database::getReplicaUid()
 {
-    m_db = QSqlDatabase::addDatabase("SQLITE");
+    QSqlQuery query (m_db.exec("SELECT value FROM u1db_config WHERE name = 'replica_uid'"));
+    if (!query.lastError().isValid() && query.next())
+        return query.value(0).toString();
+    qDebug() << "u1db: Failed to get replica uid:" << query.lastError() << "\n" << query.lastQuery();
+    return QString();
+}
+
+bool
+Database::isInitialized()
+{
+    m_db.exec("PRAGMA case_sensitive_like=ON");
+    QSqlQuery query(m_db.exec(
+        "SELECT value FROM u1db_config WHERE name = 'sql_schema'"));
+    return query.next();
+}
+
+void
+Database::initializeIfNeeded()
+{
+    if (m_db.isValid())
+        return;
+
+    m_db = QSqlDatabase::addDatabase("QSQLITE");
+    // QSqlDatabase will print diagnostics, just bail out
+    if (!m_db.isValid())
+        return;
     m_db.setDatabaseName(":memory:");
+    if (!m_db.open())
+    {
+        qDebug() << "u1db: Failed to open" << m_db.databaseName() << ":" << m_db.lastError();
+        return;
+    }
+    if (!isInitialized())
+    {
+        m_db.exec("BEGIN EXCLUSIVE");
+        if (!isInitialized())
+        {
+            QFile file("../dbschema.sql"); // FIXME: qrc
+            if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                while (!file.atEnd())
+                {
+                    QByteArray line = file.readLine();
+                    while (!line.endsWith(";\n") && !file.atEnd())
+                        line += file.readLine();
+                    if (m_db.exec(line).lastError().isValid())
+                        qDebug() << "u1db: Failed to apply internal schema:" << m_db.lastError() << "\n" << line;
+                }
+
+                QSqlQuery query(m_db.exec());
+                query.prepare("INSERT OR REPLACE INTO u1db_config VALUES ('replica_uid', :uuid)");
+                query.bindValue(":uuid", QUuid::createUuid().toString());
+                if (!query.exec())
+                    qDebug() << "u1db: Failed to apply internal schema:" << query.lastError() << "\n" << query.lastQuery();
+                // Double-check
+                if (query.boundValue(0).toString() != getReplicaUid())
+                    qDebug() << "u1db: Invalid replica uid:" << query.boundValue(0);
+
+            }
+            else
+                qDebug() << "u1db: Failed to read internal schema: FileError" << file.error();
+        }
+    }
+}
+
+Database::Database(QObject *parent) :
+    QObject(parent), m_path("")
+{
+    initializeIfNeeded();
+}
+
+QVariant
+Database::getDoc(const QString& docId, bool checkConflicts)
+{
+    initializeIfNeeded();
+
+    QSqlQuery query(m_db.exec());
+    if (checkConflicts)
+        query.prepare("SELECT document.doc_rev, document.content, "
+            "count(conflicts.doc_rev) FROM document LEFT OUTER JOIN "
+            "conflicts ON conflicts.doc_id = document.doc_id WHERE "
+            "document.doc_id = :docId GROUP BY document.doc_id, "
+            "document.doc_rev, document.content");
+    else
+        query.prepare("SELECT doc_rev, content, 0 FROM document WHERE doc_id = :docId");
+    query.bindValue("docId", docId);
+    if (query.exec())
+    {
+        if (query.next())
+            return query.value("doc_rev");
+        qDebug() << "u1db: Failed to get document" << docId << ": No document";
+        return QVariant();
+    }
+    qDebug() << "u1db: Failed to get document" << docId << ":" << query.lastError() << "\n" << query.lastQuery();
+    return QVariant();
+}
+
+static int
+increaseVectorClockRev(int oldRev)
+{
+    return oldRev;
+}
+
+int
+Database::putDoc(const QString& docId, QVariant newDoc)
+{
+    initializeIfNeeded();
+
+    // FIXME verify Id ^[a-zA-Z0-9.%_-]+$
+    QVariant oldDoc = getDoc(docId, true);
+    if (oldDoc.isValid() /*&& oldDoc.has_conflicts*/)
+        return -1; /* Error: conflicts */
+
+    int newRev = increaseVectorClockRev(7/*newDoc.rev*/);
+    QSqlQuery query(m_db.exec());
+    if (oldDoc.isValid())
+    {
+        query.prepare("UPDATE document SET doc_rev=:docRev, content=:docJson WHERE doc_id = :docId");
+        query.bindValue("docId", docId);
+        query.bindValue("docRev", newRev);
+        query.bindValue("docJson", QJsonDocument::fromVariant(newDoc).toJson());
+        query.exec();
+        query.prepare("DELETE FROM document_fields WHERE doc_id = :docId");
+        query.bindValue("docId", docId);
+    }
+    else
+    {
+        query.prepare("INSERT INTO document (doc_id, doc_rev, content) VALUES (:docId, :docRev, :docJson)");
+        query.bindValue("docId", docId);
+        query.bindValue("docRev", newRev);
+        query.bindValue("docJson", QJsonDocument::fromVariant(newDoc).toJson());
+        query.exec();
+    }
+    return newRev;
+}
+
+QList<QVariant>
+Database::listDocs()
+{
+    initializeIfNeeded();
+
+    QSqlQuery query(m_db.exec());
+    query.prepare("SELECT document.doc_id, document.doc_rev, document.content, "
+        "count(conflicts.doc_rev) FROM document LEFT OUTER JOIN conflicts "
+        "ON conflicts.doc_id = document.doc_id GROUP BY document.doc_id, "
+        "document.doc_rev, document.content");
+    if (query.exec())
+    {
+        QList<QVariant> list;
+        while (query.next())
+        {
+            QVariant newDoc(query.value("document.doc_rev"));
+            list.append(newDoc);
+        }
+        return list;
+    }
+    qDebug() << "u1db: Failed to list documents:" << query.lastError() << "\n" << query.lastQuery();
+    return QList<QVariant>();
 }
 
 void
@@ -41,23 +202,16 @@ Database::setPath(const QString& path)
         return;
 
     m_path = path;
-    qDebug() << "Updated path: " << path;
     Q_EMIT pathChanged(path);
 
-    // TODO: full path
-    m_db.setDatabaseName(path);
+    initializeIfNeeded();
+    m_db.setDatabaseName(path); // TODO: relative path
 }
 
 QString
 Database::getPath()
 {
     return m_path;
-}
-
-int
-Database::getCount()
-{
-    return m_count;
 }
 
 } // namespace U1dbDatabase
