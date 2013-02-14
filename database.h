@@ -52,6 +52,7 @@ QT_END_NAMESPACE_U1DB
 
 #include <QtCore/QObject>
 #include <QSqlDatabase>
+#include <QVariant>
 
 QT_BEGIN_NAMESPACE
 

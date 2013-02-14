@@ -18,6 +18,7 @@
  */
 
 #include "database.h"
+#include "document.h"
 #include "plugin.h"
 #include <qqml.h>
 
@@ -26,5 +27,6 @@ QT_USE_NAMESPACE_U1DB
 void U1DBPlugin::registerTypes(const char *uri)
 {
     qmlRegisterType<Database>(uri, 1, 0, "Database");
+    qmlRegisterType<Document>(uri, 1, 0, "Document");
 }
 

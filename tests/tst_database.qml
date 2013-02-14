@@ -47,14 +47,15 @@ TestCase {
         path: "bogus"
     }
 
-    /*
     U1db.Document {
         id: myDocument
         database: myDatabase
-        documentId: 'my-document-id'
+        docId: 'my-document-id'
+        create: true
         defaults: { "eggs": "spam" }
     }
 
+    /*
     ListView {
         id: myList
         model: myDocument
