@@ -25,6 +25,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wundef -std=c
 set(U1DB_QT_SRCS
     database.cpp
     document.cpp
+    index.cpp
+    query.cpp
     )
 
 ## QtU1DBQml
@@ -68,7 +70,7 @@ install(TARGETS ${U1DB_QT_LIBNAME}
     LIBRARY DESTINATION lib${LIB_SUFFIX}
     )
 
-install(FILES database.h document.h
+install(FILES database.h document.h index.h query.h
     DESTINATION ${INCLUDE_INSTALL_DIR}
     )
 

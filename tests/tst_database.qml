@@ -55,6 +55,27 @@ TestCase {
         defaults: { "eggs": "spam" }
     }
 
+    U1db.Index {
+        id: myIndex
+        database: myDatabase
+        name: 'by-title-field'
+        expression: ['title', 'bool(field)']
+    }
+
+    U1db.Query {
+        id: firstQuery
+        database: myDatabase
+        index: myIndex
+        query: ['match', false]
+    }
+
+    U1db.Query {
+        id: secondQuery
+        database: u1db
+        index: otherIndex
+        range: [['a', 'b'], ['*']]
+    }
+
     /*
     ListView {
         id: myList
