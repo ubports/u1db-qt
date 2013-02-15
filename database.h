@@ -20,39 +20,11 @@
 #ifndef U1DB_DATABASE_H
 #define U1DB_DATABASE_H
 
-//global.h begin
-#ifndef QT_STATIC
-# if defined(QT_BUILD_U1DB_LIB)
-#  define Q_U1DB_EXPORT Q_DECL_EXPORT
-# else
-#  define Q_U1DB_EXPORT Q_DECL_IMPORT
-# endif
-#else
-# define Q_U1DB_EXPORT
-#endif
-
-#if defined(QT_NAMESPACE)
-#  define QT_BEGIN_NAMESPACE_U1DB namespace QT_NAMESPACE { namespace U1dbDatabase {
-#  define QT_END_NAMESPACE_U1DB } }
-#  define QT_USE_NAMESPACE_U1DB using namespace QT_NAMESPACE::U1dbDatabase;
-#  define QT_PREPEND_NAMESPACE_U1DB(name) QT_NAMESPACE::U1DbDatabase::name
-#else
-#  define QT_BEGIN_NAMESPACE_U1DB namespace U1DbDatabase {
-#  define QT_END_NAMESPACE_U1DB }
-#  define QT_USE_NAMESPACE_U1DB using namespace U1dbDatabase;
-#  define QT_PREPEND_NAMESPACE_U1DB(name) U1dbDatabase::name
-#endif
-
-// a workaround for moc - if there is a header file that doesn't use u1db
-// namespace, we still force moc to do "using namespace" but the namespace have to
-// be defined, so let's define an empty namespace here
-QT_BEGIN_NAMESPACE_U1DB
-QT_END_NAMESPACE_U1DB
-//global.h end
-
 #include <QtCore/QObject>
 #include <QSqlDatabase>
 #include <QVariant>
+
+#include "global.h"
 
 QT_BEGIN_NAMESPACE
 
