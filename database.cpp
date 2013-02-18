@@ -144,7 +144,8 @@ Database::putDoc(const QString& docId, QVariant newDoc)
 {
     initializeIfNeeded();
 
-    // FIXME verify Id ^[a-zA-Z0-9.%_-]+$
+    if (!QRegExp("^[a-zA-Z0-9.%_-]+$").exactMatch(docId))
+        return -1;
     QVariant oldDoc = QVariant();//getDoc(docId, true);
     if (oldDoc.isValid() /*&& oldDoc.has_conflicts*/)
         return -1; /* Error: conflicts */
