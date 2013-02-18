@@ -33,6 +33,7 @@ namespace U1dbDatabase {
 class Q_DECL_EXPORT Database : public QObject {
     Q_OBJECT
     Q_PROPERTY(QString path READ getPath WRITE setPath NOTIFY pathChanged)
+    Q_PROPERTY(QString error READ lastError NOTIFY errorChanged)
 public:
     Database(QObject* parent = 0);
     ~Database() { }
@@ -42,16 +43,20 @@ public:
     Q_INVOKABLE QVariant getDoc(const QString& docId, bool checkConflicts);
     Q_INVOKABLE int putDoc(const QString& docID, QVariant newDoc);
     Q_INVOKABLE QList<QVariant> listDocs();
+    Q_INVOKABLE QString lastError();
 Q_SIGNALS:
     void pathChanged(const QString& path);
+    void errorChanged(const QString& error);
 private:
     Q_DISABLE_COPY(Database)
     QString m_path;
     QSqlDatabase m_db;
+    QString m_error;
 
     QString getReplicaUid();
     bool isInitialized();
-    void initializeIfNeeded(const QString& path=":memory:");
+    bool initializeIfNeeded(const QString& path=":memory:");
+    bool setError(const QString& error);
 };
 
 } // namespace U1dbDatabase

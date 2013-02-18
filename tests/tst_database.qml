@@ -29,6 +29,7 @@ TestCase {
         myDatabase.path = myPath
         spyPathChanged.wait()
         compare(myDatabase.path, myPath)
+        myDatabase.putDoc("ははは", {"la": "le"})
         var docRev = myDatabase.putDoc("hijklmn", {"foo": "bar"})
         console.log("putDoc: " + docRev)
         console.log("getDoc(0): " + myDatabase.getDoc("hijklmn", false))

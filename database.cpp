@@ -38,8 +38,7 @@ Database::getReplicaUid()
     QSqlQuery query (m_db.exec("SELECT value FROM u1db_config WHERE name = 'replica_uid'"));
     if (!query.lastError().isValid() && query.next())
         return query.value(0).toString();
-    qDebug() << "u1db: Failed to get replica uid:" << query.lastError() << "\n" << query.lastQuery();
-    return QString();
+    return setError(QString("Failed to get replica UID: %1\n%2").arg(query.lastError().text()).arg(query.lastQuery())) ? QString() : QString();
 }
 
 bool
@@ -51,23 +50,34 @@ Database::isInitialized()
     return query.next();
 }
 
-void
+bool
+Database::setError(const QString& error)
+{
+    qDebug() << "u1db: " << error;
+    m_error = error;
+    Q_EMIT errorChanged(error);
+    return false;
+}
+
+QString
+Database::lastError()
+{
+    return m_error;
+}
+
+bool
 Database::initializeIfNeeded(const QString& path)
 {
     if (m_db.isOpen())
-        return;
+        return true;
 
     if (!m_db.isValid())
         m_db = QSqlDatabase::addDatabase("QSQLITE");
-    // QSqlDatabase will print diagnostics, just bail out
     if (!m_db.isValid())
-        return;
+        return setError("QSqlDatabase error");
     m_db.setDatabaseName(path);
     if (!m_db.open())
-    {
-        qDebug() << "u1db: Failed to open" << path << ":" << m_db.lastError();
-        return;
-    }
+        return setError(QString("Failed to open %1: %2").arg(path).arg(m_db.lastError().text()));
     if (!isInitialized())
     {
         m_db.exec("BEGIN EXCLUSIVE");
@@ -82,23 +92,23 @@ Database::initializeIfNeeded(const QString& path)
                     while (!line.endsWith(";\n") && !file.atEnd())
                         line += file.readLine();
                     if (m_db.exec(line).lastError().isValid())
-                        qDebug() << "u1db: Failed to apply internal schema:" << m_db.lastError() << "\n" << line;
+                        return setError(QString("Failed to apply internal schema: %1\n%2").arg(m_db.lastError().text()).arg(QString(line)));
                 }
 
                 QSqlQuery query(m_db.exec());
                 query.prepare("INSERT OR REPLACE INTO u1db_config VALUES ('replica_uid', :uuid)");
                 query.bindValue(":uuid", QUuid::createUuid().toString());
                 if (!query.exec())
-                    qDebug() << "u1db: Failed to apply internal schema:" << query.lastError() << "\n" << query.lastQuery();
+                    return setError(QString("Failed to apply internal schema: %1\n%2").arg(m_db.lastError().text()).arg(query.lastQuery()));
                 // Double-check
                 if (query.boundValue(0).toString() != getReplicaUid())
-                    qDebug() << "u1db: Invalid replica uid:" << query.boundValue(0);
-
+                    return setError(QString("Invalid replica uid: %1").arg(query.boundValue(0).toString()));
             }
             else
-                qDebug() << "u1db: Failed to read internal schema: FileError" << file.error();
+                return setError(QString("Failed to read internal schema: FileError %1").arg(file.error()));
         }
     }
+    return true;
 }
 
 Database::Database(QObject *parent) :
@@ -110,7 +120,8 @@ Database::Database(QObject *parent) :
 QVariant
 Database::getDoc(const QString& docId, bool checkConflicts)
 {
-    initializeIfNeeded();
+    if (!initializeIfNeeded())
+        return QVariant();
 
     QSqlQuery query(m_db.exec());
     if (checkConflicts)
@@ -126,11 +137,9 @@ Database::getDoc(const QString& docId, bool checkConflicts)
     {
         if (query.next())
             return query.value("content");
-        qDebug() << "u1db: Failed to get document" << docId << ": No document";
-        return QVariant();
+        return setError(QString("Failed to get document %1: No document").arg(docId)) ? QVariant() : QVariant();
     }
-    qDebug() << "u1db: Failed to get document" << docId << ":" << query.lastError() << "\n" << query.lastQuery();
-    return QVariant();
+    return setError(QString("Failed to get document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? QVariant() : QVariant();
 }
 
 static int
@@ -142,13 +151,14 @@ increaseVectorClockRev(int oldRev)
 int
 Database::putDoc(const QString& docId, QVariant newDoc)
 {
-    initializeIfNeeded();
+    if (!initializeIfNeeded())
+        return -1;
 
     if (!QRegExp("^[a-zA-Z0-9.%_-]+$").exactMatch(docId))
-        return -1;
+        return setError(QString("Invalid docID %1").arg(docId)) ? -1 : -1;
     QVariant oldDoc = QVariant();//getDoc(docId, true);
     if (oldDoc.isValid() /*&& oldDoc.has_conflicts*/)
-        return -1; /* Error: conflicts */
+        return setError(QString("Conflicts in %1").arg(docId)) ? -1 : -1; /* Error: conflicts */
 
     int newRev = increaseVectorClockRev(7/*newDoc.rev*/);
     QSqlQuery query(m_db.exec());
@@ -159,11 +169,11 @@ Database::putDoc(const QString& docId, QVariant newDoc)
         query.bindValue(":docRev", newRev);
         query.bindValue(":docJson", QJsonDocument::fromVariant(newDoc).toJson());
         if (!query.exec())
-            qDebug() << "u1db: Failed to put/ update document" << docId << ":" << query.lastError() << "\n" << query.lastQuery();
+            return setError(QString("Failed to put/ update document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
         query.prepare("DELETE FROM document_fields WHERE doc_id = :docId");
         query.bindValue(":docId", docId);
         if (!query.exec())
-            qDebug() << "u1db: Failed to delete document field" << docId << ":" << query.lastError() << "\n" << query.lastQuery();
+            return setError(QString("Failed to delete document field %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
     }
     else
     {
@@ -172,7 +182,7 @@ Database::putDoc(const QString& docId, QVariant newDoc)
         query.bindValue(":docRev", newRev);
         query.bindValue(":docJson", QJsonDocument::fromVariant(newDoc).toJson());
         if (!query.exec())
-            qDebug() << "u1db: Failed to put document" << docId << ":" << query.lastError() << "\n" << query.lastQuery();
+            return setError(QString("Failed to put document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
     }
     return newRev;
 }
@@ -197,8 +207,7 @@ Database::listDocs()
         }
         return list;
     }
-    qDebug() << "u1db: Failed to list documents:" << query.lastError() << "\n" << query.lastQuery();
-    return QList<QVariant>();
+    return setError(QString("Failed to list documents: %1\n%2").arg(query.lastError().text()).arg(query.lastQuery())) ? QList<QVariant>() : QList<QVariant>();
 }
 
 void
