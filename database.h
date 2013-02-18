@@ -51,7 +51,7 @@ private:
 
     QString getReplicaUid();
     bool isInitialized();
-    void initializeIfNeeded();
+    void initializeIfNeeded(const QString& path=":memory:");
 };
 
 } // namespace U1dbDatabase

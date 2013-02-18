@@ -29,10 +29,10 @@ TestCase {
         myDatabase.path = myPath
         spyPathChanged.wait()
         compare(myDatabase.path, myPath)
-        var docId = myDatabase.putDoc("hijklmn", {"foo": "bar"})
-        console.log("putDoc: " + docId)
-        console.log("getDoc(0): " + myDatabase.getDoc(docId, false))
-        console.log("getDoc(1): " + myDatabase.getDoc(docId, true))
+        var docRev = myDatabase.putDoc("hijklmn", {"foo": "bar"})
+        console.log("putDoc: " + docRev)
+        console.log("getDoc(0): " + myDatabase.getDoc("hijklmn", false))
+        console.log("getDoc(1): " + myDatabase.getDoc("hijklmn", true))
         console.log("listDocs: " + myDatabase.listDocs())
     }
 
@@ -71,8 +71,8 @@ TestCase {
 
     U1db.Query {
         id: secondQuery
-        database: u1db
-        index: otherIndex
+        database: myDatabase
+        index: myIndex
         range: [['a', 'b'], ['*']]
     }
 

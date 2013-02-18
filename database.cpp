@@ -52,19 +52,20 @@ Database::isInitialized()
 }
 
 void
-Database::initializeIfNeeded()
+Database::initializeIfNeeded(const QString& path)
 {
-    if (m_db.isValid())
+    if (m_db.isOpen())
         return;
 
-    m_db = QSqlDatabase::addDatabase("QSQLITE");
+    if (!m_db.isValid())
+        m_db = QSqlDatabase::addDatabase("QSQLITE");
     // QSqlDatabase will print diagnostics, just bail out
     if (!m_db.isValid())
         return;
-    m_db.setDatabaseName(":memory:");
+    m_db.setDatabaseName(path);
     if (!m_db.open())
     {
-        qDebug() << "u1db: Failed to open" << m_db.databaseName() << ":" << m_db.lastError();
+        qDebug() << "u1db: Failed to open" << path << ":" << m_db.lastError();
         return;
     }
     if (!isInitialized())
@@ -120,11 +121,11 @@ Database::getDoc(const QString& docId, bool checkConflicts)
             "document.doc_rev, document.content");
     else
         query.prepare("SELECT doc_rev, content, 0 FROM document WHERE doc_id = :docId");
-    query.bindValue("docId", docId);
+    query.bindValue(":docId", docId);
     if (query.exec())
     {
         if (query.next())
-            return query.value("doc_rev");
+            return query.value("content");
         qDebug() << "u1db: Failed to get document" << docId << ": No document";
         return QVariant();
     }
@@ -144,7 +145,7 @@ Database::putDoc(const QString& docId, QVariant newDoc)
     initializeIfNeeded();
 
     // FIXME verify Id ^[a-zA-Z0-9.%_-]+$
-    QVariant oldDoc = getDoc(docId, true);
+    QVariant oldDoc = QVariant();//getDoc(docId, true);
     if (oldDoc.isValid() /*&& oldDoc.has_conflicts*/)
         return -1; /* Error: conflicts */
 
@@ -153,20 +154,24 @@ Database::putDoc(const QString& docId, QVariant newDoc)
     if (oldDoc.isValid())
     {
         query.prepare("UPDATE document SET doc_rev=:docRev, content=:docJson WHERE doc_id = :docId");
-        query.bindValue("docId", docId);
-        query.bindValue("docRev", newRev);
-        query.bindValue("docJson", QJsonDocument::fromVariant(newDoc).toJson());
-        query.exec();
+        query.bindValue(":docId", docId);
+        query.bindValue(":docRev", newRev);
+        query.bindValue(":docJson", QJsonDocument::fromVariant(newDoc).toJson());
+        if (!query.exec())
+            qDebug() << "u1db: Failed to put/ update document" << docId << ":" << query.lastError() << "\n" << query.lastQuery();
         query.prepare("DELETE FROM document_fields WHERE doc_id = :docId");
-        query.bindValue("docId", docId);
+        query.bindValue(":docId", docId);
+        if (!query.exec())
+            qDebug() << "u1db: Failed to delete document field" << docId << ":" << query.lastError() << "\n" << query.lastQuery();
     }
     else
     {
         query.prepare("INSERT INTO document (doc_id, doc_rev, content) VALUES (:docId, :docRev, :docJson)");
-        query.bindValue("docId", docId);
-        query.bindValue("docRev", newRev);
-        query.bindValue("docJson", QJsonDocument::fromVariant(newDoc).toJson());
-        query.exec();
+        query.bindValue(":docId", docId);
+        query.bindValue(":docRev", newRev);
+        query.bindValue(":docJson", QJsonDocument::fromVariant(newDoc).toJson());
+        if (!query.exec())
+            qDebug() << "u1db: Failed to put document" << docId << ":" << query.lastError() << "\n" << query.lastQuery();
     }
     return newRev;
 }
@@ -186,7 +191,7 @@ Database::listDocs()
         QList<QVariant> list;
         while (query.next())
         {
-            QVariant newDoc(query.value("document.doc_rev"));
+            QVariant newDoc(query.value("content"));
             list.append(newDoc);
         }
         return list;
@@ -201,11 +206,12 @@ Database::setPath(const QString& path)
     if (m_path == path)
         return;
 
+    m_db.close();
+    // TODO: relative path
+    initializeIfNeeded(path);
+
     m_path = path;
     Q_EMIT pathChanged(path);
-
-    initializeIfNeeded();
-    m_db.setDatabaseName(path); // TODO: relative path
 }
 
 QString
