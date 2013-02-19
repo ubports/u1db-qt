@@ -29,18 +29,30 @@ TestCase {
         myDatabase.path = myPath
         spyPathChanged.wait()
         compare(myDatabase.path, myPath)
-        myDatabase.putDoc("ははは", {"la": "le"})
-        var docRev = myDatabase.putDoc("hijklmn", {"foo": "bar"})
-        console.log("putDoc: " + docRev)
-        console.log("getDoc(0): " + myDatabase.getDoc("hijklmn", false))
-        console.log("getDoc(1): " + myDatabase.getDoc("hijklmn", true))
+        compare(myDatabase.putDoc({"spam": "eggs"}) > -1, true)
+        compare(myDatabase.putDoc({"foo": "bar"}, "hijklmn") > -1, true)
+        compare(myDatabase.getDoc("hijklmn", false), '{\n    "foo": "bar"\n}\n')
+        compare(myDatabase.getDoc("hijklmn", true), '{\n    "foo": "bar"\n}\n')
         console.log("listDocs: " + myDatabase.listDocs())
+        console.log(firstQuery.query)
+    }
+
+    function test_2_databaseError () {
+        myDatabase.putDoc({"": ""}, "日本語")
+        spyErrorChanged.wait()
+        compare(myDatabase.error.indexOf("Invalid docID") > -1, true)
     }
 
     SignalSpy {
         id: spyPathChanged
         target: myDatabase
         signalName: "pathChanged"
+    }
+
+    SignalSpy {
+        id: spyErrorChanged
+        target: myDatabase
+        signalName: "errorChanged"
     }
 
     U1db.Database {

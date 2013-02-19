@@ -118,7 +118,7 @@ Database::Database(QObject *parent) :
 }
 
 QVariant
-Database::getDoc(const QString& docId, bool checkConflicts)
+Database::getDoc(const QString& docId, bool checkConflicts, bool fallbackToEmpty)
 {
     if (!initializeIfNeeded())
         return QVariant();
@@ -137,6 +137,8 @@ Database::getDoc(const QString& docId, bool checkConflicts)
     {
         if (query.next())
             return query.value("content");
+        if (fallbackToEmpty)
+            return QVariant();
         return setError(QString("Failed to get document %1: No document").arg(docId)) ? QVariant() : QVariant();
     }
     return setError(QString("Failed to get document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? QVariant() : QVariant();
@@ -149,16 +151,14 @@ increaseVectorClockRev(int oldRev)
 }
 
 int
-Database::putDoc(const QString& docId, QVariant newDoc)
+Database::putDoc(QVariant newDoc, const QString& docId)
 {
     if (!initializeIfNeeded())
         return -1;
 
-    if (!QRegExp("^[a-zA-Z0-9.%_-]+$").exactMatch(docId))
-        return setError(QString("Invalid docID %1").arg(docId)) ? -1 : -1;
-    QVariant oldDoc = QVariant();//getDoc(docId, true);
-    if (oldDoc.isValid() /*&& oldDoc.has_conflicts*/)
-        return setError(QString("Conflicts in %1").arg(docId)) ? -1 : -1; /* Error: conflicts */
+    QVariant oldDoc = getDoc(docId, true, true);
+    /* TODO: if (oldDoc.isValid() && oldDoc.has_conflicts)
+        return setError(QString("Conflicts in %1").arg(docId)) ? -1 : -1; */
 
     int newRev = increaseVectorClockRev(7/*newDoc.rev*/);
     QSqlQuery query(m_db.exec());
@@ -177,8 +177,14 @@ Database::putDoc(const QString& docId, QVariant newDoc)
     }
     else
     {
+        QString newDocId(docId);
+        if (newDocId.isEmpty())
+            newDocId = QString("D-%1").arg(QUuid::createUuid().toString().mid(1).replace("}",""));
+        if (!QRegExp("^[a-zA-Z0-9.%_-]+$").exactMatch(newDocId))
+            return setError(QString("Invalid docID %1").arg(newDocId)) ? -1 : -1;
+
         query.prepare("INSERT INTO document (doc_id, doc_rev, content) VALUES (:docId, :docRev, :docJson)");
-        query.bindValue(":docId", docId);
+        query.bindValue(":docId", newDocId);
         query.bindValue(":docRev", newRev);
         query.bindValue(":docJson", QJsonDocument::fromVariant(newDoc).toJson());
         if (!query.exec())

@@ -40,8 +40,8 @@ public:
 
     QString getPath();
     void setPath(const QString& path);
-    Q_INVOKABLE QVariant getDoc(const QString& docId, bool checkConflicts);
-    Q_INVOKABLE int putDoc(const QString& docID, QVariant newDoc);
+    Q_INVOKABLE QVariant getDoc(const QString& docId, bool checkConflicts, bool fallbackToEmpty=false);
+    Q_INVOKABLE int putDoc(QVariant newDoc, const QString& docID=QString());
     Q_INVOKABLE QList<QVariant> listDocs();
     Q_INVOKABLE QString lastError();
 Q_SIGNALS:
