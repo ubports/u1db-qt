@@ -21,39 +21,8 @@ import QtQuick 2.0
 import QtTest 1.0
 import U1db 1.0 as U1db
 
-TestCase {
-    name: "U1dbDatabase"
-
-    function test_1_databasePopulated () {
-        var myPath = "/tmp/u1db-qt.db"
-        myDatabase.path = myPath
-        spyPathChanged.wait()
-        compare(myDatabase.path, myPath)
-        compare(myDatabase.putDoc({"spam": "eggs"}) > -1, true)
-        compare(myDatabase.putDoc({"foo": "bar"}, "hijklmn") > -1, true)
-        compare(myDatabase.getDoc("hijklmn", false), '{\n    "foo": "bar"\n}\n')
-        compare(myDatabase.getDoc("hijklmn", true), '{\n    "foo": "bar"\n}\n')
-        console.log("listDocs: " + myDatabase.listDocs())
-        console.log(firstQuery.query)
-    }
-
-    function test_2_databaseError () {
-        myDatabase.putDoc({"": ""}, "日本語")
-        spyErrorChanged.wait()
-        compare(myDatabase.error.indexOf("Invalid docID") > -1, true)
-    }
-
-    SignalSpy {
-        id: spyPathChanged
-        target: myDatabase
-        signalName: "pathChanged"
-    }
-
-    SignalSpy {
-        id: spyErrorChanged
-        target: myDatabase
-        signalName: "errorChanged"
-    }
+Item {
+    width: 200; height: 200
 
     U1db.Database {
         id: myDatabase
@@ -63,7 +32,7 @@ TestCase {
     U1db.Document {
         id: myDocument
         database: myDatabase
-        docId: 'my-document-id'
+        docId: 'qwertzui'
         create: true
         defaults: { "eggs": "spam" }
     }
@@ -89,13 +58,66 @@ TestCase {
         range: [['a', 'b'], ['*']]
     }
 
-    /*
     ListView {
         id: myList
-        model: myDocument
+        model: myDatabase
+        width: 200; height: 200
+        Component.onCompleted:
+            console.info("myList Component.loaded " + myDatabase.path + " " + myDatabase.listDocs())
         delegate: Text {
-            text: eggs
+            x: 66; y: 77
+            text: console.info("myDelegate " + this)
         }
-    */
-}
+    }
+
+TestCase {
+    name: "U1dbDatabase"
+    when: windowShown
+
+    function test_1_databasePopulated () {
+        spyListCompleted.wait()
+
+        var myPath = "/tmp/u1db-qt.db"
+        myDatabase.path = myPath
+        spyPathChanged.wait()
+        compare(myDatabase.path, myPath)
+        compare(myDatabase.putDoc({"spam": "eggs"}) > -1, true)
+        compare(myDatabase.putDoc({"foo": "bar"}, "hijklmn") > -1, true)
+        compare(myDatabase.getDoc("hijklmn", false), '{\n    "foo": "bar"\n}\n')
+        compare(myDatabase.getDoc("hijklmn", true), '{\n    "foo": "bar"\n}\n')
+        console.log("listDocs: " + myDatabase.listDocs())
+        console.log(firstQuery.query)
+    }
+
+    function test_2_databaseError () {
+        myDatabase.putDoc({"": ""}, "日本語")
+        spyErrorChanged.wait()
+        compare(myDatabase.error.indexOf("Invalid docID") > -1, true)
+    }
+
+    function test_3_documentContents () {
+        myDatabase.putDoc({"content": {"notetext": "Lorem ipsum"}}, "qwertzui")
+        console.info(myDocument.docId)
+        console.info(myDocument.content)
+    }
+
+    SignalSpy {
+        id: spyPathChanged
+        target: myDatabase
+        signalName: "pathChanged"
+    }
+
+    SignalSpy {
+        id: spyErrorChanged
+        target: myDatabase
+        signalName: "errorChanged"
+    }
+
+    SignalSpy {
+        id: spyListCompleted
+        target: myDatabase.Component
+        signalName: "completed"
+    }
+
+} }
 

@@ -83,7 +83,10 @@ Database::initializeIfNeeded(const QString& path)
         m_db.exec("BEGIN EXCLUSIVE");
         if (!isInitialized())
         {
-            QFile file("../dbschema.sql"); // FIXME: qrc
+            // QFile file("qrc:///dbschema.sql");
+            QFile file("../dbschema.sql");
+            if (!file.exists ())
+                file.setFileName("./dbschema.sql");
             if (file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
                 while (!file.atEnd())
@@ -112,9 +115,31 @@ Database::initializeIfNeeded(const QString& path)
 }
 
 Database::Database(QObject *parent) :
-    QObject(parent), m_path("")
+    QAbstractListModel(parent), m_path("")
 {
     initializeIfNeeded();
+}
+
+QVariant
+Database::data(const QModelIndex & index, int role) const
+{
+    qDebug() << "::data";
+    return QVariant();
+}
+
+int
+Database::rowCount(const QModelIndex & parent) const
+{
+    qDebug() << "::rowCount";
+    if (!m_db.isOpen())
+        return -1;
+
+    QSqlQuery query(m_db.exec());
+    query.prepare("SELECT COUNT(*) AS count FROM document");
+    if (!(query.exec() && query.next()))
+        return -1;
+    qDebug() << "rowCount" << query.value("count").toInt();
+    return query.value("count").toInt();
 }
 
 QVariant

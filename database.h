@@ -23,6 +23,7 @@
 #include <QtCore/QObject>
 #include <QSqlDatabase>
 #include <QVariant>
+#include <QAbstractListModel>
 
 #include "global.h"
 
@@ -30,13 +31,17 @@ QT_BEGIN_NAMESPACE
 
 namespace U1dbDatabase {
 
-class Q_DECL_EXPORT Database : public QObject {
+class Q_DECL_EXPORT Database : public QAbstractListModel {
     Q_OBJECT
     Q_PROPERTY(QString path READ getPath WRITE setPath NOTIFY pathChanged)
     Q_PROPERTY(QString error READ lastError NOTIFY errorChanged)
 public:
     Database(QObject* parent = 0);
     ~Database() { }
+
+    // QAbstractListModel
+    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    int rowCount(const QModelIndex & parent = QModelIndex()) const;
 
     QString getPath();
     void setPath(const QString& path);
