@@ -27,14 +27,12 @@
 #include "database.h"
 #include "index.h"
 
-QT_BEGIN_NAMESPACE
-
-namespace U1dbDatabase {
+QT_BEGIN_NAMESPACE_U1DB
 
 class Q_DECL_EXPORT Query : public QObject {
     Q_OBJECT
-    Q_PROPERTY(Database* database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
-    Q_PROPERTY(Index* index READ getIndex WRITE setIndex NOTIFY indexChanged)
+    Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
+    Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Index*) index READ getIndex WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(QVariant query READ getQuery WRITE setQuery NOTIFY queryChanged)
     Q_PROPERTY(QVariant range READ getRange WRITE setRange NOTIFY rangeChanged)
 public:
@@ -62,9 +60,7 @@ private:
     QVariant m_range;
 };
 
-} // namespace U1dbDatabase
-
-QT_END_NAMESPACE
+QT_END_NAMESPACE_U1DB
 
 #endif // U1DB_QUERY_H
 

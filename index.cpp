@@ -28,9 +28,7 @@
 #include "index.h"
 #include "private.h"
 
-QT_BEGIN_NAMESPACE
-
-namespace U1dbDatabase {
+QT_BEGIN_NAMESPACE_U1DB
 
 Index::Index(QObject *parent) :
     QObject(parent), m_database(0)
@@ -85,9 +83,7 @@ Index::setExpression(QVariant expression)
     Q_EMIT expressionChanged(expression);
 }
 
-} // namespace U1dbDatabase
-
-QT_END_NAMESPACE
+QT_END_NAMESPACE_U1DB
 
 #include "moc_index.cpp"
 

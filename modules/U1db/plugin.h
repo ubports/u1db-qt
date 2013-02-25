@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QTDEEPLUGIN_H
-#define QTDEEPLUGIN_H
+#ifndef U1DB_PLUGIN_H
+#define U1DB_PLUGIN_H
 
 #include <QQmlExtensionPlugin>
 
@@ -31,4 +31,4 @@ public:
 };
 
 
-#endif // QTDEEPLUGIN_H
+#endif // U1DB_PLUGIN_H

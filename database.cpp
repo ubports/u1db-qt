@@ -28,9 +28,7 @@
 #include "database.h"
 #include "private.h"
 
-QT_BEGIN_NAMESPACE
-
-namespace U1dbDatabase {
+QT_BEGIN_NAMESPACE_U1DB
 
 QString
 Database::getReplicaUid()
@@ -261,9 +259,7 @@ Database::getPath()
     return m_path;
 }
 
-} // namespace U1dbDatabase
-
-QT_END_NAMESPACE
+QT_END_NAMESPACE_U1DB
 
 #include "moc_database.cpp"
 

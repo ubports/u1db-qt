@@ -28,9 +28,7 @@
 #include "document.h"
 #include "private.h"
 
-QT_BEGIN_NAMESPACE
-
-namespace U1dbDatabase {
+QT_BEGIN_NAMESPACE_U1DB
 
 Document::Document(QObject *parent) :
     QObject(parent), m_database(0), m_create(false)
@@ -103,9 +101,7 @@ Document::setDefaults(QVariant defaults)
     Q_EMIT defaultsChanged(defaults);
 }
 
-} // namespace U1dbDatabase
-
-QT_END_NAMESPACE
+QT_END_NAMESPACE_U1DB
 
 #include "moc_document.cpp"
 

@@ -31,15 +31,15 @@
 #endif
 
 #if defined(QT_NAMESPACE)
-#  define QT_BEGIN_NAMESPACE_U1DB namespace QT_NAMESPACE { namespace U1dbDatabase {
+#  define QT_BEGIN_NAMESPACE_U1DB namespace QT_NAMESPACE { namespace U1db {
 #  define QT_END_NAMESPACE_U1DB } }
-#  define QT_USE_NAMESPACE_U1DB using namespace QT_NAMESPACE::U1dbDatabase;
-#  define QT_PREPEND_NAMESPACE_U1DB(name) QT_NAMESPACE::U1DbDatabase::name
+#  define QT_USE_NAMESPACE_U1DB using namespace QT_NAMESPACE::U1db;
+#  define QT_PREPEND_NAMESPACE_U1DB(name) QT_NAMESPACE::U1db::name
 #else
-#  define QT_BEGIN_NAMESPACE_U1DB namespace U1DbDatabase {
+#  define QT_BEGIN_NAMESPACE_U1DB namespace U1db {
 #  define QT_END_NAMESPACE_U1DB }
-#  define QT_USE_NAMESPACE_U1DB using namespace U1dbDatabase;
-#  define QT_PREPEND_NAMESPACE_U1DB(name) U1dbDatabase::name
+#  define QT_USE_NAMESPACE_U1DB using namespace U1db;
+#  define QT_PREPEND_NAMESPACE_U1DB(name) U1db::name
 #endif
 
 // a workaround for moc - if there is a header file that doesn't use u1db

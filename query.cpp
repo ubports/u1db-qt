@@ -28,9 +28,7 @@
 #include "query.h"
 #include "private.h"
 
-QT_BEGIN_NAMESPACE
-
-namespace U1dbDatabase {
+QT_BEGIN_NAMESPACE_U1DB
 
 Query::Query(QObject *parent) :
     QObject(parent), m_database(0), m_index(0)
@@ -107,9 +105,7 @@ Query::setRange(QVariant range)
     Q_EMIT rangeChanged(range);
 }
 
-} // namespace U1dbDatabase
-
-QT_END_NAMESPACE
+QT_END_NAMESPACE_U1DB
 
 #include "moc_query.cpp"
 

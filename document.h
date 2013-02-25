@@ -26,13 +26,11 @@
 
 #include "database.h"
 
-QT_BEGIN_NAMESPACE
-
-namespace U1dbDatabase {
+QT_BEGIN_NAMESPACE_U1DB
 
 class Q_DECL_EXPORT Document : public QObject {
     Q_OBJECT
-    Q_PROPERTY(Database* database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
+    Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
     Q_PROPERTY(QString docId READ getDocId WRITE setDocId NOTIFY docIdChanged)
     Q_PROPERTY(bool create READ getCreate WRITE setCreate NOTIFY createChanged)
     Q_PROPERTY(QVariant defaults READ getDefaults WRITE setDefaults NOTIFY defaultsChanged)
@@ -61,9 +59,7 @@ private:
     QVariant m_defaults;
 };
 
-} // namespace U1dbDatabase
-
-QT_END_NAMESPACE
+QT_END_NAMESPACE_U1DB
 
 #endif // U1DB_DOCUMENT_H
 

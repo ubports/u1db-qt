@@ -20,16 +20,14 @@
 #ifndef U1DB_DATABASE_H
 #define U1DB_DATABASE_H
 
+#include "global.h"
+
 #include <QtCore/QObject>
 #include <QSqlDatabase>
 #include <QVariant>
 #include <QAbstractListModel>
 
-#include "global.h"
-
-QT_BEGIN_NAMESPACE
-
-namespace U1dbDatabase {
+QT_BEGIN_NAMESPACE_U1DB
 
 class Q_DECL_EXPORT Database : public QAbstractListModel {
     Q_OBJECT
@@ -64,9 +62,7 @@ private:
     bool setError(const QString& error);
 };
 
-} // namespace U1dbDatabase
-
-QT_END_NAMESPACE
+QT_END_NAMESPACE_U1DB
 
 #endif // U1DB_DATABASE_H
 
