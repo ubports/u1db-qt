@@ -48,6 +48,8 @@ public:
     Q_INVOKABLE int putDoc(QVariant newDoc, const QString& docID=QString());
     Q_INVOKABLE QList<QVariant> listDocs();
     Q_INVOKABLE QString lastError();
+    Q_INVOKABLE int createIndexList(QString index_name, QStringList expressions);
+    Q_INVOKABLE int createIndex(QString index_name, QStringList expressions);
 Q_SIGNALS:
     void pathChanged(const QString& path);
     void errorChanged(const QString& error);
