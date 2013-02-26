@@ -294,119 +294,72 @@ Database::getPath()
     return m_path;
 }
 
-/* int Database::putIndexList(QString index_name, QStringList expressions) 
-
-corresponds to the u1db.c function:
-
+/*
 int u1db_create_index_list(u1database *db, const char *index_name, int n_expressions, const char **expressions) 
-
-It is currently marked INCOMPLETE */
-
-
-/* Tests to create for putIndexList: does it return a value, what is the value it returns, is the value returned an acceptable value, what is the expected result for an index_name that we know is unique as well as one we know is not unique, is the database NULL or not, is the expressions list empty or not, is the index_name empty or not
+Tests to create for putIndex:
+does it return a value, what is the value it returns, is the value returned an acceptable value, what is the expected result for an index_name that we know is unique as well as one we know is not unique, is the database NULL or not, is the expressions list empty or not, is the index_name empty or not
 */
 
-int Database::putIndexList(QString index_name, QStringList expressions)
+QString
+Database::putIndex(const QString& index_name, QStringList expressions)
 {
-    enum { U1DB_OK, U1DB_INVALID_PARAMETER, U1DB_DUPLICATE_INDEX_NAME, SQLITE_OK }; // These are here temporarily
-    int status = U1DB_OK; 
-    int i = 0;
+    if (!initializeIfNeeded())
+        return QString("Database isn't ready");
 
-    if (m_db.isOpen() == false  || index_name.isEmpty() == false || expressions.isEmpty() == false) {
-        return U1DB_INVALID_PARAMETER; // is this really the correct return value for all three of the conditions above?
-    }
-    
+    if (index_name.isEmpty() || expressions.isEmpty())
+        return QString("Either name or expressions is empty");
+
+    int i = 0;
     for (i = 0; i < expressions.count(); ++i) {
-        if (expressions[i].isEmpty() == true || expressions[i].isNull() == true) {
-            return U1DB_INVALID_PARAMETER;
+        if (expressions[i].isEmpty() || expressions[i].isNull()) {
+            return QString("Empty expression in list");
         }
     }
-       
-    //status = u1db__find_unique_expressions(db, n_expressions, expressions, &n_unique, &unique_expressions); // needs to be modified
 
+    /*
+    status = u1db__find_unique_expressions(db, n_expressions, expressions, &n_unique, &unique_expressions); // needs to be modified
     if (status != U1DB_OK) {
         return status;
     }
-        
-    //QString statement = "SELECT field FROM index_definitions WHERE name = ".index_name." ORDER BY offset DESC";
-    QSqlQuery query; 
-    query.prepare("SELECT field FROM index_definitions WHERE name = ? ORDER BY offset DESC");
-    query.addBindValue(index_name);
-    
-    QStringList results;
-    
-    //QSqlQuery query(statement);
-    
-    // Add a check to ensure our query was OK -- what return value do we need here if there was an error rather than simply an empty set of results?
-    
-    while (query.next()) {    	
-         results.append(query.value(0).toString());  
+    */
+
+    QSqlQuery query(m_db.exec());
+    query.prepare("SELECT field FROM index_definitions WHERE name = :indexName ORDER BY offset DESC");
+    query.bindValue(":indexName", index_name);
+    if (!query.exec())
+    {
+        QString error(QString("Failed to lookup index definition: %1\n%2").arg(m_db.lastError().text()).arg(query.lastQuery()));
+        setError(error);
+        return error;
     }
-    
+
+    QStringList results;
+    //QSqlQuery query(statement);
+    // Add a check to ensure our query was OK -- what return value do we need here if there was an error rather than simply an empty set of results?
+    while (query.next()) {
+         results.append(query.value(0).toString());
+    }
     for (i = 0; i < expressions.count(); i++) {
-        if (results.contains(expressions.at(i))==true) {
-            return U1DB_DUPLICATE_INDEX_NAME;
+        if (results.contains(expressions.at(i))) {
+            return QString("Duplicate index name");
         }
-    }     
-        
+    }
     if (results.count() > 0) {
-        status = SQLITE_OK;
-        return status;
+        return QString();
     }
     else{
-    	
-    
-    // Should probably use a prepared statement here ... or some alternative
-    
     for (i = 0; i < expressions.count(); ++i) {
-    	   							
-     			query.prepare("INSERT INTO index_definitions VALUES (?, ?, ?)");
-     			query.addBindValue(index_name);
-     			query.addBindValue(i);
-     			query.addBindValue(expressions.at(i));
-     			
-     			if(query.exec()==false){
-     				// Actually in the orginal C function the check was to see if the return value was SQLITE_CONSTRAINT and not only whether the exec generally failed
-     				status = U1DB_DUPLICATE_INDEX_NAME;
-     				// Is it safe to assume that all insert statements in this loop need to be rolled back?
-     				return status;
-     			}
-     			
+        query.prepare("INSERT INTO index_definitions VALUES (?, ?, ?)");
+        query.addBindValue(index_name);
+        query.addBindValue(i);
+        query.addBindValue(expressions.at(i));
+        if(!query.exec())
+            return QString("Duplicate index name (2)");
+        qDebug() << "did insert index" << index_name << expressions;
     }
-    
-    //status = u1db__index_all_docs(db, n_unique, unique_expressions); // Needs to be modified
-    
-    return status;
-    
+    //status = u1db__index_all_docs(db, n_unique, unique_expressions);
+    return QString();
     }
-    
-    
-    
-}
-
-
-/* int Database::putIndex(QString index_name, QStringList expressions)
-
-corresponds to the u1db.c function:
-
-int u1db_create_index(u1database *db, const char *index_name, int n_expressions, ...) 
-
-It is being marked as INCOMPLETE */
-
-int Database::putIndex(QString index_name, QStringList expressions)
-{
-   enum { U1DB_OK, U1DB_NOMEM };
-
-   int status = U1DB_OK;
-        
-   if(expressions.isEmpty() == true) {
-	status = U1DB_NOMEM;	
-   }
-   else
-   {    		
-     status = putIndexList(index_name, expressions);
-   }
-     return status;
 }
 
 QT_END_NAMESPACE_U1DB

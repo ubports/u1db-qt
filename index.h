@@ -22,7 +22,7 @@
 
 #include <QtCore/QObject>
 #include <QSqlDatabase>
-#include <QVariant>
+#include <QStringList>
 
 #include "database.h"
 
@@ -32,7 +32,7 @@ class Q_DECL_EXPORT Index : public QObject {
     Q_OBJECT
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QVariant expression READ getExpression WRITE setExpression NOTIFY expressionChanged)
+    Q_PROPERTY(QStringList expression READ getExpression WRITE setExpression NOTIFY expressionChanged)
 public:
     Index(QObject* parent = 0);
     ~Index() { }
@@ -41,8 +41,8 @@ public:
     void setDatabase(Database* database);
     QString getName();
     void setName(const QString& name);
-    QVariant getExpression();
-    void setExpression(QVariant expression);
+    QStringList getExpression();
+    void setExpression(QStringList expression);
 Q_SIGNALS:
     void databaseChanged(Database* database);
     void nameChanged(const QString& name);
@@ -51,7 +51,7 @@ private:
     Q_DISABLE_COPY(Index)
     Database* m_database;
     QString m_name;
-    QVariant m_expression;
+    QStringList m_expression;
 };
 
 QT_END_NAMESPACE_U1DB

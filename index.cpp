@@ -63,21 +63,27 @@ Index::setName(const QString& name)
     if (m_name == name)
         return;
 
+    if (m_database)
+        m_database->putIndex(name, m_expression);
+
     m_name = name;
     Q_EMIT nameChanged(name);
 }
 
-QVariant
+QStringList
 Index::getExpression()
 {
     return m_expression;
 }
 
 void
-Index::setExpression(QVariant expression)
+Index::setExpression(QStringList expression)
 {
     if (m_expression == expression)
         return;
+
+    if (m_database)
+        m_database->putIndex(m_name, expression);
 
     m_expression = expression;
     Q_EMIT expressionChanged(expression);
