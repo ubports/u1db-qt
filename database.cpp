@@ -259,6 +259,96 @@ Database::getPath()
     return m_path;
 }
 
+/* int Database::createIndexList(QString index_name, QStringList expressions) 
+
+corresponds to the u1db.c function:
+
+int u1db_create_index_list(u1database *db, const char *index_name, int n_expressions, const char **expressions) 
+
+It is currently marked INCOMPLETE */
+
+
+/* Tests to create for createIndexList: does it return a value, what is the value it returns, is the value returned an acceptable value, what is the expected result for an index_name that we know is unique as well as one we know is not unique, is the database NULL or not, is the expressions list empty or not, is the index_name empty or not
+*/
+
+int Database::createIndexList(QString index_name, QStringList expressions)
+{
+    int U1DB_OK, U1DB_INVALID_PARAMETER, U1DB_DUPLICATE_INDEX_NAME, SQLITE_OK = 0; // These are here temporarily
+    int status = U1DB_OK; 
+    int i = 0;
+
+    if (m_db.isOpen() == false  || index_name.isEmpty() == false || expressions.isEmpty() == false) {
+        return U1DB_INVALID_PARAMETER; // is this really the correct return value for all three of the conditions above?
+    }
+    
+    for (i = 0; i < expressions.count(); ++i) {
+        if (expressions[i].isEmpty() == true || expressions[i].isNull() == true) {
+            return U1DB_INVALID_PARAMETER;
+        }
+    }
+       
+    //status = u1db__find_unique_expressions(db, n_expressions, expressions, &n_unique, &unique_expressions); // needs to be modified
+
+    if (status != U1DB_OK) {
+        return status;
+    }
+        
+    //QString statement = "SELECT field FROM index_definitions WHERE name = ".index_name." ORDER BY offset DESC";
+    QSqlQuery query; 
+    query.prepare("SELECT field FROM index_definitions WHERE name = ? ORDER BY offset DESC");
+    query.addBindValue(index_name);
+    
+    QStringList results;
+    
+    //QSqlQuery query(statement);
+    
+    // Add a check to ensure our query was OK -- what return value do we need here if there was an error rather than simply an empty set of results?
+    
+    while (query.next()) {    	
+         results.append(query.value(0).toString());  
+    }
+    
+    for (i = 0; i < expressions.count(); i++) {
+        if (results.contains(expressions.at(i))==true) {
+            return U1DB_DUPLICATE_INDEX_NAME;
+        }
+    }     
+        
+    if (results.count() > 0) {
+        status = SQLITE_OK;
+        return status;
+    }
+    else{
+    	
+    
+    // Should probably use a prepared statement here ... or some alternative
+    
+    for (i = 0; i < expressions.count(); ++i) {
+    	   							
+     			query.prepare("INSERT INTO index_definitions VALUES (?, ?, ?)");
+     			query.addBindValue(index_name);
+     			query.addBindValue(i);
+     			query.addBindValue(expressions.at(i));
+     			
+     			if(query.exec()==false){
+     				// Actually in the orginal C function the check was to see if the return value was SQLITE_CONSTRAINT and not only whether the exec generally failed
+     				status = U1DB_DUPLICATE_INDEX_NAME;
+     				// Is it safe to assume that all insert statements in this loop need to be rolled back?
+     				return status;
+     			}
+     			
+    }
+    
+    //status = u1db__index_all_docs(db, n_unique, unique_expressions); // Needs to be modified
+    
+    return status;
+    
+    }
+    
+    
+    
+}
+
 QT_END_NAMESPACE_U1DB
 
 #include "moc_database.cpp"
