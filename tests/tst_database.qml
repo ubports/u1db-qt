@@ -66,7 +66,25 @@ Item {
             console.info("myList Component.loaded " + myDatabase.path + " " + myDatabase.listDocs())
         delegate: Text {
             x: 66; y: 77
-            text: console.info("myDelegate " + this)
+            text: {
+                console.info("myDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents))
+                ""
+            }
+        }
+    }
+
+    ListView {
+        id: otherList
+        model: firstQuery
+        width: 200; height: 200
+        Component.onCompleted:
+            console.info("otherList Component.loaded " + myDatabase.path + " " + myDatabase.listDocs())
+        delegate: Text {
+            x: 66; y: 77
+            text: {
+                console.info("otherDelegate")
+                ""
+            }
         }
     }
 
@@ -76,6 +94,8 @@ TestCase {
 
     function test_1_databasePopulated () {
         spyListCompleted.wait()
+        compare(myDatabase.putDoc({"animals": ["cat", "dog", "hamster"]}) > -1, true)
+        console.log("listDocs: " + myDatabase.listDocs())
 
         var myPath = "/tmp/u1db-qt.db"
         myDatabase.path = myPath
@@ -97,8 +117,6 @@ TestCase {
 
     function test_3_documentContents () {
         myDatabase.putDoc({"content": {"notetext": "Lorem ipsum"}}, "qwertzui")
-        console.info(myDocument.docId)
-        console.info(myDocument.content)
     }
 
     SignalSpy {

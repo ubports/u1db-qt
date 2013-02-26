@@ -39,11 +39,12 @@ public:
 
     // QAbstractListModel
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray>roleNames() const;
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
 
     QString getPath();
     void setPath(const QString& path);
-    Q_INVOKABLE QVariant getDoc(const QString& docId, bool checkConflicts, bool fallbackToEmpty=false);
+    Q_INVOKABLE QVariant getDoc(const QString& docId);
     Q_INVOKABLE int putDoc(QVariant newDoc, const QString& docID=QString());
     Q_INVOKABLE QList<QVariant> listDocs();
     Q_INVOKABLE QString lastError();
@@ -54,11 +55,13 @@ private:
     Q_DISABLE_COPY(Database)
     QString m_path;
     QSqlDatabase m_db;
+    QHash<int, QString> m_hash;
     QString m_error;
 
     QString getReplicaUid();
     bool isInitialized();
     bool initializeIfNeeded(const QString& path=":memory:");
+    QVariant getDocUnchecked(const QString& docId) const;
     bool setError(const QString& error);
 };
 

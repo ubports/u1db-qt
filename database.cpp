@@ -121,14 +121,26 @@ Database::Database(QObject *parent) :
 QVariant
 Database::data(const QModelIndex & index, int role) const
 {
-    qDebug() << "::data";
+    QString docId(m_hash.value(index.row()));
+    if (role == 0) // contents
+        return getDocUnchecked(docId);
+    if (role == 1) // docId
+        return docId;
     return QVariant();
+}
+
+QHash<int, QByteArray>
+Database::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles.insert(0, "contents");
+    roles.insert(1, "docId");
+    return roles;
 }
 
 int
 Database::rowCount(const QModelIndex & parent) const
 {
-    qDebug() << "::rowCount";
     if (!m_db.isOpen())
         return -1;
 
@@ -136,32 +148,44 @@ Database::rowCount(const QModelIndex & parent) const
     query.prepare("SELECT COUNT(*) AS count FROM document");
     if (!(query.exec() && query.next()))
         return -1;
-    qDebug() << "rowCount" << query.value("count").toInt();
     return query.value("count").toInt();
 }
 
 QVariant
-Database::getDoc(const QString& docId, bool checkConflicts, bool fallbackToEmpty)
+Database::getDocUnchecked(const QString& docId) const
+{
+    if (!m_db.isOpen())
+        return QVariant();
+
+    QSqlQuery query(m_db.exec());
+    query.prepare("SELECT doc_rev, content FROM document WHERE doc_id = :docId");
+    query.bindValue(":docId", docId);
+    if (query.exec() && query.next())
+        return query.value("content");
+    return QVariant();
+}
+
+QVariant
+Database::getDoc(const QString& docId)
 {
     if (!initializeIfNeeded())
         return QVariant();
 
     QSqlQuery query(m_db.exec());
-    if (checkConflicts)
-        query.prepare("SELECT document.doc_rev, document.content, "
-            "count(conflicts.doc_rev) FROM document LEFT OUTER JOIN "
-            "conflicts ON conflicts.doc_id = document.doc_id WHERE "
-            "document.doc_id = :docId GROUP BY document.doc_id, "
-            "document.doc_rev, document.content");
-    else
-        query.prepare("SELECT doc_rev, content, 0 FROM document WHERE doc_id = :docId");
+    query.prepare("SELECT document.doc_rev, document.content, "
+        "count(conflicts.doc_rev) AS conflicts FROM document LEFT OUTER JOIN "
+        "conflicts ON conflicts.doc_id = document.doc_id WHERE "
+        "document.doc_id = :docId GROUP BY document.doc_id, "
+        "document.doc_rev, document.content");
     query.bindValue(":docId", docId);
     if (query.exec())
     {
         if (query.next())
+        {
+            if (query.value("conflicts").toInt() > 0)
+                setError(QString("Conflicts in %1").arg(docId));
             return query.value("content");
-        if (fallbackToEmpty)
-            return QVariant();
+        }
         return setError(QString("Failed to get document %1: No document").arg(docId)) ? QVariant() : QVariant();
     }
     return setError(QString("Failed to get document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? QVariant() : QVariant();
@@ -174,14 +198,14 @@ increaseVectorClockRev(int oldRev)
 }
 
 int
-Database::putDoc(QVariant newDoc, const QString& docId)
+Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
 {
     if (!initializeIfNeeded())
         return -1;
 
-    QVariant oldDoc = getDoc(docId, true, true);
-    /* TODO: if (oldDoc.isValid() && oldDoc.has_conflicts)
-        return setError(QString("Conflicts in %1").arg(docId)) ? -1 : -1; */
+    QString docId(newOrEmptyDocId);
+    QVariant oldDoc = docId.isEmpty() ? QVariant() : getDocUnchecked(docId);
+    /* FIXME: Conflicts */
 
     int newRev = increaseVectorClockRev(7/*newDoc.rev*/);
     QSqlQuery query(m_db.exec());
@@ -200,19 +224,24 @@ Database::putDoc(QVariant newDoc, const QString& docId)
     }
     else
     {
-        QString newDocId(docId);
-        if (newDocId.isEmpty())
-            newDocId = QString("D-%1").arg(QUuid::createUuid().toString().mid(1).replace("}",""));
-        if (!QRegExp("^[a-zA-Z0-9.%_-]+$").exactMatch(newDocId))
-            return setError(QString("Invalid docID %1").arg(newDocId)) ? -1 : -1;
+        if (docId.isEmpty())
+            docId = QString("D-%1").arg(QUuid::createUuid().toString().mid(1).replace("}",""));
+        if (!QRegExp("^[a-zA-Z0-9.%_-]+$").exactMatch(docId))
+            return setError(QString("Invalid docID %1").arg(docId)) ? -1 : -1;
 
         query.prepare("INSERT INTO document (doc_id, doc_rev, content) VALUES (:docId, :docRev, :docJson)");
-        query.bindValue(":docId", newDocId);
+        query.bindValue(":docId", docId);
         query.bindValue(":docRev", newRev);
         query.bindValue(":docJson", QJsonDocument::fromVariant(newDoc).toJson());
         if (!query.exec())
             return setError(QString("Failed to put document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
     }
+
+    QModelIndex index(createIndex(rowCount(), 0));
+    m_hash.insert(index.row(), docId);
+    beginInsertRows(index, index.row(), index.column());
+    endInsertRows();
+
     return newRev;
 }
 
@@ -245,9 +274,12 @@ Database::setPath(const QString& path)
     if (m_path == path)
         return;
 
+    beginResetModel();
+    m_hash.clear();
     m_db.close();
     // TODO: relative path
     initializeIfNeeded(path);
+    endResetModel();
 
     m_path = path;
     Q_EMIT pathChanged(path);

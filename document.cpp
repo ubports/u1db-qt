@@ -54,8 +54,6 @@ Document::setDatabase(Database* database)
 QString
 Document::getDocId()
 {
-    qDebug() << "setting test property";
-    setProperty("content", "lala");
     return m_docId;
 }
 
