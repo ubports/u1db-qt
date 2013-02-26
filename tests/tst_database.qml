@@ -37,6 +37,15 @@ Item {
         defaults: { "eggs": "spam" }
     }
 
+    U1db.Document {
+        id: otherDocument
+        database: myDatabase
+        docId: 'shallow'
+        create: true
+        defaults: { "eggs": "spam" }
+    }
+
+
     U1db.Index {
         id: myIndex
         database: myDatabase
@@ -117,6 +126,9 @@ TestCase {
 
     function test_3_documentContents () {
         myDatabase.putDoc({"content": {"notetext": "Lorem ipsum"}}, "qwertzui")
+        myDocument.docId = ''
+        myDocument.docId = 'qwertzui'
+        console.info(myDocument.contents)
     }
 
     function test_4_putIndex () {

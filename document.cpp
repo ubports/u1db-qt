@@ -47,6 +47,9 @@ Document::setDatabase(Database* database)
     if (m_database == database)
         return;
 
+    if (m_database && !m_docId.isEmpty())
+        m_contents = m_database->getDoc(m_docId);
+
     m_database = database;
     Q_EMIT databaseChanged(database);
 }
@@ -62,6 +65,9 @@ Document::setDocId(const QString& docId)
 {
     if (m_docId == docId)
         return;
+
+    if (m_database)
+        m_contents = m_database->getDoc(docId);
 
     m_docId = docId;
     Q_EMIT docIdChanged(docId);
@@ -97,6 +103,22 @@ Document::setDefaults(QVariant defaults)
 
     m_defaults = defaults;
     Q_EMIT defaultsChanged(defaults);
+}
+
+QVariant
+Document::getContents()
+{
+    return m_contents;
+}
+
+void
+Document::setContents(QVariant contents)
+{
+    if (m_contents == contents)
+        return;
+
+    m_contents = contents;
+    Q_EMIT contentsChanged(contents);
 }
 
 QT_END_NAMESPACE_U1DB
