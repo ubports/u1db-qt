@@ -4,7 +4,7 @@ set(OUR_QT_QUICK_LIB ${Qt5Quick_LIBRARIES})
 get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
 # See http://doc-snapshot.qt-project.org/5.0/qtcore/qlibraryinfo.html#LibraryLocation-enum
 # exec_program(${QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_QML" OUTPUT_VARIABLE QT_IMPORTS_DIR)
-exec_program(${QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_IMPORTS" OUTPUT_VARIABLE QT_IMPORTS_DIR)
+exec_program(${QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_QML" OUTPUT_VARIABLE QT_IMPORTS_DIR)
 file(TO_CMAKE_PATH "${QT_IMPORTS_DIR}" QT_IMPORTS_DIR)
 
 set(OUR_QT_QUICK_INCLUDE ${Qt5Quick_INCLUDE_DIRS})
