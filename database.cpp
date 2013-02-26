@@ -184,7 +184,8 @@ Database::getDoc(const QString& docId)
         {
             if (query.value("conflicts").toInt() > 0)
                 setError(QString("Conflicts in %1").arg(docId));
-            return query.value("content");
+            QJsonDocument json(QJsonDocument::fromVariant(query.value("content")));
+            return json.isEmpty() ? query.value("content") : json;
         }
         return setError(QString("Failed to get document %1: No document").arg(docId)) ? QVariant() : QVariant();
     }
@@ -214,7 +215,8 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
         query.prepare("UPDATE document SET doc_rev=:docRev, content=:docJson WHERE doc_id = :docId");
         query.bindValue(":docId", docId);
         query.bindValue(":docRev", newRev);
-        query.bindValue(":docJson", QJsonDocument::fromVariant(newDoc).toJson());
+        QString json(QJsonDocument::fromVariant(newDoc).toJson());
+        query.bindValue(":docJson", json.isEmpty() ? newDoc : json);
         if (!query.exec())
             return setError(QString("Failed to put/ update document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
         query.prepare("DELETE FROM document_fields WHERE doc_id = :docId");
@@ -232,7 +234,8 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
         query.prepare("INSERT INTO document (doc_id, doc_rev, content) VALUES (:docId, :docRev, :docJson)");
         query.bindValue(":docId", docId);
         query.bindValue(":docRev", newRev);
-        query.bindValue(":docJson", QJsonDocument::fromVariant(newDoc).toJson());
+        QString json(QJsonDocument::fromVariant(newDoc).toJson());
+        query.bindValue(":docJson", json.isEmpty() ? newDoc : json);
         if (!query.exec())
             return setError(QString("Failed to put document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
     }
