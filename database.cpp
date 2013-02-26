@@ -294,7 +294,7 @@ Database::getPath()
     return m_path;
 }
 
-/* int Database::createIndexList(QString index_name, QStringList expressions) 
+/* int Database::putIndexList(QString index_name, QStringList expressions) 
 
 corresponds to the u1db.c function:
 
@@ -303,12 +303,12 @@ int u1db_create_index_list(u1database *db, const char *index_name, int n_express
 It is currently marked INCOMPLETE */
 
 
-/* Tests to create for createIndexList: does it return a value, what is the value it returns, is the value returned an acceptable value, what is the expected result for an index_name that we know is unique as well as one we know is not unique, is the database NULL or not, is the expressions list empty or not, is the index_name empty or not
+/* Tests to create for putIndexList: does it return a value, what is the value it returns, is the value returned an acceptable value, what is the expected result for an index_name that we know is unique as well as one we know is not unique, is the database NULL or not, is the expressions list empty or not, is the index_name empty or not
 */
 
-int Database::createIndexList(QString index_name, QStringList expressions)
+int Database::putIndexList(QString index_name, QStringList expressions)
 {
-    int U1DB_OK, U1DB_INVALID_PARAMETER, U1DB_DUPLICATE_INDEX_NAME, SQLITE_OK = 0; // These are here temporarily
+    enum { U1DB_OK, U1DB_INVALID_PARAMETER, U1DB_DUPLICATE_INDEX_NAME, SQLITE_OK }; // These are here temporarily
     int status = U1DB_OK; 
     int i = 0;
 
@@ -385,7 +385,7 @@ int Database::createIndexList(QString index_name, QStringList expressions)
 }
 
 
-/* int Database::createIndex(QString index_name, QStringList expressions)
+/* int Database::putIndex(QString index_name, QStringList expressions)
 
 corresponds to the u1db.c function:
 
@@ -393,10 +393,9 @@ int u1db_create_index(u1database *db, const char *index_name, int n_expressions,
 
 It is being marked as INCOMPLETE */
 
-int Database::createIndex(QString index_name, QStringList expressions)
+int Database::putIndex(QString index_name, QStringList expressions)
 {
-   int U1DB_OK, U1DB_NOMEM;
-   int i;
+   enum { U1DB_OK, U1DB_NOMEM };
 
    int status = U1DB_OK;
         
@@ -405,10 +404,9 @@ int Database::createIndex(QString index_name, QStringList expressions)
    }
    else
    {    		
-     status = createIndexList(index_name, expressions);
-     return status;
+     status = putIndexList(index_name, expressions);
    }
-    
+     return status;
 }
 
 QT_END_NAMESPACE_U1DB

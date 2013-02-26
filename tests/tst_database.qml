@@ -119,6 +119,10 @@ TestCase {
         myDatabase.putDoc({"content": {"notetext": "Lorem ipsum"}}, "qwertzui")
     }
 
+    function test_4_putIndex () {
+        myDatabase.putIndex("by-foo", ["foo", "bool(field)"])
+    }
+
     SignalSpy {
         id: spyPathChanged
         target: myDatabase
