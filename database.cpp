@@ -350,7 +350,7 @@ int Database::createIndexList(QString index_name, QStringList expressions)
 }
 
 
-/* int Database::createIndex(u1database *db, const char *index_name, QStringList expressions)
+/* int Database::createIndex(QString index_name, QStringList expressions)
 
 corresponds to the u1db.c function:
 
