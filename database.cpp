@@ -349,6 +349,33 @@ int Database::createIndexList(QString index_name, QStringList expressions)
     
 }
 
+
+/* int Database::createIndex(u1database *db, const char *index_name, QStringList expressions)
+
+corresponds to the u1db.c function:
+
+int u1db_create_index(u1database *db, const char *index_name, int n_expressions, ...) 
+
+It is being marked as INCOMPLETE */
+
+int Database::createIndex(QString index_name, QStringList expressions)
+{
+   int U1DB_OK, U1DB_NOMEM;
+   int i;
+
+   int status = U1DB_OK;
+        
+   if(expressions.isEmpty() == true) {
+	status = U1DB_NOMEM;	
+   }
+   else
+   {    		
+     status = createIndexList(index_name, expressions);
+     return status;
+   }
+    
+}
+
 QT_END_NAMESPACE_U1DB
 
 #include "moc_database.cpp"
