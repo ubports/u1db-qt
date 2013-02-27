@@ -52,6 +52,7 @@ public:
 Q_SIGNALS:
     void pathChanged(const QString& path);
     void errorChanged(const QString& error);
+    void docChanged(const QString& docId, QVariant content);
 private:
     Q_DISABLE_COPY(Database)
     QString m_path;

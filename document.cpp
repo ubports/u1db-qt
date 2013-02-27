@@ -42,15 +42,40 @@ Document::getDatabase()
 }
 
 void
+Document::onDocChanged(const QString& docId, QVariant content)
+{
+    if (docId == m_docId)
+    {
+        m_contents = m_database->getDoc(m_docId);
+        Q_EMIT contentsChanged(m_contents);
+    }
+}
+
+void
+Document::onPathChanged(const QString& path)
+{
+    if (!m_docId.isEmpty())
+    {
+        m_contents = m_database->getDoc(m_docId);
+        Q_EMIT contentsChanged(m_contents);
+    }
+}
+
+void
 Document::setDatabase(Database* database)
 {
     if (m_database == database)
         return;
 
+    if (m_database)
+        QObject::disconnect(m_database, 0, this, 0);
+
     if (m_database && !m_docId.isEmpty())
         m_contents = m_database->getDoc(m_docId);
 
     m_database = database;
+    QObject::connect(m_database, &Database::pathChanged, this, &Document::onPathChanged);
+    QObject::connect(m_database, &Database::docChanged, this, &Document::onDocChanged);
     Q_EMIT databaseChanged(database);
 }
 
@@ -66,11 +91,14 @@ Document::setDocId(const QString& docId)
     if (m_docId == docId)
         return;
 
-    if (m_database)
-        m_contents = m_database->getDoc(docId);
-
     m_docId = docId;
     Q_EMIT docIdChanged(docId);
+
+    if (m_database)
+    {
+        m_contents = m_database->getDoc(docId);
+        Q_EMIT contentsChanged(m_contents);
+    }
 }
 
 bool

@@ -24,6 +24,7 @@
 #include <QUuid>
 #include <QStringList>
 #include <QJsonDocument>
+#include <QJsonObject>
 
 #include "database.h"
 #include "private.h"
@@ -184,8 +185,8 @@ Database::getDoc(const QString& docId)
         {
             if (query.value("conflicts").toInt() > 0)
                 setError(QString("Conflicts in %1").arg(docId));
-            QJsonDocument json(QJsonDocument::fromVariant(query.value("content")));
-            return json.isEmpty() ? query.value("content") : json;
+            QJsonDocument json(QJsonDocument::fromJson(query.value("content").toByteArray()));
+            return json.object().toVariantMap();
         }
         return setError(QString("Failed to get document %1: No document").arg(docId)) ? QVariant() : QVariant();
     }
@@ -234,8 +235,8 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
         query.prepare("INSERT INTO document (doc_id, doc_rev, content) VALUES (:docId, :docRev, :docJson)");
         query.bindValue(":docId", docId);
         query.bindValue(":docRev", newRev);
-        QString json(QJsonDocument::fromVariant(newDoc).toJson());
-        query.bindValue(":docJson", json.isEmpty() ? newDoc : json);
+        QJsonDocument json(QJsonDocument::fromVariant(newDoc));
+        query.bindValue(":docJson", json.isEmpty() ? newDoc : json.toJson());
         if (!query.exec())
             return setError(QString("Failed to put document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
     }
@@ -244,6 +245,7 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
     m_hash.insert(index.row(), docId);
     beginInsertRows(index, index.row(), index.column());
     endInsertRows();
+    Q_EMIT docChanged(docId, newDoc);
 
     return newRev;
 }

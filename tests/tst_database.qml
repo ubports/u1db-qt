@@ -111,9 +111,10 @@ TestCase {
         spyPathChanged.wait()
         compare(myDatabase.path, myPath)
         compare(myDatabase.putDoc({"spam": "eggs"}) > -1, true)
-        compare(myDatabase.putDoc({"foo": "bar"}, "hijklmn") > -1, true)
-        compare(myDatabase.getDoc("hijklmn", false), '{\n    "foo": "bar"\n}\n')
-        compare(myDatabase.getDoc("hijklmn", true), '{\n    "foo": "bar"\n}\n')
+        var json = {"foo": "bar"}
+        compare(myDatabase.putDoc(json, "hijklmn") > -1, true)
+        compare(myDatabase.getDoc("hijklmn"), json)
+        compare(myDatabase.getDoc("hijklmn"), json)
         console.log("listDocs: " + myDatabase.listDocs())
         console.log(firstQuery.query)
     }
@@ -125,10 +126,18 @@ TestCase {
     }
 
     function test_3_documentContents () {
-        myDatabase.putDoc({"content": {"notetext": "Lorem ipsum"}}, "qwertzui")
+        var json = {"content": {"notetext": "Lorem ipsum"}}
+        myDatabase.putDoc(json, "qwertzui")
         myDocument.docId = ''
+        compare(myDocument.contents, undefined)
         myDocument.docId = 'qwertzui'
-        console.info(myDocument.contents)
+        compare(myDocument.contents, json)
+        compare(myDocument.contents.content.notetext, 'Lorem ipsum')
+
+        var path = myDatabase.path
+        myDatabase.path = ':memory:'
+        myDatabase.path = path
+        spyContentsChanged.wait()
     }
 
     function test_4_putIndex () {
@@ -139,6 +148,12 @@ TestCase {
         id: spyPathChanged
         target: myDatabase
         signalName: "pathChanged"
+    }
+
+    SignalSpy {
+        id: spyContentsChanged
+        target: myDocument
+        signalName: "contentsChanged"
     }
 
     SignalSpy {

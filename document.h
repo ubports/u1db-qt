@@ -62,6 +62,9 @@ private:
     bool m_create;
     QVariant m_defaults;
     QVariant m_contents;
+
+    void onDocChanged(const QString& docID, QVariant content);
+    void onPathChanged(const QString& path);
 };
 
 QT_END_NAMESPACE_U1DB
