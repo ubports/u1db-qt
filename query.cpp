@@ -31,24 +31,8 @@
 QT_BEGIN_NAMESPACE_U1DB
 
 Query::Query(QObject *parent) :
-    QObject(parent), m_database(0), m_index(0)
+    QObject(parent), m_index(0)
 {
-}
-
-Database*
-Query::getDatabase()
-{
-    return m_database;
-}
-
-void
-Query::setDatabase(Database* database)
-{
-    if (m_database == database)
-        return;
-
-    m_database = database;
-    Q_EMIT databaseChanged(database);
 }
 
 Index*

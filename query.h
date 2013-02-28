@@ -21,17 +21,14 @@
 #define U1DB_QUERY_H
 
 #include <QtCore/QObject>
-#include <QSqlDatabase>
 #include <QVariant>
 
-#include "database.h"
 #include "index.h"
 
 QT_BEGIN_NAMESPACE_U1DB
 
 class Q_DECL_EXPORT Query : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Index*) index READ getIndex WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(QVariant query READ getQuery WRITE setQuery NOTIFY queryChanged)
     Q_PROPERTY(QVariant range READ getRange WRITE setRange NOTIFY rangeChanged)
@@ -39,8 +36,6 @@ public:
     Query(QObject* parent = 0);
     ~Query() { }
 
-    Database* getDatabase();
-    void setDatabase(Database* database);
     Index* getIndex();
     void setIndex(Index* index);
     QVariant getQuery();
@@ -48,13 +43,11 @@ public:
     QVariant getRange();
     void setRange(QVariant range);
 Q_SIGNALS:
-    void databaseChanged(Database* database);
     void indexChanged(Index* index);
     void queryChanged(QVariant query);
     void rangeChanged(QVariant range);
 private:
     Q_DISABLE_COPY(Query)
-    Database* m_database;
     Index* m_index;
     QVariant m_query;
     QVariant m_range;

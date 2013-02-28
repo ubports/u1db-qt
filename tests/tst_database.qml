@@ -54,14 +54,12 @@ Item {
 
     U1db.Query {
         id: firstQuery
-        database: myDatabase
         index: myIndex
         query: ['match', false]
     }
 
     U1db.Query {
         id: secondQuery
-        database: myDatabase
         index: myIndex
         range: [['a', 'b'], ['*']]
     }
