@@ -115,6 +115,9 @@ Document::setCreate(bool create)
 
     m_create = create;
     Q_EMIT createChanged(create);
+
+    if (m_create && m_database && m_defaults.isValid())
+        m_database->putDoc(m_defaults, m_docId);
 }
 
 QVariant
@@ -131,6 +134,9 @@ Document::setDefaults(QVariant defaults)
 
     m_defaults = defaults;
     Q_EMIT defaultsChanged(defaults);
+
+    if (m_create && m_database && m_defaults.isValid())
+        m_database->putDoc(m_defaults, m_docId);
 }
 
 QVariant

@@ -33,7 +33,6 @@ Item {
         id: myDocument
         database: myDatabase
         docId: 'qwertzui'
-        create: true
         defaults: { "eggs": "spam" }
     }
 
@@ -100,6 +99,10 @@ Item {
 TestCase {
     name: "U1dbDatabase"
     when: windowShown
+
+    function test_0_documentCreate () {
+        compare(myDatabase.getDoc(otherDocument.docId), otherDocument.defaults)
+    }
 
     function test_1_databasePopulated () {
         spyListCompleted.wait()
