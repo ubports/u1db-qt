@@ -68,14 +68,9 @@ Item {
         id: myList
         model: myDatabase
         width: 200; height: 200
-        Component.onCompleted:
-            console.info("myList Component.loaded " + myDatabase.path + " " + myDatabase.listDocs())
         delegate: Text {
             x: 66; y: 77
-            text: {
-                console.info("myDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents))
-                ""
-            }
+            text: "myDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents)
         }
     }
 
@@ -83,14 +78,9 @@ Item {
         id: otherList
         model: firstQuery
         width: 200; height: 200
-        Component.onCompleted:
-            console.info("otherList Component.loaded " + myDatabase.path + " " + myDatabase.listDocs())
         delegate: Text {
             x: 66; y: 77
-            text: {
-                console.info("otherDelegate")
-                ""
-            }
+            text: "otherDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents)
         }
     }
 
@@ -105,7 +95,6 @@ TestCase {
     function test_1_databasePopulated () {
         spyListCompleted.wait()
         compare(myDatabase.putDoc({"animals": ["cat", "dog", "hamster"]}) > -1, true)
-        console.log("listDocs: " + myDatabase.listDocs())
 
         var myPath = "/tmp/u1db-qt.db"
         myDatabase.path = myPath
@@ -116,8 +105,6 @@ TestCase {
         compare(myDatabase.putDoc(json, "hijklmn") > -1, true)
         compare(myDatabase.getDoc("hijklmn"), json)
         compare(myDatabase.getDoc("hijklmn"), json)
-        console.log("listDocs: " + myDatabase.listDocs())
-        console.log(firstQuery.query)
     }
 
     function test_2_databaseError () {
