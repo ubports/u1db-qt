@@ -70,12 +70,17 @@ Document::setDatabase(Database* database)
     if (m_database)
         QObject::disconnect(m_database, 0, this, 0);
 
-    if (m_database && !m_docId.isEmpty())
-        m_contents = m_database->getDoc(m_docId);
-
     m_database = database;
-    QObject::connect(m_database, &Database::pathChanged, this, &Document::onPathChanged);
-    QObject::connect(m_database, &Database::docChanged, this, &Document::onDocChanged);
+    if (m_database)
+    {
+        if (!m_docId.isEmpty())
+        {
+            m_contents = m_database->getDoc(m_docId);
+            Q_EMIT contentsChanged(m_contents);
+        }
+        QObject::connect(m_database, &Database::pathChanged, this, &Document::onPathChanged);
+        QObject::connect(m_database, &Database::docChanged, this, &Document::onDocChanged);
+    }
     Q_EMIT databaseChanged(database);
 }
 

@@ -142,12 +142,12 @@ int
 Database::rowCount(const QModelIndex & parent) const
 {
     if (!m_db.isOpen())
-        return -1;
+        return 0;
 
     QSqlQuery query(m_db.exec());
     query.prepare("SELECT COUNT(*) AS count FROM document");
     if (!(query.exec() && query.next()))
-        return -1;
+        return 0;
     return query.value("count").toInt();
 }
 

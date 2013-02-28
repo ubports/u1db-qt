@@ -26,13 +26,44 @@
 #include <QJsonDocument>
 
 #include "query.h"
+#include "database.h"
 #include "private.h"
 
 QT_BEGIN_NAMESPACE_U1DB
 
 Query::Query(QObject *parent) :
-    QObject(parent), m_index(0)
+    QAbstractListModel(parent), m_index(0)
 {
+}
+
+QVariant
+Query::data(const QModelIndex & index, int role) const
+{
+    QString docId(m_hash.value(index.row()));
+    if (role == 0) // contents
+    {
+        Database* db(m_index->getDatabase());
+        if (db)
+            return db->getDocUnchecked(docId);
+    }
+    if (role == 1) // docId
+        return docId;
+    return QVariant();
+}
+
+QHash<int, QByteArray>
+Query::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles.insert(0, "contents");
+    roles.insert(1, "docId");
+    return roles;
+}
+
+int
+Query::rowCount(const QModelIndex & parent) const
+{
+    return m_hash.count();
 }
 
 Index*
@@ -42,13 +73,28 @@ Query::getIndex()
 }
 
 void
+Query::onDataInvalidated()
+{
+    m_hash.clear();
+    Database* db(m_index->getDatabase());
+    if (db)
+        ;
+    // TODO
+}
+
+void
 Query::setIndex(Index* index)
 {
     if (m_index == index)
         return;
 
+    if (m_index)
+        QObject::disconnect(m_index, 0, this, 0);
     m_index = index;
+    if (m_index)
+        QObject::connect(m_index, &Index::dataInvalidated, this, &Query::onDataInvalidated);
     Q_EMIT indexChanged(index);
+    onDataInvalidated();
 }
 
 QVariant
@@ -68,6 +114,7 @@ Query::setQuery(QVariant query)
 
     m_query = query;
     Q_EMIT queryChanged(query);
+    onDataInvalidated();
 }
 
 QVariant
@@ -87,6 +134,7 @@ Query::setRange(QVariant range)
 
     m_range = range;
     Q_EMIT rangeChanged(range);
+    onDataInvalidated();
 }
 
 QT_END_NAMESPACE_U1DB

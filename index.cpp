@@ -42,13 +42,36 @@ Index::getDatabase()
 }
 
 void
+Index::onPathChanged(const QString& path)
+{
+    Q_EMIT dataInvalidated();
+}
+
+void
+Index::onDocChanged(const QString& docId, QVariant content)
+{
+    Q_EMIT dataInvalidated();
+}
+
+void
 Index::setDatabase(Database* database)
 {
     if (m_database == database)
         return;
 
+    if (m_database)
+        QObject::disconnect(m_database, 0, this, 0);
+
     m_database = database;
     Q_EMIT databaseChanged(database);
+
+    if (m_database)
+    {
+        m_database->putIndex(m_name, m_expression);
+        QObject::connect(m_database, &Database::pathChanged, this, &Index::onPathChanged);
+        QObject::connect(m_database, &Database::docChanged, this, &Index::onDocChanged);
+        Q_EMIT dataInvalidated();
+    }
 }
 
 QString
@@ -64,7 +87,10 @@ Index::setName(const QString& name)
         return;
 
     if (m_database)
+    {
         m_database->putIndex(name, m_expression);
+        Q_EMIT dataInvalidated();
+    }
 
     m_name = name;
     Q_EMIT nameChanged(name);
@@ -83,7 +109,10 @@ Index::setExpression(QStringList expression)
         return;
 
     if (m_database)
+    {
         m_database->putIndex(m_name, expression);
+        Q_EMIT dataInvalidated();
+    }
 
     m_expression = expression;
     Q_EMIT expressionChanged(expression);

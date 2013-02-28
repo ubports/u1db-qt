@@ -45,6 +45,7 @@ public:
     QString getPath();
     void setPath(const QString& path);
     Q_INVOKABLE QVariant getDoc(const QString& docId);
+    QVariant getDocUnchecked(const QString& docId) const;
     Q_INVOKABLE int putDoc(QVariant newDoc, const QString& docID=QString());
     Q_INVOKABLE QList<QVariant> listDocs();
     Q_INVOKABLE QString lastError();
@@ -63,7 +64,6 @@ private:
     QString getReplicaUid();
     bool isInitialized();
     bool initializeIfNeeded(const QString& path=":memory:");
-    QVariant getDocUnchecked(const QString& docId) const;
     bool setError(const QString& error);
 };
 

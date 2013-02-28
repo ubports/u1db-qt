@@ -27,7 +27,7 @@
 
 QT_BEGIN_NAMESPACE_U1DB
 
-class Q_DECL_EXPORT Query : public QObject {
+class Q_DECL_EXPORT Query : public QAbstractListModel {
     Q_OBJECT
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Index*) index READ getIndex WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(QVariant query READ getQuery WRITE setQuery NOTIFY queryChanged)
@@ -35,6 +35,11 @@ class Q_DECL_EXPORT Query : public QObject {
 public:
     Query(QObject* parent = 0);
     ~Query() { }
+
+    // QAbstractListModel
+    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray>roleNames() const;
+    int rowCount(const QModelIndex & parent = QModelIndex()) const;
 
     Index* getIndex();
     void setIndex(Index* index);
@@ -49,8 +54,11 @@ Q_SIGNALS:
 private:
     Q_DISABLE_COPY(Query)
     Index* m_index;
+    QHash<int, QString> m_hash;
     QVariant m_query;
     QVariant m_range;
+
+    void onDataInvalidated();
 };
 
 QT_END_NAMESPACE_U1DB
