@@ -79,7 +79,6 @@ Database::initializeIfNeeded(const QString& path)
         return setError(QString("Failed to open %1: %2").arg(path).arg(m_db.lastError().text()));
     if (!isInitialized())
     {
-        m_db.exec("BEGIN EXCLUSIVE");
         if (!isInitialized())
         {
             // QFile file("qrc:///dbschema.sql");
