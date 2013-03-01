@@ -161,7 +161,10 @@ Database::getDocUnchecked(const QString& docId) const
     query.prepare("SELECT doc_rev, content FROM document WHERE doc_id = :docId");
     query.bindValue(":docId", docId);
     if (query.exec() && query.next())
-        return query.value("content");
+    {
+        QJsonDocument json(QJsonDocument::fromJson(query.value("content").toByteArray()));
+        return json.object().toVariantMap();
+    }
     return QVariant();
 }
 
