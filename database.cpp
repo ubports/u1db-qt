@@ -121,8 +121,9 @@ Database::Database(QObject *parent) :
 QVariant
 Database::data(const QModelIndex & index, int role) const
 {
+		
     QString docId(m_hash.value(index.row()));
-    if (role == 0) // contents
+    if (role == 0)// contents
         return getDocUnchecked(docId);
     if (role == 1) // docId
         return docId;
@@ -156,12 +157,13 @@ Database::getDocUnchecked(const QString& docId) const
 {
     if (!m_db.isOpen())
         return QVariant();
-
+        
     QSqlQuery query(m_db.exec());
     query.prepare("SELECT doc_rev, content FROM document WHERE doc_id = :docId");
     query.bindValue(":docId", docId);
     if (query.exec() && query.next())
-        return query.value("content");
+        return query.value("content");      
+        
     return QVariant();
 }
 
@@ -241,7 +243,7 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
     }
 
     QModelIndex index(createIndex(rowCount(), 0));
-    m_hash.insert(index.row(), docId);
+    m_hash.insert((index.row()-1), docId);
     beginInsertRows(index, index.row(), index.column());
     endInsertRows();
     Q_EMIT docChanged(docId, newDoc);
