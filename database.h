@@ -58,13 +58,13 @@ private:
     Q_DISABLE_COPY(Database)
     QString m_path;
     QSqlDatabase m_db;
-    QHash<int, QString> m_hash;
     QString m_error;
 
     QString getReplicaUid();
     bool isInitialized();
     bool initializeIfNeeded(const QString& path=":memory:");
     bool setError(const QString& error);
+    QString getDocIdByRow(int row) const;
 };
 
 QT_END_NAMESPACE_U1DB

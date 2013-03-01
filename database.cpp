@@ -118,10 +118,24 @@ Database::Database(QObject *parent) :
     initializeIfNeeded();
 }
 
+QString
+Database::getDocIdByRow(int row) const
+{
+    if (!m_db.isOpen())
+        return QString();
+
+    QSqlQuery query(m_db.exec());
+    query.prepare("SELECT doc_id FROM document LIMIT 1 OFFSET :row");
+    query.bindValue(":row", row);
+    if (query.exec() && query.next())
+        return query.value("doc_id").toString();
+    return QString();
+}
+
 QVariant
 Database::data(const QModelIndex & index, int role) const
 {
-    QString docId(m_hash.value(index.row()));
+    QString docId(getDocIdByRow(index.row()));
     if (role == 0) // contents
         return getDocUnchecked(docId);
     if (role == 1) // docId
@@ -244,7 +258,6 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
     }
 
     QModelIndex index(createIndex(rowCount(), 0));
-    m_hash.insert((index.row()-1), docId);
     beginInsertRows(index, index.row(), index.column());
     endInsertRows();
     Q_EMIT docChanged(docId, newDoc);
@@ -282,7 +295,6 @@ Database::setPath(const QString& path)
         return;
 
     beginResetModel();
-    m_hash.clear();
     m_db.close();
     // TODO: relative path
     initializeIfNeeded(path);
