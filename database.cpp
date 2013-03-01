@@ -241,7 +241,7 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
     }
 
     QModelIndex index(createIndex(rowCount(), 0));
-    m_hash.insert(index.row(), docId);
+    m_hash.insert((index.row()-1), docId);
     beginInsertRows(index, index.row(), index.column());
     endInsertRows();
     Q_EMIT docChanged(docId, newDoc);

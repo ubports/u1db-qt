@@ -60,7 +60,7 @@ MainView {
                         x: 66; y: 77
                         text: {
                             console.info("aDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents))
-                            ""
+                            text: contents
                         }
                     }
                 }
