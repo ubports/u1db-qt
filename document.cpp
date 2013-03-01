@@ -46,7 +46,7 @@ Document::onDocChanged(const QString& docId, QVariant content)
 {
     if (docId == m_docId)
     {
-        m_contents = m_database->getDoc(m_docId);
+        m_contents = m_database->getDocUnchecked(m_docId);
         Q_EMIT contentsChanged(m_contents);
     }
 }
@@ -56,7 +56,7 @@ Document::onPathChanged(const QString& path)
 {
     if (!m_docId.isEmpty())
     {
-        m_contents = m_database->getDoc(m_docId);
+        m_contents = m_database->getDocUnchecked(m_docId);
         Q_EMIT contentsChanged(m_contents);
     }
 }
@@ -75,7 +75,7 @@ Document::setDatabase(Database* database)
     {
         if (!m_docId.isEmpty())
         {
-            m_contents = m_database->getDoc(m_docId);
+            m_contents = m_database->getDocUnchecked(m_docId);
             Q_EMIT contentsChanged(m_contents);
         }
         QObject::connect(m_database, &Database::pathChanged, this, &Document::onPathChanged);
@@ -101,7 +101,7 @@ Document::setDocId(const QString& docId)
 
     if (m_database)
     {
-        m_contents = m_database->getDoc(docId);
+        m_contents = m_database->getDocUnchecked(docId);
         Q_EMIT contentsChanged(m_contents);
     }
 }
