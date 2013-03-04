@@ -28,10 +28,23 @@ MainView {
     width: units.gu(45)
     height: units.gu(80)
     
+    /*!
+    
+    A Database is very simple to create. It only needs an id and a path where the file will be created. A Database is a model, which can be used by elements, such as the ListView further in this example. 
+    
+    */
+    
     U1db.Database {
         id: aDatabase
         path: "aU1DbDSatabase"
     }
+    
+    /*!
+    
+    A Document can be declared at runtime. It requires at the very least a unique 'docId', but that alone won't do anything special. In order for a document to be entered into the database the below snippet demonstrates the basic requirements. The id might be optional.
+    
+    
+    */
     
     U1db.Document {
         id: aDocument
@@ -40,26 +53,34 @@ MainView {
         create: true
         defaults: { "hello": "world" }
     }
-    
+           
     Tabs {
         id: tabs
         anchors.fill: parent
 
         Tab {
             objectName: "Tab1"
-
+									
             title: i18n.tr("Hello U1Db!")
 
             page: Page {
+                id: helloPage
 											    ListView {
                     width: units.gu(45)
                     height: units.gu(80)
+                    
+                    /*
+                    Here is the reference to the Database model mentioned earlier.
+                    */                    
                     model: aDatabase
        
+       												/* A delegate will be created for each Document retrieved from the Database */
                     delegate: Text {
                         x: 66; y: 77
                         text: {
-                            console.info("aDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents))
+                        				/*
+                        				The contents of each Document are represented by a string that can be used in on the console or text as demonstrated here.
+                        				*/
                             text: contents.hello
                         }
                     }
