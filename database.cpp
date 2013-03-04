@@ -257,9 +257,12 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
             return setError(QString("Failed to put document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
     }
 
-    QModelIndex index(createIndex(rowCount(), 0));
-    beginInsertRows(index, index.row(), index.column());
+    beginResetModel();
+    endResetModel();
+    /* FIXME investigate correctly notifying about new rows
+    beginInsertRows(QModelIndex(), rowCount(), 0);
     endInsertRows();
+    */
     Q_EMIT docChanged(docId, newDoc);
 
     return newRev;
