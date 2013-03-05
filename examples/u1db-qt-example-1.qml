@@ -51,7 +51,7 @@ MainView {
         database: aDatabase
         docId: 'helloworld'
         create: true
-        defaults: { "hello": "world" }
+        defaults: { "hello": "Hello World!" }
     }
            
     Tabs {
@@ -79,7 +79,10 @@ MainView {
                         x: 66; y: 77
                         text: {
                         				/*
-                        				The contents of each Document are represented by a string that can be used in on the console or text as demonstrated here.
+                           				The contents of each Document are represented by a string that can be used on the console or text as demonstrated here.
+                        				
+                        				    text: contents.hello
+                        				    
                         				*/
                             text: contents.hello
                         }
