@@ -41,16 +41,16 @@ MainView {
         
     Timer {
     
-        property int i: 0; interval: 500; running: true; repeat: true
+        property int i: 0; interval: 5; running: true; repeat: true
         onTriggered: newDocumentObject() 
      
-     			function newDocumentObject() {   
-     			   
-     			   var qmlString = "import QtQuick 2.0; import U1db 1.0 as U1db; U1db.Document {id: aDcoument"+i+";database: aDatabase;docId: 'helloworld"+i+"';create: true; defaults: { 'hello': 'Hello New Document "+i+"!' }}"
-     			
-							    Qt.createQmlObject(qmlString, u1dbView, "dynamicNewDocument"+i);     			
-     			
-     			    i = i+1						
+        function newDocumentObject() {
+
+           var qmlString = "import QtQuick 2.0; import U1db 1.0 as U1db; U1db.Document {id: aDcoument"+i+";database: aDatabase;docId: 'helloworld"+i+"';create: true; defaults: { 'hello': 'Hello New Document "+i+"!' }}"
+
+           Qt.createQmlObject(qmlString, u1dbView, "dynamicNewDocument"+i);
+
+            i = i+1
          }     
      
     }
@@ -61,12 +61,12 @@ MainView {
 
         Tab {
             objectName: "Tab1"
-									
+
             title: i18n.tr("Hello U1Db!")
 
             page: Page {
                 id: helloPage
-											    ListView {
+               ListView {
                     width: units.gu(45)
                     height: units.gu(80)
                     
@@ -75,15 +75,22 @@ MainView {
                     */                    
                     model: aDatabase
        
-       												/* A delegate will be created for each Document retrieved from the Database */
+                   /* A delegate will be created for each Document retrieved from the Database */
                     delegate: Text {
                         x: 66; y: 77
                         text: {
-                        				/*
-                        				The contents of each Document are represented by a string that can be used in on the console or text as demonstrated here.
-                        				*/
-                        				
-                        				if(contents !== undefined){
+                            /*!
+                                The object called 'contents' contains a string as demonstrated here. In this example 'hello' is our search string.
+
+                                if(contents !== undefined){
+                                    text: contents.hello
+                                }
+                                else { "" }
+
+
+                            */
+
+                            if(contents !== undefined){
                                 text: contents.hello
                             }
                             else { "" }

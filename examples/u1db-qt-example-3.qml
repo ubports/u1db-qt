@@ -90,10 +90,6 @@ Item {
                          height: units.gu(70)
                          anchors.bottom: parent.bottom
 
-                         /*border.color : "black"
-                         smooth: true
-                         border.width: 1*/
-
                          color: "#00FFFFFF"
 
                          ListView {
@@ -196,7 +192,7 @@ Item {
 
                                     text: {
                                         /*!
-                                            The contents of each Document are represented by a string as demonstrated here. In this example 'hello' is our search string.
+                                            The object called 'contents' contains a string as demonstrated here. In this example 'hello' is our search string.
 
                                             if(contents !== undefined){
                                                 text: contents.hello
