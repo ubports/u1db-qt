@@ -47,7 +47,7 @@ public:
     Q_INVOKABLE QVariant getDoc(const QString& docId);
     QVariant getDocUnchecked(const QString& docId) const;
     Q_INVOKABLE int putDoc(QVariant newDoc, const QString& docID=QString());
-    Q_INVOKABLE QList<QVariant> listDocs();
+    Q_INVOKABLE QList<QString> listDocs();
     Q_INVOKABLE QString lastError();
     Q_INVOKABLE QString putIndex(const QString& index_name, QStringList expressions);
 Q_SIGNALS:

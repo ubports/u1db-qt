@@ -268,10 +268,12 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
     return newRev;
 }
 
-QList<QVariant>
+QList<QString>
 Database::listDocs()
 {
-    initializeIfNeeded();
+    QList<QString> list;
+    if (!initializeIfNeeded())
+        return list;
 
     QSqlQuery query(m_db.exec());
     query.prepare("SELECT document.doc_id, document.doc_rev, document.content, "
@@ -280,15 +282,13 @@ Database::listDocs()
         "document.doc_rev, document.content");
     if (query.exec())
     {
-        QList<QVariant> list;
         while (query.next())
         {
-            QVariant newDoc(query.value("content"));
-            list.append(newDoc);
+            list.append(query.value("doc_id").toString());
         }
         return list;
     }
-    return setError(QString("Failed to list documents: %1\n%2").arg(query.lastError().text()).arg(query.lastQuery())) ? QList<QVariant>() : QList<QVariant>();
+    return setError(QString("Failed to list documents: %1\n%2").arg(query.lastError().text()).arg(query.lastQuery())) ? list : list;
 }
 
 void
