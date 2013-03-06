@@ -41,7 +41,7 @@ MainView {
         
     Timer {
     
-        property int i: 0; interval: 5; running: true; repeat: true
+        property int i: 0; interval: 5000; running: true; repeat: true
         onTriggered: newDocumentObject() 
      
         function newDocumentObject() {
