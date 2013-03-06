@@ -36,24 +36,25 @@ MainView {
     
     U1db.Database {
         id: aDatabase
-        path: "aU1DbDSatabase"
+        path: "aU1DbDSatabase2"
+    }
+        
+    Timer {
+    
+        property int i: 0; interval: 5; running: true; repeat: true
+        onTriggered: newDocumentObject() 
+     
+        function newDocumentObject() {
+
+           var qmlString = "import QtQuick 2.0; import U1db 1.0 as U1db; U1db.Document {id: aDcoument"+i+";database: aDatabase;docId: 'helloworld"+i+"';create: true; defaults: { 'hello': 'Hello New Document "+i+"!' }}"
+
+           Qt.createQmlObject(qmlString, u1dbView, "dynamicNewDocument"+i);
+
+            i = i+1
+         }     
+     
     }
     
-    /*!
-    
-    A Document can be declared at runtime. It requires at the very least a unique 'docId', but that alone won't do anything special. In order for a document to be entered into the database the below snippet demonstrates the basic requirements. The id might be optional.
-    
-    
-    */
-    
-    U1db.Document {
-        id: aDocument
-        database: aDatabase
-        docId: 'helloworld'
-        create: true
-        defaults: { "hello": "Hello World!" }
-    }
-           
     Tabs {
         id: tabs
         anchors.fill: parent
@@ -83,6 +84,7 @@ MainView {
 
                                 text: contents.hello
                             */
+
                             text: contents.hello
                         }
                     }
