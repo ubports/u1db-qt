@@ -121,7 +121,7 @@ Document::setCreate(bool create)
     m_create = create;
     Q_EMIT createChanged(create);
 
-    if (m_create && m_database && m_defaults.isValid())
+    if (m_create && m_database && m_defaults.isValid() && !m_database->getDocUnchecked(m_docId).isValid())
         m_database->putDoc(m_defaults, m_docId);
 }
 
@@ -140,7 +140,7 @@ Document::setDefaults(QVariant defaults)
     m_defaults = defaults;
     Q_EMIT defaultsChanged(defaults);
 
-    if (m_create && m_database && m_defaults.isValid())
+    if (m_create && m_database && m_defaults.isValid() && !m_database->getDocUnchecked(m_docId).isValid())
         m_database->putDoc(m_defaults, m_docId);
 }
 
@@ -158,6 +158,8 @@ Document::setContents(QVariant contents)
 
     m_contents = contents;
     Q_EMIT contentsChanged(contents);
+    if (m_database && !m_docId.isEmpty())
+        m_database->putDoc(m_contents, m_docId);
 }
 
 QT_END_NAMESPACE_U1DB
