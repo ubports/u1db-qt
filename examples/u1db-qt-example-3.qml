@@ -23,141 +23,209 @@ import Ubuntu.Components 0.1
 
 Item {
 
-				    width: units.gu(45)
-				    height: units.gu(80)
+        width: units.gu(45)
+        height: units.gu(80)
 
-				MainView {
-				
-				    id: u1dbView
-				    width: units.gu(45)
-				    height: units.gu(70)
-				    anchors.top: parent.top;
-				    
-				    /*!
-				    
-								    A Database is very simple to create. It only needs an id and a path where the file will be created. A Database is a model, which can be used by elements, such as the ListView further in this example. 
-								    
-								    U1db.Database {
-								        id: aDatabase
-								        path: "aU1DbDSatabase2"
-								    }
-				    
-				    */
-				    
-				    U1db.Database {
-				        id: aDatabase
-				        path: "aU1DbDSatabase2"
-				    }
-				    
-				    /*!
-				    
-								    A Document can be declared at runtime. It requires at the very least a unique 'docId', but that alone won't do anything special. In order for a document to be entered into the database the below snippet demonstrates the basic requirements. The id might be optional.
-								    
-								    U1db.Document {
-				        id: aDocument
-				        database: aDatabase
-				        docId: 'helloworld'
-				        create: true
-				        defaults: { "hello":"Hello World" }
-				    				}
-				        
-				    */
-				    
-				   U1db.Document {
+    MainView {
+
+        id: u1dbView
+        width: units.gu(45)
+        height: units.gu(80)
+        anchors.top: parent.top;
+
+        /*!
+
+            A Database is very simple to create. It only needs an id and a path where the file will be created. A Database is a model, which can be used by elements, such as the ListView further in this example.
+
+            U1db.Database {
+                id: aDatabase
+                path: "aU1DbDSatabase2"
+            }
+
+        */
+
+        U1db.Database {
+            id: aDatabase
+            path: "aU1DbDSatabase2"
+        }
+
+        /*!
+
+            A Document can be declared at runtime. It requires at the very least a unique 'docId', but that alone won't do anything special. In order for a document to be entered into the database the below snippet demonstrates the basic requirements. The id might be optional.
+
+            U1db.Document {
+            id: aDocument
+            database: aDatabase
+            docId: 'helloworld'
+            create: true
+            defaults: { "hello":"Hello World" }
+            }
+
+        */
+
+       U1db.Document {
         id: aDocument
         database: aDatabase
         docId: 'helloworld'
         create: true
         defaults: { "hello":"Hello World" }
-    				}
-				    				    
-				    Tabs {
-				        id: tabs
-				        anchors.fill: parent
-				
-				        Tab {
-				            objectName: "Tab1"
-													
-				            title: i18n.tr("Hello U1Db!")
-				
-				            page: Page {
-				            
-				                id: helloPage
-															    
-															    ListView {
+        }
 
-				                    width: units.gu(45)
-				                    height: units.gu(80)
-				                    
-				                    /*! Inside this example ListView is a reference to the Database model mentioned earlier:
-				                    
-				                        ListView {
+        Tabs {
+            id: tabs
+            anchors.fill: parent
 
-                                 model: aDatabase	
-                                 
-                             }			                    
-				                    
-				                    */    
-				                                    
-				                    model: aDatabase
-				       
-				       												/*! 
-				       												
-				       												    Once a model is assigned to a ListView a delegate can represent each Document retrieved from the Database.
-				       												    
-				       												    	ListView {
+            Tab {
+                objectName: "Tab1"
 
-                                 model: aDatabase	
-                                 
-                                 delegate: Rectangle{                               
-                                     anchors.right: parent.right                                    
+                title: i18n.tr("Hello U1Db!")
+
+                page: Page {
+
+                    id: helloPage
+
+                    Rectangle {
+
+                         width: units.gu(45)
+                         height: units.gu(70)
+                         anchors.bottom: parent.bottom
+
+                         /*border.color : "black"
+                         smooth: true
+                         border.width: 1*/
+
+                         color: "#00FFFFFF"
+
+                         ListView {
+
+                            width: units.gu(45)
+                            height: units.gu(60)
+                            anchors.bottom: parent.bottom
+
+                            TextArea{
+
+                                x: units.gu(1)
+                                y: units.gu(1)
+                                width: units.gu(43)
+                                height: units.gu(58)
+
+                                color: "#FFFFFF"
+
+                            }
+
+                         }
+
+                         Rectangle {
+
+                              width: units.gu(43)
+                              height: units.gu(5)
+                              anchors.top: addressBar.bottom
+                              x: units.gu(1.5)
+
+                              color: "#00FFFFFF"
+
+                              Row{
+
+                                 width: units.gu(43)
+                                 height: units.gu(5)
+                                 anchors.verticalCenter: parent.verticalCenter
+                                 spacing: units.gu(2)
+
+
+                                 Button {
+                                 text: "<"
+                                 onClicked: print("clicked Back Button")
                                  }
-                                 
-                             }		 
-				       												
-				       												
-				       												*/
-				       												
-				                    delegate: Rectangle{
-																										border.color : "black"
-																										smooth: true
-																										border.width: 5		
-				                         width: units.gu(25)
-				                         height: units.gu(5)
-				                         anchors.right: parent.right  
-				                                         
-				                    
-								                    TextInput {
-								                        x: 10;
-								                        anchors.verticalCenter: parent.verticalCenter 
+                                 Button {
+                                 text: "Home"
+                                 onClicked: print("clicked Home Button")
+                                 }
+                                 Button {
+                                 text: "+"
+                                 onClicked: print("clicked Save Button")
+                                 }
+                                 Button {
+                                 text: ">"
+                                 onClicked: print("clicked Forward Button")
+                                 }
+                              }
 
-								                        text: {
-								                        				/*!
-								                        				    The contents of each Document are represented by a string as demonstrated here. In this example 'hello' is our search string. 
+                          }
 
-												                        				if(contents !== undefined){
-												                                text: contents.hello
-												                            }
-												                            else { "" }								                        				
-								                        				
-								                        				
-								                        				*/
-								                        				
-								                        				if(contents !== undefined){
-								                                text: contents.hello
-								                            }
-								                            else { "" }
-								                        }
-				                        
-				                        }
-				                    }
-				                }
-				            }
-				            				            
-				        }
-				    				    
-				    }
-				
-				}
+                       ListView {
+
+                            width: units.gu(45)
+                            height: units.gu(5)
+                            anchors.top: parent.top
+
+                            id: addressBar
+
+                            /*! Inside this example ListView is a reference to the Database model mentioned earlier:
+
+                                ListView {
+
+                                     model: aDatabase
+
+                                 }
+
+                            */
+
+                            model: aDatabase
+
+                           /*!
+
+                               Once a model is assigned to a ListView a delegate can represent each Document retrieved from the Database.
+
+                                ListView {
+
+                                     model: aDatabase
+
+                                     delegate: Rectangle{
+                                         anchors.right: parent.right
+                                     }
+
+                                 }
+
+
+                           */
+
+                            delegate: TextField {
+                                    width: units.gu(43)
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    x: units.gu(1)
+
+                                    text: {
+                                        /*!
+                                            The contents of each Document are represented by a string as demonstrated here. In this example 'hello' is our search string.
+
+                                            if(contents !== undefined){
+                                                text: contents.hello
+                                            }
+                                            else { "" }
+
+
+                                        */
+
+                                        if(contents !== undefined){
+                                            text: contents.hello
+                                        }
+                                        else { "" }
+                                    }
+
+                                }
+
+
+                        }
+
+                    }
+
+
+                }
+
+            }
+
+        }
+
+    }
 
 }
