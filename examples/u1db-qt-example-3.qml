@@ -46,7 +46,7 @@ Item {
 
         U1db.Database {
             id: aDatabase
-            path: "aU1DbDSatabase2"
+            path: "aU1DbDSatabase3"
         }
 
         /*!
@@ -84,6 +84,8 @@ Item {
 
                     id: helloPage
 
+                    // Here we define a rectangle that represents the lower portion of our application. It will contain all the main parts of the application.
+
                     Rectangle {
 
                          width: units.gu(45)
@@ -91,6 +93,10 @@ Item {
                          anchors.bottom: parent.bottom
 
                          color: "#00FFFFFF"
+
+                         /* The following ListView, which contains a TextArea for displaying contents from the database.
+
+                         The ListView should probably be removed in this case since we are not displaying multiple records from the database. */
 
                          ListView {
 
@@ -111,11 +117,13 @@ Item {
 
                          }
 
+                         // This rectangle contains our navigation controls
+
                          Rectangle {
 
                               width: units.gu(43)
                               height: units.gu(5)
-                              anchors.top: addressBar.bottom
+                              anchors.top: addressBarListView.bottom
                               x: units.gu(1.5)
 
                               color: "#00FFFFFF"
@@ -144,6 +152,7 @@ Item {
                                  text: ">"
                                  onClicked: print("clicked Forward Button")
                                  }
+
                               }
 
                           }
@@ -154,7 +163,7 @@ Item {
                             height: units.gu(5)
                             anchors.top: parent.top
 
-                            id: addressBar
+                            id: addressBarListView
 
                             /*! Inside this example ListView is a reference to the Database model mentioned earlier:
 
@@ -186,26 +195,38 @@ Item {
                            */
 
                             delegate: TextField {
+
+                                    id: addressBar
+
                                     width: units.gu(43)
                                     anchors.verticalCenter: parent.verticalCenter
                                     x: units.gu(1)
+
+                                    onAccepted: {
+
+                                        onClicked: updateContent(contents.hello,addressBar.text)
+
+                                    }
+
+                                    function updateContent(documentText, addressBarText) {
+                                        if(documentText!==addressBarText){
+                                            print(documentText+" * "+addressBarText)
+                                        }
+                                    }
 
                                     text: {
                                         /*!
                                             The object called 'contents' contains a string as demonstrated here. In this example 'hello' is our search string.
 
-                                            if(contents !== undefined){
-                                                text: contents.hello
-                                            }
-                                            else { "" }
+
+                                        text: contents.hello
+
 
 
                                         */
 
-                                        if(contents !== undefined){
-                                            text: contents.hello
-                                        }
-                                        else { "" }
+                                        text: contents.hello
+
                                     }
 
                                 }
