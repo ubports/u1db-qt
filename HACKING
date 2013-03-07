@@ -1,0 +1,16 @@
+*** Building and installing ***
+
+cmake .; make
+sudo make install
+
+*** Test from the build folder ***
+
+qmlscene -I ./modules examples/u1db-qt-example-1.qml
+qmltestrunner -import ./modules
+make check
+
+*** Use U1DB Python API to check sqlite compatiblity ***
+
+python -c "import u1db;db=u1db.open('pDb',create=False);print(db.get_all_docs());print(db.list_indexes())"
+python -c "import u1db;db=u1db.open('pDb',create=True);db.create_index('by-phone', 'gents.phone');doc3 = db.create_doc({'gents': [ {'name': 'Mary', 'phone': '12345'}, {'name': 'Peter', 'phone': '54321'} ]})"
+
