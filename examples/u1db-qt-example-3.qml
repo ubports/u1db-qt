@@ -69,6 +69,7 @@ Item {
         docId: 'helloworld'
         create: true
         defaults: { "hello":"Hello World" }
+        onContentsChanged: print(contents.hello)
         }
 
         Tabs {
@@ -165,7 +166,7 @@ Item {
 
                             id: addressBarListView
 
-                            /*! Inside this example ListView is a reference to the Database model mentioned earlier:
+                            /*! Inside this example ListView is a reference to a Database model:
 
                                 ListView {
 
@@ -209,8 +210,16 @@ Item {
                                     }
 
                                     function updateContent(documentText, addressBarText) {
+
                                         if(documentText!==addressBarText){
                                             print(documentText+" * "+addressBarText)
+
+                                            var address = aDocument.contents;
+                                            address.hello = addressBarText;
+                                            aDocument.contents=address
+
+                                            print("Changing " + documentText+" --> "+addressBarText)
+
                                         }
                                     }
 
