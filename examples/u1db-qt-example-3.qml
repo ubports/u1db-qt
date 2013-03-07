@@ -69,6 +69,7 @@ Item {
         docId: 'helloworld'
         create: true
         defaults: { "hello":"Hello World" }
+        onContentsChanged: print(contents.hello)
         }
 
         Tabs {
@@ -213,11 +214,10 @@ Item {
                                         if(documentText!==addressBarText){
 
                                             var address = aDocument.contents;
-                                            /*address.hello = addressBarText;
-                                            aDocument.contents=address*/
-                                            aDocument.contents.hello = addressBarText
+                                            address.hello = addressBarText;
+                                            aDocument.contents=address
 
-                                            print(documentText+" * "+addressBarText)
+                                            print("Changing " + documentText+" --> "+addressBarText)
 
                                         }
 
