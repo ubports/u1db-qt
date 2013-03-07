@@ -227,22 +227,13 @@ Item {
                                         /*!
                                             The object called 'contents' contains a string as demonstrated here. In this example 'hello' is our search string.
 
-<<<<<<< TREE
-
-                                        text: contents.hello
-
-
-
-=======
                                             text: contents.hello
->>>>>>> MERGE-SOURCE
+
                                         */
 
                                         text: contents.hello
-<<<<<<< TREE
 
-=======
->>>>>>> MERGE-SOURCE
+
                                     }
 
                                 }
