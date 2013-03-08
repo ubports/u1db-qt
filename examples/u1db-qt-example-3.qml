@@ -69,7 +69,6 @@ Item {
         docId: 'helloworld'
         create: true
         defaults: { "hello":"Hello World" }
-        onContentsChanged: print(contents.hello)
         }
 
         Tabs {
@@ -99,7 +98,7 @@ Item {
 
                          The ListView should probably be removed in this case since we are not displaying multiple records from the database. */
 
-                         ListView {
+                         Rectangle {
 
                             width: units.gu(45)
                             height: units.gu(60)
@@ -158,7 +157,7 @@ Item {
 
                           }
 
-                       ListView {
+                       Rectangle {
 
                             width: units.gu(45)
                             height: units.gu(5)
@@ -166,36 +165,7 @@ Item {
 
                             id: addressBarListView
 
-                            /*! Inside this example ListView is a reference to a Database model:
-
-                                ListView {
-
-                                     model: aDatabase
-
-                                 }
-
-                            */
-
-                            model: aDatabase
-
-                           /*!
-
-                               Once a model is assigned to a ListView a delegate can represent each Document retrieved from the Database.
-
-                                ListView {
-
-                                     model: aDatabase
-
-                                     delegate: Rectangle{
-                                         anchors.right: parent.right
-                                     }
-
-                                 }
-
-
-                           */
-
-                            delegate: TextField {
+                            TextField {
 
                                     id: addressBar
 
@@ -203,35 +173,67 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     x: units.gu(1)
 
-                                    onAccepted: {
+                                    /*!
+                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  In our example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
 
-                                        onClicked: updateContent(contents.hello,addressBar.text)
+                                    text: displayKey(aDocument.contents)
+
+                                    function displayKey(documentObject){
+
+                                        var keys = Object.keys(documentObject);
+
+                                        return keys[0]
 
                                     }
+
+                                    */
+
+                                    text: getCurrentDocumentKey(aDocument.contents)
+
+                                    function getCurrentDocumentKey(documentObject){
+
+                                        if(typeof documentObject!='undefined'){
+
+                                            var keys = Object.keys(documentObject);
+
+                                            print("keys[0] = " + keys[0])
+
+                                            return keys[0]
+
+                                        }
+
+                                        else{
+
+                                            return ''
+                                        }
+
+
+
+                                    }
+
+                                    onAccepted: {
+
+                                        onClicked: updateContent(getCurrentDocumentKey(aDocument.contents),addressBar.text)
+
+                                    }
+
 
                                     function updateContent(documentText, addressBarText) {
 
                                         if(documentText!==addressBarText){
                                             print(documentText+" * "+addressBarText)
 
-                                            var address = aDocument.contents;
-                                            address.hello = addressBarText;
-                                            aDocument.contents=address
+                                            var newContents = {};
+                                            var newFieldName = addressBarText;
+                                            aDocument.docId = addressBarText;
+                                            newContents[newFieldName]= 'More Hello Word...';
+                                            aDocument.contents=newContents
 
                                             print("Changing " + documentText+" --> "+addressBarText)
 
                                         }
                                     }
 
-                                    text: {
-                                        /*!
-                                            The object called 'contents' contains a string as demonstrated here. In this example 'hello' is our search string.
-
-                                            text: contents.hello
-                                        */
-
-                                        text: contents.hello
-                                    }
 
                                 }
 
