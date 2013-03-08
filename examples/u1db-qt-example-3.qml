@@ -69,7 +69,6 @@ Item {
         docId: 'helloworld'
         create: true
         defaults: { "hello":"Hello World" }
-        //onContentsChanged: print(contents.hello)
         }
 
         Tabs {
@@ -85,7 +84,21 @@ Item {
 
                     id: helloPage
 
-                    // Here we define a rectangle that represents the lower portion of our application. It will contain all the main parts of the application.
+                    /*! Here we define a rectangle that represents the lower portion of our application. It will contain all the main parts of the application.
+
+                    Rectangle {
+
+                         width: units.gu(45)
+                         height: units.gu(70)
+                         anchors.bottom: parent.bottom
+
+                         color: "#00FFFFFF"
+
+                         // The remainder of the main part of the application goes here ...
+
+                         }
+
+                     */
 
                     Rectangle {
 
@@ -105,7 +118,21 @@ Item {
 
                             /*
 
-                            The following TextArea is for displaying contents from the database for the current .
+                            The following TextArea is for displaying contents from the database for the current state of the global document, as defined by the key / name in the address bar.
+
+                            TextArea{
+
+                                id: documentContent
+
+                                selectByMouse : false
+
+                                x: units.gu(1)
+                                y: units.gu(1)
+                                width: units.gu(43)
+                                height: units.gu(58)
+                                color: "#000000"
+
+                            }
 
                              */
 
@@ -119,7 +146,6 @@ Item {
                                 y: units.gu(1)
                                 width: units.gu(43)
                                 height: units.gu(58)
-
                                 color: "#000000"
 
                             }
@@ -132,9 +158,8 @@ Item {
 
                               width: units.gu(43)
                               height: units.gu(5)
-                              anchors.top: addressBarListView.bottom
+                              anchors.top: addressBarArea.bottom
                               x: units.gu(1.5)
-
                               color: "#00FFFFFF"
 
                               Row{
@@ -168,11 +193,11 @@ Item {
 
                        Rectangle {
 
+                           id: addressBarArea
+
                             width: units.gu(45)
                             height: units.gu(5)
                             anchors.top: parent.top
-
-                            id: addressBarListView
 
                             TextField {
 
@@ -233,9 +258,9 @@ Item {
 
                                             /*!
 
-                                              Here we create a new object that will become the ccontents of the global document, including some default text.
+                                              Here we create a new object that will become the contents of the global document, including some default text.
 
-                                            documentContent.text = 'More Hello Word...';
+                                            documentContent.text = 'More Hello World...';
 
                                             var newContents = {};
                                             var newFieldName = addressBarText;
@@ -245,15 +270,13 @@ Item {
 
                                               */
 
-                                            documentContent.text = 'More Hello Word...';
+                                            documentContent.text = 'More Hello World...';
 
                                             var newContents = {};
                                             var newFieldName = addressBarText;
                                             aDocument.docId = addressBarText;
                                             newContents[newFieldName]= documentContent.text;
                                             aDocument.contents=newContents
-
-                                            print("Changing " + documentText+" --> "+addressBarText)
 
                                         }
 
