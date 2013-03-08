@@ -50,6 +50,7 @@ public:
     Q_INVOKABLE QList<QString> listDocs();
     Q_INVOKABLE QString lastError();
     Q_INVOKABLE QString putIndex(const QString& index_name, QStringList expressions);
+    Q_INVOKABLE QStringList getIndexExpressions(const QString& indexName);
 Q_SIGNALS:
     void pathChanged(const QString& path);
     void errorChanged(const QString& error);

@@ -129,7 +129,12 @@ TestCase {
     }
 
     function test_4_putIndex () {
-        myDatabase.putIndex("by-foo", ["foo", "bool(field)"])
+        myDatabase.putIndex("by-phone-number", ["managers.phone_number"])
+        compare(myDatabase.getIndexExpressions('by-phone-number'), ["managers.phone_number"])
+        myDatabase.putDoc({ 'managers': [
+            { 'name': 'Mary', 'phone_number': '12345' },
+            { 'name': 'Rob', 'phone_number': '54321' },
+            ] })
     }
 
     SignalSpy {

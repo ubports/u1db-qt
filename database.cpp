@@ -313,72 +313,57 @@ Database::getPath()
     return m_path;
 }
 
-/*
-int u1db_create_index_list(u1database *db, const char *index_name, int n_expressions, const char **expressions) 
-Tests to create for putIndex:
-does it return a value, what is the value it returns, is the value returned an acceptable value, what is the expected result for an index_name that we know is unique as well as one we know is not unique, is the database NULL or not, is the expressions list empty or not, is the index_name empty or not
-*/
-
 QString
-Database::putIndex(const QString& index_name, QStringList expressions)
+Database::putIndex(const QString& indexName, QStringList expressions)
 {
+    if (indexName.isEmpty() || expressions.isEmpty())
+        return QString("Either name or expressions is empty");
+
+    Q_FOREACH (QString expression, expressions)
+        if (expression.isEmpty() || expression.isNull())
+            return QString("Empty expression in list");
+
     if (!initializeIfNeeded())
         return QString("Database isn't ready");
 
-    if (index_name.isEmpty() || expressions.isEmpty())
-        return QString("Either name or expressions is empty");
+    QStringList results = getIndexExpressions(indexName);
+    bool changed = false;
+    Q_FOREACH (QString expression, expressions)
+        if (results.contains(expression))
+            changed = true;
+    if (changed)
+        return QString("Index conflicts with existing index");
 
-    int i = 0;
-    for (i = 0; i < expressions.count(); ++i) {
-        if (expressions[i].isEmpty() || expressions[i].isNull()) {
-            return QString("Empty expression in list");
-        }
+    QSqlQuery query(m_db.exec());
+    for (int i = 0; i < expressions.count(); ++i)
+    {
+        query.prepare("INSERT INTO index_definitions VALUES (:indexName, :offset, :field)");
+        query.bindValue(":indexName", indexName);
+        query.bindValue(":offset", i);
+        query.bindValue(":field", expressions.at(i));
+        if (!query.exec())
+            return QString("Failed to insert index definition: %1\n%2").arg(m_db.lastError().text()).arg(query.lastQuery());
     }
+    return QString();
+}
 
-    /*
-    status = u1db__find_unique_expressions(db, n_expressions, expressions, &n_unique, &unique_expressions); // needs to be modified
-    if (status != U1DB_OK) {
-        return status;
-    }
-    */
+QStringList
+Database::getIndexExpressions(const QString& indexName)
+{
+    QStringList expressions;
+
+    if (!initializeIfNeeded())
+        return expressions;
 
     QSqlQuery query(m_db.exec());
     query.prepare("SELECT field FROM index_definitions WHERE name = :indexName ORDER BY offset DESC");
-    query.bindValue(":indexName", index_name);
+    query.bindValue(":indexName", indexName);
     if (!query.exec())
-    {
-        QString error(QString("Failed to lookup index definition: %1\n%2").arg(m_db.lastError().text()).arg(query.lastQuery()));
-        setError(error);
-        return error;
-    }
+        return setError(QString("Failed to lookup index definition: %1\n%2").arg(m_db.lastError().text()).arg(query.lastQuery())) ? expressions : expressions;
 
-    QStringList results;
-    //QSqlQuery query(statement);
-    // Add a check to ensure our query was OK -- what return value do we need here if there was an error rather than simply an empty set of results?
-    while (query.next()) {
-         results.append(query.value(0).toString());
-    }
-    for (i = 0; i < expressions.count(); i++) {
-        if (results.contains(expressions.at(i))) {
-            return QString("Duplicate index name");
-        }
-    }
-    if (results.count() > 0) {
-        return QString();
-    }
-    else{
-    for (i = 0; i < expressions.count(); ++i) {
-        query.prepare("INSERT INTO index_definitions VALUES (?, ?, ?)");
-        query.addBindValue(index_name);
-        query.addBindValue(i);
-        query.addBindValue(expressions.at(i));
-        if(!query.exec())
-            return QString("Duplicate index name (2)");
-        qDebug() << "did insert index" << index_name << expressions;
-    }
-    //status = u1db__index_all_docs(db, n_unique, unique_expressions);
-    return QString();
-    }
+    while (query.next())
+         expressions.append(query.value("field").toString());
+    return expressions;
 }
 
 QT_END_NAMESPACE_U1DB
