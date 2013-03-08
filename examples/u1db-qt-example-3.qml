@@ -175,19 +175,37 @@ Item {
                                     x: units.gu(1)
 
                                     /*!
-                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  Displaying its results is demonstrated here:
+                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  In our example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
 
-                                        text: aDocument.contents.hello
+                                    text: displayKey(aDocument.contents)
+
+                                    function displayKey(documentObject){
+
+                                        var keys = Object.keys(documentObject);
+
+                                        return keys[0]
+
+                                    }
 
                                     */
 
-                                    text: aDocument.contents.hello
+                                    text: displayKey(aDocument.contents)
+
+                                    function displayKey(documentObject){
+
+                                        var keys = Object.keys(documentObject);
+
+                                        return keys[0]
+
+                                    }
 
                                     onAccepted: {
 
                                         onClicked: updateContent(contents.hello,addressBar.text)
 
                                     }
+
+
 
                                     function updateContent(documentText, addressBarText) {
 
