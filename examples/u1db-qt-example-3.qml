@@ -69,7 +69,7 @@ Item {
         docId: 'helloworld'
         create: true
         defaults: { "hello":"Hello World" }
-        onContentsChanged: print(contents.hello)
+        //onContentsChanged: print(contents.hello)
         }
 
         Tabs {
@@ -189,31 +189,45 @@ Item {
 
                                     */
 
-                                    text: displayKey(aDocument.contents)
+                                    text: getCurrentDocumentKey(aDocument.contents)
 
-                                    function displayKey(documentObject){
+                                    function getCurrentDocumentKey(documentObject){
 
-                                        var keys = Object.keys(documentObject);
+                                        if(typeof documentObject!='undefined'){
 
-                                        return keys[0]
+                                            var keys = Object.keys(documentObject);
+
+                                            print("keys[0] = " + keys[0])
+
+                                            return keys[0]
+
+                                        }
+
+                                        else{
+
+                                            return ''
+                                        }
+
+
 
                                     }
 
                                     onAccepted: {
 
-                                        onClicked: updateContent(contents.hello,addressBar.text)
+                                        onClicked: updateContent(getCurrentDocumentKey(aDocument.contents),addressBar.text)
 
                                     }
-
 
 
                                     function updateContent(documentText, addressBarText) {
 
                                         if(documentText!==addressBarText){
 
-                                            var address = aDocument.contents;
-                                            address.hello = addressBarText;
-                                            aDocument.contents=address
+                                            var newContents = {};
+                                            var newFieldName = addressBarText;
+                                            aDocument.docId = addressBarText;
+                                            newContents[newFieldName]= 'More Hello Word...';
+                                            aDocument.contents=newContents
 
                                             print("Changing " + documentText+" --> "+addressBarText)
 
