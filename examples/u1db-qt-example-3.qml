@@ -95,9 +95,7 @@ Item {
 
                          color: "#00FFFFFF"
 
-                         /* The following ListView, which contains a TextArea for displaying contents from the database.
 
-                         The ListView should probably be removed in this case since we are not displaying multiple records from the database. */
 
                          Rectangle {
 
@@ -105,14 +103,24 @@ Item {
                             height: units.gu(60)
                             anchors.bottom: parent.bottom
 
+                            /*
+
+                            The following TextArea is for displaying contents from the database for the current .
+
+                             */
+
                             TextArea{
+
+                                id: documentContent
+
+                                selectByMouse : false
 
                                 x: units.gu(1)
                                 y: units.gu(1)
                                 width: units.gu(43)
                                 height: units.gu(58)
 
-                                color: "#FFFFFF"
+                                color: "#000000"
 
                             }
 
@@ -223,10 +231,26 @@ Item {
 
                                         if(documentText!==addressBarText){
 
+                                            /*!
+
+                                              Here we create a new object that will become the ccontents of the global document, including some default text.
+
+                                            documentContent.text = 'More Hello Word...';
+
                                             var newContents = {};
                                             var newFieldName = addressBarText;
                                             aDocument.docId = addressBarText;
-                                            newContents[newFieldName]= 'More Hello Word...';
+                                            newContents[newFieldName]= documentContent.text;
+                                            aDocument.contents=newContents
+
+                                              */
+
+                                            documentContent.text = 'More Hello Word...';
+
+                                            var newContents = {};
+                                            var newFieldName = addressBarText;
+                                            aDocument.docId = addressBarText;
+                                            newContents[newFieldName]= documentContent.text;
                                             aDocument.contents=newContents
 
                                             print("Changing " + documentText+" --> "+addressBarText)
