@@ -99,7 +99,7 @@ Item {
 
                          The ListView should probably be removed in this case since we are not displaying multiple records from the database. */
 
-                         ListView {
+                         Rectangle {
 
                             width: units.gu(45)
                             height: units.gu(60)
@@ -158,7 +158,7 @@ Item {
 
                           }
 
-                       ListView {
+                       Rectangle {
 
                             width: units.gu(45)
                             height: units.gu(5)
@@ -166,42 +166,22 @@ Item {
 
                             id: addressBarListView
 
-                            /*! Inside this example ListView is a reference to a Database model:
-
-                                ListView {
-
-                                     model: aDatabase
-
-                                 }
-
-                            */
-
-                            model: aDatabase
-
-                           /*!
-
-                               Once a model is assigned to a ListView a delegate can represent each Document retrieved from the Database.
-
-                                ListView {
-
-                                     model: aDatabase
-
-                                     delegate: Rectangle{
-                                         anchors.right: parent.right
-                                     }
-
-                                 }
-
-
-                           */
-
-                            delegate: TextField {
+                            TextField {
 
                                     id: addressBar
 
                                     width: units.gu(43)
                                     anchors.verticalCenter: parent.verticalCenter
                                     x: units.gu(1)
+
+                                    /*!
+                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  Displaying its results is demonstrated here:
+
+                                        text: aDocument.contents.hello
+
+                                    */
+
+                                    text: aDocument.contents.hello
 
                                     onAccepted: {
 
@@ -223,18 +203,6 @@ Item {
 
                                     }
 
-                                    text: {
-                                        /*!
-                                            The object called 'contents' contains a string as demonstrated here. In this example 'hello' is our search string.
-
-                                            text: contents.hello
-
-                                        */
-
-                                        text: contents.hello
-
-
-                                    }
 
                                 }
 
