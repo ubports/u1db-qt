@@ -68,7 +68,7 @@ Item {
         database: aDatabase
         docId: 'helloworld'
         create: true
-        defaults: { "hello":"Hello World" }
+        defaults: { "helloworld":"Hello World" }
         }
 
         Tabs {
@@ -84,7 +84,7 @@ Item {
 
                     id: helloPage
 
-                    // Here we define a rectangle that represents the lower portion of our application. It will contain all the main parts of the application.
+                    /*! Here a rectangle is defined that represents the lower portion of our application. It will contain all the main parts of the application.
 
                     Rectangle {
 
@@ -94,9 +94,19 @@ Item {
 
                          color: "#00FFFFFF"
 
-                         /* The following ListView, which contains a TextArea for displaying contents from the database.
+                         // The remainder of the main part of the application goes here ...
 
-                         The ListView should probably be removed in this case since we are not displaying multiple records from the database. */
+                         }
+
+                     */
+
+                    Rectangle {
+
+                         width: units.gu(45)
+                         height: units.gu(70)
+                         anchors.bottom: parent.bottom
+
+                         color: "#00FFFFFF"
 
                          Rectangle {
 
@@ -104,14 +114,39 @@ Item {
                             height: units.gu(60)
                             anchors.bottom: parent.bottom
 
+                            /*
+
+                            The following TextArea is for displaying contents for the current state of the global document, as defined by the key / name in the address bar.
+
                             TextArea{
+
+                                id: documentContent
+
+                                selectByMouse : false
 
                                 x: units.gu(1)
                                 y: units.gu(1)
                                 width: units.gu(43)
                                 height: units.gu(58)
+                                color: "#000000"
 
-                                color: "#FFFFFF"
+                            }
+
+                             */
+
+                            TextArea{
+
+                                id: documentContent
+
+                                selectByMouse : false
+
+                                x: units.gu(1)
+                                y: units.gu(1)
+                                width: units.gu(43)
+                                height: units.gu(58)
+                                color: "#000000"
+
+                                text: aDocument.contents.helloworld
 
                             }
 
@@ -123,9 +158,8 @@ Item {
 
                               width: units.gu(43)
                               height: units.gu(5)
-                              anchors.top: addressBarListView.bottom
+                              anchors.top: addressBarArea.bottom
                               x: units.gu(1.5)
-
                               color: "#00FFFFFF"
 
                               Row{
@@ -135,35 +169,38 @@ Item {
                                  anchors.verticalCenter: parent.verticalCenter
                                  spacing: units.gu(2)
 
-
                                  Button {
                                  text: "<"
                                  onClicked: print("clicked Back Button")
+                                 // add and call a function to find the document (in the database) previous to the current one, and then change both the address bar and content window to match as appropriate
                                  }
                                  Button {
                                  text: "Home"
                                  onClicked: print("clicked Home Button")
+                                 // add and call a function to find the document (in the database) defined as 'home', and then change both the address bar and content window to match as appropriate
                                  }
                                  Button {
                                  text: "+"
                                  onClicked: print("clicked Save Button")
+                                 // add a function to save the text in the content window, which will be applied to the name/key in the address bar
                                  }
                                  Button {
                                  text: ">"
                                  onClicked: print("clicked Forward Button")
+                                 // add and call a function to find the document (in the database) next to the current one, and then change both the address bar and content window to match as appropriate
                                  }
 
                               }
 
                           }
 
-                       Rectangle {
+                          Rectangle {
+
+                            id: addressBarArea
 
                             width: units.gu(45)
                             height: units.gu(5)
                             anchors.top: parent.top
-
-                            id: addressBarListView
 
                             TextField {
 
@@ -174,7 +211,7 @@ Item {
                                     x: units.gu(1)
 
                                     /*!
-                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  In our example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
+                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'helloworld', which represents a search string.  In our example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
 
                                     text: displayKey(aDocument.contents)
 
@@ -213,23 +250,77 @@ Item {
 
                                     onAccepted: {
 
-                                        onClicked: updateContent(getCurrentDocumentKey(aDocument.contents),addressBar.text)
+                                        onClicked: updateContentWindow(getCurrentDocumentKey(aDocument.contents),addressBar.text)
 
                                     }
 
+                                    function updateContentWindow(documentText, addressBarText) {
 
-                                    function updateContent(documentText, addressBarText) {
+                                        if(documentText!==addressBarText) {
 
-                                        if(documentText!==addressBarText){
-                                            print(documentText+" * "+addressBarText)
+                                            print('Current Document Key != Address Bar Text')
 
-                                            var newContents = {};
-                                            var newFieldName = addressBarText;
-                                            aDocument.docId = addressBarText;
-                                            newContents[newFieldName]= 'More Hello Word...';
-                                            aDocument.contents=newContents
+                                            /*!
 
-                                            print("Changing " + documentText+" --> "+addressBarText)
+                                            The next steps demonstrate the creation of a temporary document, based on a copy of the global document. This will then be used to determine if there is already a document in the database with the same docId as the address bar, and additionally with a key id with the same name.
+
+                                            var tempDocument = {}
+                                            var tempFieldName = addressBarText;
+                                            var tempContents = {};
+
+                                            tempDocument = aDocument
+                                            tempDocument.docId = addressBarText;
+
+                                            tempContents = tempDocument.contents
+
+                                            NOTE: For simplicity sake this example sometimes uses the same value for both the docId and the key id, as seen here. Real life implimentations can and will differ, and this will be demonstrated elsewhere in the example code.
+
+                                            */
+
+                                            var tempDocument = {}
+                                            var tempFieldName = addressBarText;
+                                            var tempContents = {};
+
+                                            tempDocument = aDocument
+                                            tempDocument.docId = addressBarText;
+
+                                            tempContents = tempDocument.contents
+
+                                            if(typeof tempContents !='undefined' && typeof tempContents[tempFieldName]!='undefined') {
+
+                                                aDocument = tempDocument
+                                                documentContent.text = tempContents[tempFieldName]
+
+                                            }
+                                            else {
+
+                                                /*!
+
+                                                Here the contents of the temporary document are modified, which then replaces the global document.
+
+                                                documentContent.text = 'More Hello World...';
+
+                                                tempContents = {}
+                                                tempContents[tempFieldName] = documentContent.text
+                                                tempDocument.contents = tempContents
+                                                aDocument = tempDocument
+
+                                                */
+
+                                                documentContent.text = 'More Hello World...';
+
+                                                tempContents = {}
+                                                tempContents[tempFieldName] = documentContent.text
+                                                tempDocument.contents = tempContents
+                                                aDocument = tempDocument
+
+
+                                            }
+
+                                        }
+                                        else {
+
+                                            print('Current Document Key == Address Bar Text')
 
                                         }
                                     }
