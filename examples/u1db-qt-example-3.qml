@@ -26,6 +26,108 @@ Item {
         width: units.gu(45)
         height: units.gu(80)
 
+        function getCurrentDocumentKey(documentObject){
+
+            if(typeof documentObject!='undefined'){
+
+                var keys = Object.keys(documentObject);
+
+                print("keys[0] = " + keys[0])
+
+                return keys[0]
+
+            }
+
+            else{
+
+                return ''
+            }
+
+
+
+        }
+
+
+        function updateContentWindow(documentText, addressBarText) {
+
+            // Somewhere below need to check for things like invalid docId
+
+            if(documentText!==addressBarText) {
+
+                print('Current Document Key != Address Bar Text')
+
+                /*!
+
+                The next steps demonstrate the creation of a temporary document, based on a copy of the global document. This will then be used to determine if there is already a document in the database with the same docId as the address bar, and additionally with a key id with the same name.
+
+                var tempDocument = {}
+                var tempFieldName = addressBarText;
+                var tempContents = {};
+
+                tempDocument = aDocument
+                tempDocument.docId = addressBarText;
+
+                tempContents = tempDocument.contents
+
+                NOTE: For simplicity sake this example sometimes uses the same value for both the docId and the key id, as seen here. Real life implimentations can and will differ, and this will be demonstrated elsewhere in the example code.
+
+                */
+
+                var tempDocument = {}
+                var tempFieldName = addressBarText;
+                var tempContents = {};
+
+                tempDocument = aDocument
+                tempDocument.docId = addressBarText;
+
+                tempContents = tempDocument.contents
+
+                if(typeof tempContents !='undefined' && typeof tempContents[tempFieldName]!='undefined') {
+
+                    aDocument = tempDocument
+                    documentContent.text = tempContents[tempFieldName]
+
+                }
+                else {
+
+                    /*!
+
+                    Here the contents of the temporary document are modified, which then replaces the global document.
+
+                    documentContent.text = 'More Hello World...';
+
+                    tempContents = {}
+                    tempContents[tempFieldName] = documentContent.text
+                    tempDocument.contents = tempContents
+                    aDocument = tempDocument
+
+                    */
+
+                    documentContent.text = 'More Hello World...';
+
+                    tempContents = {}
+                    tempContents[tempFieldName] = documentContent.text
+                    tempDocument.contents = tempContents
+                    aDocument = tempDocument
+
+
+                }
+
+            }
+            else {
+
+                print('Current Document Key == Address Bar Text')
+
+                tempContents = {}
+                tempFieldName = getCurrentDocumentKey(aDocument.contents)
+                tempContents[tempFieldName] = documentContent.text
+                aDocument.contents = tempContents
+
+
+            }
+
+        }
+
     MainView {
 
         id: u1dbView
@@ -109,6 +211,8 @@ Item {
 
                          color: "#00FFFFFF"
 
+
+
                          Rectangle {
 
                             width: units.gu(45)
@@ -135,7 +239,7 @@ Item {
 
                              */
 
-                            TextArea{
+                            TextArea {
 
                                 id: documentContent
 
@@ -182,7 +286,7 @@ Item {
                                  }
                                  Button {
                                  text: "+"
-                                 onClicked: print("clicked Save Button")
+                                 onClicked: print("clicked Save Button"), updateContentWindow(getCurrentDocumentKey(aDocument.contents),addressBar.text)
                                  // add a function to save the text in the content window, which will be applied to the name/key in the address bar
                                  }
                                  Button {
@@ -213,7 +317,7 @@ Item {
 
                                     /*!
 
-                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  In our example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
+                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  In this example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
 
                                     text: displayKey(aDocument.contents)
 
@@ -229,26 +333,6 @@ Item {
 
                                     text: getCurrentDocumentKey(aDocument.contents)
 
-                                    function getCurrentDocumentKey(documentObject){
-
-                                        if(typeof documentObject!='undefined'){
-
-                                            var keys = Object.keys(documentObject);
-
-                                            print("keys[0] = " + keys[0])
-
-                                            return keys[0]
-
-                                        }
-
-                                        else{
-
-                                            return ''
-                                        }
-
-
-
-                                    }
 
                                     onAccepted: {
 
@@ -256,77 +340,7 @@ Item {
 
                                     }
 
-                                    function updateContentWindow(documentText, addressBarText) {
 
-                                        if(documentText!==addressBarText) {
-
-                                            print('Current Document Key != Address Bar Text')
-
-                                            /*!
-
-                                            The next steps demonstrate the creation of a temporary document, based on a copy of the global document. This will then be used to determine if there is already a document in the database with the same docId as the address bar, and additionally with a key id with the same name.
-
-                                            var tempDocument = {}
-                                            var tempFieldName = addressBarText;
-                                            var tempContents = {};
-
-                                            tempDocument = aDocument
-                                            tempDocument.docId = addressBarText;
-
-                                            tempContents = tempDocument.contents
-
-                                            NOTE: For simplicity sake this example sometimes uses the same value for both the docId and the key id, as seen here. Real life implimentations can and will differ, and this will be demonstrated elsewhere in the example code.
-
-                                            */
-
-                                            var tempDocument = {}
-                                            var tempFieldName = addressBarText;
-                                            var tempContents = {};
-
-                                            tempDocument = aDocument
-                                            tempDocument.docId = addressBarText;
-
-                                            tempContents = tempDocument.contents
-
-                                            if(typeof tempContents !='undefined' && typeof tempContents[tempFieldName]!='undefined') {
-
-                                                aDocument = tempDocument
-                                                documentContent.text = tempContents[tempFieldName]
-
-                                            }
-                                            else {
-
-                                                /*!
-
-                                                Here the contents of the temporary document are modified, which then replaces the global document.
-
-                                                documentContent.text = 'More Hello World...';
-
-                                                tempContents = {}
-                                                tempContents[tempFieldName] = documentContent.text
-                                                tempDocument.contents = tempContents
-                                                aDocument = tempDocument
-
-                                                */
-
-                                                documentContent.text = 'More Hello World...';
-
-                                                tempContents = {}
-                                                tempContents[tempFieldName] = documentContent.text
-                                                tempDocument.contents = tempContents
-                                                aDocument = tempDocument
-
-
-                                            }
-
-                                        }
-                                        else {
-
-                                            print('Current Document Key == Address Bar Text')
-
-                                        }
-
-                                    }
 
 
                                 }
