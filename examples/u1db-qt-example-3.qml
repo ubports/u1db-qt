@@ -21,18 +21,77 @@ import QtQuick 2.0
 import U1db 1.0 as U1db
 import Ubuntu.Components 0.1
 
+/*!
+
+This example and tutorial is designed to show a wide variety of U1Db-Qt functionality and usage. The example demonstrates:
+
+\list 1
+    \li Combining U1Db-Qt with elements and components that do not utilize models
+    \li Blending the U1Db-Qt plugin with QML and Javascript
+\endlist
+
+  */
+
 Item {
 
         width: units.gu(45)
         height: units.gu(80)
+
+        /*!
+
+            A Database is very simple to create. It only needs an id and a path where the file will be created. A Database is a model, which can be used by elements, such as the ListView further in this example.
+
+            U1db.Database {
+                id: aDatabase
+                path: "aU1DbDSatabase2"
+            }
+
+        */
+
+        U1db.Database {
+            id: aDatabase
+            path: "aU1DbDSatabase3"
+        }
+
+        /*!
+
+            A Document can be declared at runtime. It requires at the very least a unique 'docId', but that alone won't do anything special. The snipet below snippet demonstrates the basic requirements.
+
+            In addition to this, this example displays text from the database for a specific docId and id key in a text area called 'documentContent. To update the text area at startup with either the default value or a value from the database the onCompleted function is utilized, which is also demonstrated below.
+
+            U1db.Document {
+                id: aDocument
+                database: aDatabase
+                docId: 'helloworld'
+                create: true
+                defaults: { "helloworld":"Hello World" }
+
+                Component.onCompleted: {
+                    documentContent.text = aDocument.contents.helloworld
+                }
+
+            }
+
+        */
+
+       U1db.Document {
+            id: aDocument
+            database: aDatabase
+            docId: 'helloworld'
+            create: true
+            defaults: { "helloworld":"Hello World" }
+
+            Component.onCompleted: {
+                documentContent.text = aDocument.contents.helloworld
+            }
+
+        }
 
         function getCurrentDocumentKey(documentObject){
 
             if(typeof documentObject!='undefined'){
 
                 var keys = Object.keys(documentObject);
-
-                print("keys[0] = " + keys[0])
 
                 return keys[0]
 
@@ -54,11 +113,9 @@ Item {
 
             if(documentText!==addressBarText) {
 
-                print('Current Document Key != Address Bar Text')
-
                 /*!
 
-                The next steps demonstrate the creation of a temporary document, based on a copy of the global document. This will then be used to determine if there is already a document in the database with the same docId as the address bar, and additionally with a key id with the same name.
+                Thes steps demonstrate the creation of a temporary document, based on a copy of the global document. This will then be used to determine if there is already a document in the database with the same docId as the address bar, and additionally with a key id with the same name.
 
                 var tempDocument = {}
                 var tempFieldName = addressBarText;
@@ -110,19 +167,26 @@ Item {
                     tempDocument.contents = tempContents
                     aDocument = tempDocument
 
-
                 }
 
             }
             else {
 
-                print('Current Document Key == Address Bar Text')
+                /*!
+
+                In this instance the current document's content is updated from the text view. The unique key and docId are not modified because the database already contains a record with those properties.
 
                 tempContents = {}
                 tempFieldName = getCurrentDocumentKey(aDocument.contents)
                 tempContents[tempFieldName] = documentContent.text
                 aDocument.contents = tempContents
 
+                */
+
+                tempContents = {}
+                tempFieldName = getCurrentDocumentKey(aDocument.contents)
+                tempContents[tempFieldName] = documentContent.text
+                aDocument.contents = tempContents
 
             }
 
@@ -134,44 +198,6 @@ Item {
         width: units.gu(45)
         height: units.gu(80)
         anchors.top: parent.top;
-
-        /*!
-
-            A Database is very simple to create. It only needs an id and a path where the file will be created. A Database is a model, which can be used by elements, such as the ListView further in this example.
-
-            U1db.Database {
-                id: aDatabase
-                path: "aU1DbDSatabase2"
-            }
-
-        */
-
-        U1db.Database {
-            id: aDatabase
-            path: "aU1DbDSatabase3"
-        }
-
-        /*!
-
-            A Document can be declared at runtime. It requires at the very least a unique 'docId', but that alone won't do anything special. In order for a document to be entered into the database the below snippet demonstrates the basic requirements. The id might be optional.
-
-            U1db.Document {
-            id: aDocument
-            database: aDatabase
-            docId: 'helloworld'
-            create: true
-            defaults: { "hello":"Hello World" }
-            }
-
-        */
-
-       U1db.Document {
-        id: aDocument
-        database: aDatabase
-        docId: 'helloworld'
-        create: true
-        defaults: { "helloworld":"Hello World" }
-        }
 
         Tabs {
             id: tabs
@@ -248,8 +274,6 @@ Item {
                                 height: units.gu(58)
                                 color: "#000000"
 
-                                text: aDocument.contents.helloworld
-
                             }
 
                          }
@@ -278,13 +302,11 @@ Item {
                                  }
                                  Button {
                                  text: "Home"
-                                 onClicked: print("clicked Home Button")
-                                 // add and call a function to find the document (in the database) defined as 'home', and then change both the address bar and content window to match as appropriate
-                                 }
+                                 onClicked: updateContentWindow(getCurrentDocumentKey(aDocument.contents),'helloworld')
+                                                                 }
                                  Button {
-                                 text: "+"
-                                 onClicked: print("clicked Save Button"), updateContentWindow(getCurrentDocumentKey(aDocument.contents),addressBar.text)
-                                 // add a function to save the text in the content window, which will be applied to the name/key in the address bar
+                                 text: "Save"
+                                 onClicked: updateContentWindow(getCurrentDocumentKey(aDocument.contents),addressBar.text)
                                  }
                                  Button {
                                  text: ">"
@@ -341,6 +363,7 @@ Item {
 
 
                         }
+
 
                     }
 
