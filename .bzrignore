@@ -15,3 +15,5 @@ Testing
 *-xunit.xml
 libu1db-qt.pc.in
 tests/test-database
+sql.qrc.depends
+qrc_sql.cpp

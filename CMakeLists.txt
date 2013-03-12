@@ -29,6 +29,13 @@ set(U1DB_QT_SRCS
     query.cpp
     )
 
+# Resources
+set(U1DB_QT_RESOURCES
+    sql.qrc
+    )
+
+QT5_ADD_RESOURCES(U1DB_QT_RCC ${U1DB_QT_RESOURCES})
+
 ## QtU1DBQml
 set(QtU1DBQml_SRCS
     plugin.cpp
@@ -44,7 +51,7 @@ include_directories(
     ${U1DB_INCLUDE_DIRS}
     )
 
-add_library(${U1DB_QT_LIBNAME} SHARED ${U1DB_QT_SRCS})
+add_library(${U1DB_QT_LIBNAME} SHARED ${U1DB_QT_SRCS} ${U1DB_QT_RCC})
 target_link_libraries(${U1DB_QT_LIBNAME}
     ${OUR_QT_CORE_LIB}
     ${OUR_QT_SQL_LIB}
