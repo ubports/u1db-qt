@@ -344,7 +344,7 @@ Item {
                             height: units.gu(60)
                             anchors.bottom: parent.bottom
 
-                            /*
+                            /*!
 
                             The following TextArea is for displaying contents for the current state of the global document, as defined by the key / name in the address bar.
 
