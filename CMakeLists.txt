@@ -29,6 +29,16 @@ set(U1DB_QT_SRCS
     query.cpp
     )
 
+# Generated files
+set(U1DB_QT_GENERATED
+    moc_database.cpp
+    moc_document.cpp
+    moc_index.cpp
+    moc_query.cpp
+    )
+
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${U1DB_QT_GENERATED}")
+
 # Resources
 set(U1DB_QT_RESOURCES
     sql.qrc
