@@ -436,6 +436,8 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     x: units.gu(1)
 
+                                    hasClearButton: false
+
                                     /*!
 
                                         There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  In this example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
