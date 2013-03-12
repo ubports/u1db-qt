@@ -81,10 +81,10 @@ Database::initializeIfNeeded(const QString& path)
     {
         if (!isInitialized())
         {
-            // QFile file("qrc:///dbschema.sql");
-            QFile file("../dbschema.sql");
-            if (!file.exists ())
-                file.setFileName("./dbschema.sql");
+            QFile file(":/dbschema.sql");            
+										 if (!file.exists ()){
+											    return setError(QString("Failed to find database schema file: FileError %1").arg(file.error()));
+											}   
             if (file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
                 while (!file.atEnd())
