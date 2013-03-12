@@ -87,11 +87,109 @@ Item {
 
         }
 
-        function getCurrentDocumentKey(documentObject){
+       function switchToPreviousDocument(documentObject){
 
-            if(typeof documentObject!='undefined'){
+          aDocument.docId = getPreviousDocumentId(documentObject)
 
-                var keys = Object.keys(documentObject);
+          }
+
+       function switchToNextDocument(){
+
+          aDocument.docId = getNextDocumentId(aDocument)
+
+        }
+
+
+       function getPreviousDocumentId(documentObject){
+
+           if(typeof documentObject!='undefined'){
+
+               /*!
+
+                 The listDocs method retrieves all the docId values from the current database. In this demonstration the values are put into an array, which is then checked to locate the docId for the current and previous documents within the database.
+
+               var documentIds = {}
+
+               documentIds = documentObject.database.listDocs()
+
+               for(var i = 0; i < documentIds.length; i++){
+
+                   if(documentIds[i]===documentObject.docId && i > 0){
+                       return documentIds[i-1]
+                   }
+                   else if(documentIds[i]===documentObject.docId && i==0){
+                       return documentIds[documentIds.length-1]
+                   }
+
+               }
+
+                 */
+
+               var documentIds = {}
+
+               documentIds = documentObject.database.listDocs()
+
+               for(var i = 0; i < documentIds.length; i++){
+
+                   if(documentIds[i]===documentObject.docId && i > 0){
+                       return documentIds[i-1]
+                   }
+                   else if(documentIds[i]===documentObject.docId && i==0){
+                       return documentIds[documentIds.length-1]
+                   }
+
+               }
+
+               return documentIds[0]
+
+           }
+
+           else{
+
+               print("Error!")
+
+               return ''
+           }
+
+
+       }
+
+       function getNextDocumentId(documentObject){
+
+           if(typeof documentObject!='undefined'){
+
+               var documentIds = documentObject.database.listDocs()
+
+               for(var i = 0; i < documentIds.length; i++){
+
+                   if(documentIds[i]===documentObject.docId && i < (documentIds.length-1)){
+                       return documentIds[i+1]
+                   }
+                   else if(documentIds[i]===documentObject.docId && i==(documentIds.length-1)){
+                       return documentIds[0]
+                   }
+
+               }
+
+               return documentIds[0]
+
+           }
+
+           else{
+
+               print("Error!")
+
+               return ''
+           }
+
+
+       }
+
+        function getCurrentDocumentKey(contentsObject){
+
+            if(typeof contentsObject!='undefined'){
+
+                var keys = Object.keys(contentsObject);
 
                 return keys[0]
 
@@ -115,7 +213,7 @@ Item {
 
                 /*!
 
-                Thes steps demonstrate the creation of a temporary document, based on a copy of the global document. This will then be used to determine if there is already a document in the database with the same docId as the address bar, and additionally with a key id with the same name.
+                These steps demonstrate the creation of a temporary document, based on a copy of the global document. This will then be used to determine if there is already a document in the database with the same docId as the address bar, and additionally with a key id with the same name.
 
                 var tempDocument = {}
                 var tempFieldName = addressBarText;
@@ -242,7 +340,7 @@ Item {
                             height: units.gu(60)
                             anchors.bottom: parent.bottom
 
-                            /*
+                            /*!
 
                             The following TextArea is for displaying contents for the current state of the global document, as defined by the key / name in the address bar.
 
@@ -297,8 +395,7 @@ Item {
 
                                  Button {
                                  text: "<"
-                                 onClicked: print("clicked Back Button")
-                                 // add and call a function to find the document (in the database) previous to the current one, and then change both the address bar and content window to match as appropriate
+                                 onClicked: updateContentWindow(switchToPreviousDocument(aDocument), addressBar.text)
                                  }
                                  Button {
                                  text: "Home"
@@ -310,9 +407,10 @@ Item {
                                  }
                                  Button {
                                  text: ">"
-                                 onClicked: print("clicked Forward Button")
-                                 // add and call a function to find the document (in the database) next to the current one, and then change both the address bar and content window to match as appropriate
+                                 onClicked: updateContentWindow(switchToNextDocument(aDocument), addressBar.text)
                                  }
+
+
 
                               }
 
@@ -333,6 +431,8 @@ Item {
                                     width: units.gu(43)
                                     anchors.verticalCenter: parent.verticalCenter
                                     x: units.gu(1)
+
+                                    hasClearButton: false
 
                                     /*!
                                         There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'helloworld', which represents a search string.  In our example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
