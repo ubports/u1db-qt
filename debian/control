@@ -4,8 +4,8 @@ Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
                cmake (>= 2.8.6),
-               qtbase,
-               qtdeclarative,
+               qtdeclarative5-dev,
+               qtbase5-dev,
                dbus-test-runner,
 Standards-Version: 3.9.3
 Vcs-Bzr: https://launchpad.net/u1db-qt/trunk
@@ -22,8 +22,8 @@ Section: libdevel
 Architecture: any
 Depends: ${misc:Depends},
          libu1db-qt5-1 (= ${binary:Version}),
-         qtbase,
-         qtdeclarative,
+         qtdeclarative5dev,
+         qtbase5-dev,
          libu1db-dev (>= 1.0.0),
 Description: Qt5 binding and QtQuick2 plugin for U1DB - development files
  Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).

@@ -1,5 +1,10 @@
-u1db-qt (1.0-0ubuntu0) quantal; urgency=low
+u1db-qt (0.1.1-0ubuntu0) quantal; urgency=low
 
-  * Initial Release
+  * Fixed a packaging issue. The following still apply from 0.1:
 
- -- Christian Dywan <christian.dywan@canonical.com>  Wed, 30 Jan 2013 17:30:00  +0200
+  * Initial Alpha (Unstable) Release
+  * API subject to change
+  * API not feature complete
+  * Basic functionality is available, but does not yet meet the API specification and may still contain bugs
+ 
+ -- Kevin Wright <kevin.wright@canonical.com>  Tue, 12 Mar 2013 12:15:00  +0100
