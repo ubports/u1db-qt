@@ -74,6 +74,7 @@ Item {
 
         */
 
+
        U1db.Document {
             id: aDocument
             database: aDatabase
@@ -87,6 +88,29 @@ Item {
 
         }
 
+       /*!
+
+         It should be possible to use a document without a database, as demonstrated in this snippet. Additionally this document will use the concept of sub-keys, as exemplified by the "bookmarks" id key + contents. This example will attempt to use the bookmark document to store docId values from the database, which will be displayed in a ListView on the second tab of the application. The user will be able to select a value from the ListView and the first tab will be modified accordingly.
+
+       U1db.Document {
+            id: aBookmarkDocument
+            docId: 'bookmarks'
+            create: true
+            defaults: { "bookmarks": [{}] }
+       }
+
+
+         */
+
+
+       U1db.Document {
+            id: aBookmarkDocument
+            docId: 'bookmarks'
+            create: true
+            defaults: { "bookmarks": [{}] }
+       }
+
+
        function switchToPreviousDocument(documentObject){
 
           aDocument.docId = getPreviousDocumentId(documentObject)
@@ -98,7 +122,6 @@ Item {
           aDocument.docId = getNextDocumentId(aDocument)
 
         }
-
 
        function getPreviousDocumentId(documentObject){
 
@@ -151,7 +174,6 @@ Item {
                return ''
            }
 
-
        }
 
        function getNextDocumentId(documentObject){
@@ -182,7 +204,6 @@ Item {
                return ''
            }
 
-
        }
 
         function getCurrentDocumentKey(contentsObject){
@@ -200,10 +221,7 @@ Item {
                 return ''
             }
 
-
-
         }
-
 
         function updateContentWindow(documentText, addressBarText) {
 
@@ -297,8 +315,6 @@ Item {
         height: units.gu(80)
         anchors.top: parent.top;
 
-
-
         Tabs {
             id: tabs
             anchors.fill: parent
@@ -335,8 +351,6 @@ Item {
                          anchors.bottom: parent.bottom
 
                          color: "#00FFFFFF"
-
-
 
                          Rectangle {
 
@@ -413,8 +427,6 @@ Item {
                                  text: ">"
                                  onClicked: updateContentWindow(switchToNextDocument(aDocument), addressBar.text)
                                  }
-
-
 
                               }
 
