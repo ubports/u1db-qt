@@ -23,8 +23,8 @@
 This concept guide will describe a wide variety of U1Db-Qt functionality and usage. It will cover:
 
 \list 1
-    \li Breif description of U1Db
-    \li What is the difference between U1Db and U1Db-Qt?
+    \li Brief description of U1DB
+    \li What is the difference between U1DB and U1Db-Qt?
     \li Overview of U1Db Documents and Databases
     \li Creating Documents and Databases
     \li Blending the U1Db-Qt plugin with QML and Javascript
@@ -38,7 +38,21 @@ This concept guide will describe a wide variety of U1Db-Qt functionality and usa
 
   */
 
+/*!
 
+\section1 Brief Description of U1DB
+
+U1DB is a database API for synchronised databases of JSON documents. It’s simple to use in applications, and allows apps to store documents and synchronise them between machines and devices. U1DB is the database designed to work everywhere, backed by the platform’s native data storage capabilities. This means that you can use u1db on different platforms, from different languages, and backed on to different databases, and sync between all of them.
+
+  */
+
+/*!
+
+\section1 What is the difference between U1DB and U1Db-Qt
+
+U1Db-Qt is the QML implementation of U1DB. It is a QML plugin written in C++ and allows for creating and manipulating U1DB databases via a more declarative approach within a QML application.
+
+  */
 
         /*!
 
