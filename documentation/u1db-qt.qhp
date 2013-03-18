@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <QtHelpProject version="1.0">
+     <namespace>ubuntu.com.u1db-qt.0.33</namespace>
+     <virtualFolder>doc</virtualFolder>
+     <customFilter name="U1Db-Qt 0.33">
+         <filterAttribute>u1db-qt</filterAttribute>
+         <filterAttribute>0.33</filterAttribute>
+     </customFilter>
+     <filterSection>
+         <filterAttribute>u1db-qt</filterAttribute>
+         <filterAttribute>0.33</filterAttribute>
+         <toc>
+             <section title="U1Db-Qt Manual" ref="index.html">
+                 <section title="Example 3" ref="qml-u1db-qt-example-3.html"/>
+                 <section title="Example 4" ref="qml-u1db-qt-example-4.html"/>
+             </section>
+         </toc>
+         <files>
+             <file>output/html/*.html</file>
+         </files>
+     </filterSection>
+ </QtHelpProject>

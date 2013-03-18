@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE QDOCINDEX>
+<INDEX url="" title="U1Db-Qt plugin documentation" version="">
+    <namespace access="public" threadsafety="unspecified" status="commendable" name="" href="" location="">
+        <qmlclass access="public" status="commendable" name="u1db-qt-example-3" href="qml-u1db-qt-example-3.html" title="u1db-qt-example-3" fulltitle="u1db-qt-example-3" subtitle="" location="u1db-qt-example-3.qml">
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="getCurrentDocumentKey" fullname="u1db-qt-example-3::getCurrentDocumentKey" href="qml-u1db-qt-example-3.html#getCurrentDocumentKey-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="getNextDocumentId" fullname="u1db-qt-example-3::getNextDocumentId" href="qml-u1db-qt-example-3.html#getNextDocumentId-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="getPreviousDocumentId" fullname="u1db-qt-example-3::getPreviousDocumentId" href="qml-u1db-qt-example-3.html#getPreviousDocumentId-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="switchToNextDocument" fullname="u1db-qt-example-3::switchToNextDocument" href="qml-u1db-qt-example-3.html#switchToNextDocument-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="switchToPreviousDocument" fullname="u1db-qt-example-3::switchToPreviousDocument" href="qml-u1db-qt-example-3.html#switchToPreviousDocument-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="updateContentWindow" fullname="u1db-qt-example-3::updateContentWindow" href="qml-u1db-qt-example-3.html#updateContentWindow-method"/>
+        </qmlclass>
+        <qmlclass access="public" status="commendable" name="u1db-qt-example-4" href="qml-u1db-qt-example-4.html" title="u1db-qt-example-4" fulltitle="u1db-qt-example-4" subtitle="" location="u1db-qt-example-4.qml">
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="getCurrentDocumentKey" fullname="u1db-qt-example-4::getCurrentDocumentKey" href="qml-u1db-qt-example-4.html#getCurrentDocumentKey-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="getNextDocumentId" fullname="u1db-qt-example-4::getNextDocumentId" href="qml-u1db-qt-example-4.html#getNextDocumentId-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="getPreviousDocumentId" fullname="u1db-qt-example-4::getPreviousDocumentId" href="qml-u1db-qt-example-4.html#getPreviousDocumentId-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="switchToNextDocument" fullname="u1db-qt-example-4::switchToNextDocument" href="qml-u1db-qt-example-4.html#switchToNextDocument-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="switchToPreviousDocument" fullname="u1db-qt-example-4::switchToPreviousDocument" href="qml-u1db-qt-example-4.html#switchToPreviousDocument-method"/>
+            <qmlmethod access="public" threadsafety="unspecified" status="commendable" name="updateContentWindow" fullname="u1db-qt-example-4::updateContentWindow" href="qml-u1db-qt-example-4.html#updateContentWindow-method"/>
+        </qmlclass>
+    </namespace>
+</INDEX>
