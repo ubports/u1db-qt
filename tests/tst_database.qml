@@ -78,7 +78,8 @@ Item {
         width: 200; height: 200
         delegate: Text {
             x: 66; y: 77
-            text: "myDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents)
+            text: "otherDelegate index:%1".arg(index)
+            // text: "myDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents)
         }
     }
 
@@ -88,7 +89,8 @@ Item {
         width: 200; height: 200
         delegate: Text {
             x: 66; y: 77
-            text: "otherDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents)
+            text: "otherDelegate index:%1".arg(index)
+            // text: "otherDelegate index:%1 docId:%2 contents:%3".arg(index).arg(docId).arg(contents)
         }
     }
 
