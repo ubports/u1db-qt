@@ -17,3 +17,6 @@ libu1db-qt.pc.in
 tests/test-database
 sql.qrc.depends
 qrc_sql.cpp
+documentation/output
+documentation/u1db-qt.qhcp
+documentation/u1db-qt.qhp

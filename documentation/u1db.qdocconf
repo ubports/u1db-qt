@@ -1,0 +1,14 @@
+project = U1Db-Qt
+description = U1Db-Qt plugin documentation
+
+sourcedirs = ..
+exampledirs = ../examples
+imagedirs = images 
+
+sources.fileextensions = "*.cpp *.qdoc *.mm *.qml"
+headers.fileextensions = "*.h *.ch *.h++ *.hh *.hpp *.hxx"
+examples.fileextensions = "*.cpp *.h *.js *.xq *.svg *.xml *.ui *.qhp *.qhcp *.qml"
+examples.imageextensions = "*.png *.jpeg *.jpg *.gif *.mng"
+
+outputdir  =    output/html
+outputformats = HTML
