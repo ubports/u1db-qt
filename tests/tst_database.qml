@@ -27,6 +27,14 @@ Item {
     U1db.Database {
         id: myDatabase
         path: "bogus"
+        property bool first_row_loaded: false
+        property bool last_row_loaded: false
+        onDocLoaded: {
+            if (path == 'loaded.db' && docId == 'dl0')
+                first_row_loaded = true
+            if (path == 'loaded.db' && docId == 'dl99')
+                last_row_loaded = true
+        }
     }
 
     U1db.Document {
@@ -138,6 +146,25 @@ TestCase {
         compare(myDatabase.getIndexKeys('by-phone-number'), ['12345', '54321'])
     }
 
+    function test_6_fillDocument () {
+        myDatabase.path = "loaded.db"
+        spyPathChanged.wait()
+        for (var i = 0; i < 100; i++)
+            myDatabase.putDoc({'foo': 'bar'} ,'dl' + Number(i).toLocaleString())
+        myDatabase.path = ":memory:"
+        spyPathChanged.wait()
+        compare(myDatabase.listDocs(), [])
+        compare(myList.count, 0)
+        myDatabase.first_row_loaded = false
+        myDatabase.last_row_loaded = false
+        myDatabase.path = "loaded.db"
+        spyPathChanged.wait()
+        compare(myList.count, 100)
+        spyDocLoaded.wait()
+        // FIXME compare(myDatabase.first_row_loaded, true)
+        compare(myDatabase.last_row_loaded, false)
+    }
+
     SignalSpy {
         id: spyPathChanged
         target: myDatabase
@@ -162,5 +189,10 @@ TestCase {
         signalName: "completed"
     }
 
+    SignalSpy {
+        id: spyDocLoaded
+        target: myDatabase
+        signalName: "docLoaded"
+    }
 } }
 

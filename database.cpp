@@ -174,6 +174,7 @@ Database::getDocUnchecked(const QString& docId) const
     if (query.exec() && query.next())
     {
         QJsonDocument json(QJsonDocument::fromJson(query.value("content").toByteArray()));
+        Q_EMIT docLoaded(docId, json.object().toVariantMap());
         return json.object().toVariantMap();
     }
     return QVariant();
@@ -199,6 +200,7 @@ Database::getDoc(const QString& docId)
             if (query.value("conflicts").toInt() > 0)
                 setError(QString("Conflicts in %1").arg(docId));
             QJsonDocument json(QJsonDocument::fromJson(query.value("content").toByteArray()));
+            Q_EMIT docLoaded(docId, json.object().toVariantMap());
             return json.object().toVariantMap();
         }
         return setError(QString("Failed to get document %1: No document").arg(docId)) ? QVariant() : QVariant();
