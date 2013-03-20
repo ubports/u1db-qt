@@ -363,6 +363,51 @@ Database::getIndexExpressions(const QString& indexName)
     return expressions;
 }
 
+QStringList
+Database::getIndexKeys(const QString& indexName)
+{
+    QStringList list;
+    if (!initializeIfNeeded())
+        return list;
+
+    QStringList expressions = getIndexExpressions(indexName);
+    QString valueFields, tables, noValueWhere;
+    int i = 0;
+    Q_FOREACH (QString expression, expressions)
+    {
+        valueFields += QString("d%1.value,").arg(i);
+        tables += QString("document_fields d%1,").arg(i);
+        noValueWhere += QString("d.doc_id = d%1.doc_id AND d%1.field_name = \"%2\" AND ").arg(
+            i).arg(expression);
+    }
+    if (valueFields.endsWith(","))
+        valueFields.chop(1);
+    if (tables.endsWith(","))
+        tables.chop(1);
+    if (noValueWhere.endsWith("AND "))
+        noValueWhere.chop(4);
+
+    QString where;
+    i = 0;
+    Q_FOREACH (QString expression, expressions)
+    {
+        where += QString("%1 AND d%2.value NOT NULL AND ").arg(noValueWhere).arg(i);
+        i++;
+    }
+    if (where.endsWith("AND "))
+        where.chop(4);
+
+    QSqlQuery query(m_db.exec());
+    query.prepare(QString("SELECT %1 FROM document d, %2 WHERE %3 GROUP BY %1").arg(
+        valueFields, tables, where));
+    if (!query.exec())
+        return setError(QString("Failed to get index keys: %1\n%2").arg(m_db.lastError().text()).arg(query.lastQuery())) ? list : list;
+
+    while (query.next())
+        list.append(query.value("value").toString());
+    return list;
+}
+
 QT_END_NAMESPACE_U1DB
 
 #include "moc_database.cpp"

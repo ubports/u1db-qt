@@ -135,6 +135,7 @@ TestCase {
             { 'name': 'Mary', 'phone_number': '12345' },
             { 'name': 'Rob', 'phone_number': '54321' },
             ] })
+        compare(myDatabase.getIndexKeys('by-phone-number'), ['12345', '54321'])
     }
 
     SignalSpy {
