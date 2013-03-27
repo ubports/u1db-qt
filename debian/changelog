@@ -1,3 +1,10 @@
+u1db-qt (0.1.1-0ubuntu1) quantal; urgency=low
+  * Added .install files
+  * Corrected dependencies
+  * Drop obsolete -DWITHQT5=1 flag
+ 
+ -- Christian Dywan <christian.dywan@canonical.com>  Wed, 27 Mar 2013 12:37:06  +0100
+
 u1db-qt (0.1.1-0ubuntu0) quantal; urgency=low
 
   * Fixed a packaging issue. The following still apply from 0.1:

@@ -14,6 +14,7 @@ Package: libu1db-qt5-1
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
+         libqt5sql5-sqlite
 Description: Qt5 binding and QtQuick2 plugin for U1DB - shared library
  Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
 
@@ -22,9 +23,8 @@ Section: libdevel
 Architecture: any
 Depends: ${misc:Depends},
          libu1db-qt5-1 (= ${binary:Version}),
-         qtdeclarative5dev,
-         qtbase5-dev,
-         libu1db-dev (>= 1.0.0),
+         qtdeclarative5-dev,
+         qtbase5-dev
 Description: Qt5 binding and QtQuick2 plugin for U1DB - development files
  Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
  .
