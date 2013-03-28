@@ -43,14 +43,14 @@ Item {
 
             U1db.Database {
                 id: aDatabase
-                path: "aU1DbDSatabase2"
+                path: "aDatabase4"
             }
 
         */
 
         U1db.Database {
             id: aDatabase
-            path: "aU1DbDSatabase4"
+            path: "aDatabase4"
         }
 
         /*!

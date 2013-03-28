@@ -9,6 +9,11 @@ qmlscene -I ./modules examples/u1db-qt-example-1.qml
 qmltestrunner -import ./modules
 make check
 
+*** Run reference test cases ***
+
+make
+env PYTHONPATH=/path/to/u1db ./tests/test-upstream.py
+
 *** Use U1DB Python API to check sqlite compatiblity ***
 
 python -c "import u1db;db=u1db.open('pDb',create=False);print(db.get_all_docs());print(db.list_indexes())"

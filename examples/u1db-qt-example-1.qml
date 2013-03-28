@@ -36,7 +36,7 @@ MainView {
     
     U1db.Database {
         id: aDatabase
-        path: "aU1DbDSatabase"
+        path: "aDatabase1"
     }
     
     /*!
