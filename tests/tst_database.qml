@@ -26,13 +26,13 @@ Item {
 
     U1db.Database {
         id: myDatabase
-        path: "bogus"
+        path: "aDatabaseB"
         property bool first_row_loaded: false
         property bool last_row_loaded: false
         onDocLoaded: {
-            if (path == 'loaded.db' && docId == 'dl0')
+            if (path == 'aDatabaseC' && docId == 'dl0')
                 first_row_loaded = true
-            if (path == 'loaded.db' && docId == 'dl99')
+            if (path == 'aDatabaseC' && docId == 'dl99')
                 last_row_loaded = true
         }
     }
@@ -106,7 +106,7 @@ TestCase {
         spyListCompleted.wait()
         compare(myDatabase.putDoc({"animals": ["cat", "dog", "hamster"]}) > -1, true)
 
-        var myPath = "/tmp/u1db-qt.db"
+        var myPath = "aDatabaseA"
         myDatabase.path = myPath
         spyPathChanged.wait()
         compare(myDatabase.path, myPath)
@@ -149,7 +149,8 @@ TestCase {
     }
 
     function test_6_fillDocument () {
-        myDatabase.path = "loaded.db"
+        var path = "aDatabaseC"
+        myDatabase.path = path
         spyPathChanged.wait()
         for (var i = 0; i < 100; i++)
             myDatabase.putDoc({'foo': 'bar'} ,'dl' + Number(i).toLocaleString())
@@ -159,7 +160,7 @@ TestCase {
         compare(myList.count, 0)
         myDatabase.first_row_loaded = false
         myDatabase.last_row_loaded = false
-        myDatabase.path = "loaded.db"
+        myDatabase.path = path
         spyPathChanged.wait()
         compare(myList.count, 100)
         spyDocLoaded.wait()
