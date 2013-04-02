@@ -173,6 +173,7 @@ Database::getDocUnchecked(const QString& docId) const
     query.bindValue(":docId", docId);
     if (query.exec() && query.next())
     {
+        // Convert JSON string to the Variant that QML expects
         QJsonDocument json(QJsonDocument::fromJson(query.value("content").toByteArray()));
         Q_EMIT docLoaded(docId, json.object().toVariantMap());
         return json.object().toVariantMap();
@@ -199,6 +200,7 @@ Database::getDoc(const QString& docId)
         {
             if (query.value("conflicts").toInt() > 0)
                 setError(QString("Conflicts in %1").arg(docId));
+            // Convert JSON string to the Variant that QML expects
             QJsonDocument json(QJsonDocument::fromJson(query.value("content").toByteArray()));
             Q_EMIT docLoaded(docId, json.object().toVariantMap());
             return json.object().toVariantMap();
@@ -231,6 +233,7 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
         query.prepare("UPDATE document SET doc_rev=:docRev, content=:docJson WHERE doc_id = :docId");
         query.bindValue(":docId", docId);
         query.bindValue(":docRev", newRev);
+        // Parse Variant from QML as JsonDocument, fallback to string
         QString json(QJsonDocument::fromVariant(newDoc).toJson());
         query.bindValue(":docJson", json.isEmpty() ? newDoc : json);
         if (!query.exec())
@@ -250,6 +253,7 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
         query.prepare("INSERT INTO document (doc_id, doc_rev, content) VALUES (:docId, :docRev, :docJson)");
         query.bindValue(":docId", docId);
         query.bindValue(":docRev", newRev);
+        // Parse Variant from QML as JsonDocument, fallback to string
         QJsonDocument json(QJsonDocument::fromVariant(newDoc));
         query.bindValue(":docJson", json.isEmpty() ? newDoc : json.toJson());
         if (!query.exec())
