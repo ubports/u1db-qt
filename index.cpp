@@ -30,6 +30,17 @@
 
 QT_BEGIN_NAMESPACE_U1DB
 
+/*!
+    \class Index
+
+    \brief The Index class defines an index to be stored in the database and
+    queried using Query. Changes in documents affected by the index also update
+    the index in the database.
+
+    This is the declarative API equivalent of Database::putIndex() and
+    Database::getIndexExpressions().
+*/
+
 Index::Index(QObject *parent) :
     QObject(parent), m_database(0)
 {
@@ -53,6 +64,11 @@ Index::onDocChanged(const QString& docId, QVariant content)
     Q_EMIT dataInvalidated();
 }
 
+/*!
+    Sets the Database to lookup documents from and store the index in. The
+    dataInvalidated() signal will be emitted on all changes that could affect
+    the index.
+ */
 void
 Index::setDatabase(Database* database)
 {
@@ -80,6 +96,10 @@ Index::getName()
     return m_name;
 }
 
+/*!
+    Sets the name used. Both an expression and a name must be specified
+    for an index to be created.
+ */
 void
 Index::setName(const QString& name)
 {
@@ -102,6 +122,10 @@ Index::getExpression()
     return m_expression;
 }
 
+/*!
+    Sets the expression used. Both an expression and a name must be specified
+    for an index to be created.
+ */
 void
 Index::setExpression(QStringList expression)
 {
