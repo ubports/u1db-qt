@@ -30,6 +30,15 @@
 
 QT_BEGIN_NAMESPACE_U1DB
 
+/*!
+    \class Document
+
+    \brief The Document class proxies a single document stored in the Database.
+
+    This is the declarative API equivalent of Database::putDoc() and
+    Database::getDoc().
+*/
+
 Document::Document(QObject *parent) :
     QObject(parent), m_database(0), m_create(false)
 {
