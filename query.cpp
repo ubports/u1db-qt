@@ -31,11 +31,27 @@
 
 QT_BEGIN_NAMESPACE_U1DB
 
+/*!
+    \class Query
+
+    \brief The Query class generates a filtered list of documents based on either
+    a query or a range, and using the given Index.
+
+    This is the declarative API equivalent of FIXME
+*/
+
 Query::Query(QObject *parent) :
     QAbstractListModel(parent), m_index(0)
 {
 }
 
+/*!
+    Used to implement QAbstractListModel
+    Implements the variables exposed to the Delegate in a model
+    QVariant contents
+    QString docId
+    int index (built-in)
+ */
 QVariant
 Query::data(const QModelIndex & index, int role) const
 {
@@ -44,13 +60,21 @@ Query::data(const QModelIndex & index, int role) const
     {
         Database* db(m_index->getDatabase());
         if (db)
+        {
+            qDebug() << "Query::getData" << docId;
             return db->getDocUnchecked(docId);
+        }
     }
     if (role == 1) // docId
         return docId;
     return QVariant();
 }
 
+/*!
+    Used to implement QAbstractListModel
+    Defines \b{contents} and \b{docId} as variables exposed to the Delegate in a model
+    \b{index} is supported out of the box.
+ */
 QHash<int, QByteArray>
 Query::roleNames() const
 {
@@ -60,6 +84,10 @@ Query::roleNames() const
     return roles;
 }
 
+/*!
+    Used to implement QAbstractListModel
+    The number of rows: the number of documents given by the query.
+ */
 int
 Query::rowCount(const QModelIndex & parent) const
 {
@@ -82,6 +110,10 @@ Query::onDataInvalidated()
     // TODO
 }
 
+/*!
+    Sets the Index to use. The index must have a valid name and index expressions,
+    then either a range or query can be set.
+ */
 void
 Query::setIndex(Index* index)
 {
@@ -103,6 +135,10 @@ Query::getQuery()
     return m_query;
 }
 
+/*!
+    Sets a range, such as ['match', false].
+    Only one of query and range is used - setting range unsets the query.
+ */
 void
 Query::setQuery(QVariant query)
 {
@@ -123,6 +159,10 @@ Query::getRange()
     return m_range;
 }
 
+/*!
+    Sets a range, such as [['a', 'b'], ['*']].
+    Only one of query and range is used - setting range unsets the query.
+ */
 void
 Query::setRange(QVariant range)
 {

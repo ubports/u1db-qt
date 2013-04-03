@@ -30,6 +30,15 @@
 
 QT_BEGIN_NAMESPACE_U1DB
 
+/*!
+    \class Document
+
+    \brief The Document class proxies a single document stored in the Database.
+
+    This is the declarative API equivalent of Database::putDoc() and
+    Database::getDoc().
+*/
+
 Document::Document(QObject *parent) :
     QObject(parent), m_database(0), m_create(false)
 {
@@ -61,6 +70,10 @@ Document::onPathChanged(const QString& path)
     }
 }
 
+/*!
+    The database is used to lookup the contents of the document, reflecting
+    changes done to it and conversely changes are saved to the database.
+ */
 void
 Document::setDatabase(Database* database)
 {
@@ -90,6 +103,11 @@ Document::getDocId()
     return m_docId;
 }
 
+/*!
+    The docId can be that of an existing document in the database and
+    will determine what getContents() returns.
+    If no such documents exists, setDefaults() can be used to supply a preset.
+ */
 void
 Document::setDocId(const QString& docId)
 {
@@ -112,6 +130,10 @@ Document::getCreate()
     return m_create;
 }
 
+/*!
+    If create is true, docId is not empty and no document with the same docId
+    exists, defaults will be used to store the document.
+ */
 void
 Document::setCreate(bool create)
 {
@@ -131,6 +153,12 @@ Document::getDefaults()
     return m_defaults;
 }
 
+/*!
+    The default contents of the document, which are used only if
+    create is true, docId is not empty and no document with the same
+    docId exists in the database yet.
+    If the defaults change, it's up to the API user to handle it.
+ */
 void
 Document::setDefaults(QVariant defaults)
 {
@@ -144,12 +172,20 @@ Document::setDefaults(QVariant defaults)
         m_database->putDoc(m_defaults, m_docId);
 }
 
+/*!
+    The contents of the document, as set via setContents() or stored in
+    the database via Database::putDoc().
+    onContentsChanged() can be used to monitor changes.
+ */
 QVariant
 Document::getContents()
 {
     return m_contents;
 }
 
+/*!
+    Updates the contents of the document. A valid docId must be set.
+ */
 void
 Document::setContents(QVariant contents)
 {
