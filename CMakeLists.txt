@@ -78,6 +78,7 @@ enable_testing()
 
 add_custom_target(check COMMAND "env" "CTEST_OUTPUT_ON_FAILURE=1" "${CMAKE_CTEST_COMMAND}")
 add_custom_target(doc "qdoc" "u1db.qdocconf"
+    COMMAND "sed" "-r" "-i" "'s@(</head>)@<link rel=\"stylesheet\" type=\"text/css\" href=\"style/base.css\" />\\1@'" "./output/html/*.html"
     COMMAND "qhelpgenerator" "./output/html/u1dbqt.qhp"
     COMMAND "assistant" "-register" "./output/html/u1dbqt.qch"
     WORKING_DIRECTORY "documentation")
