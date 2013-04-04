@@ -77,7 +77,10 @@ set_target_properties(${U1DB_QT_LIBNAME} PROPERTIES
 enable_testing()
 
 add_custom_target(check COMMAND "env" "CTEST_OUTPUT_ON_FAILURE=1" "${CMAKE_CTEST_COMMAND}")
-add_custom_target(doc COMMAND "qdoc" "u1db.qdocconf" WORKING_DIRECTORY "documentation")
+add_custom_target(doc "qdoc" "u1db.qdocconf"
+    COMMAND "qhelpgenerator" "./output/html/u1dbqt.qhp"
+    COMMAND "assistant" "-register" "./output/html/u1dbqt.qch"
+    WORKING_DIRECTORY "documentation")
 add_subdirectory(modules)
 add_subdirectory(tests)
 

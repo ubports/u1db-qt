@@ -26,3 +26,9 @@ examples.imageextensions = "*.png *.jpeg *.jpg *.gif *.mng"
 
 outputdir  =    output/html
 outputformats = HTML
+
+qhp.projects             = U1DbQt
+qhp.U1DbQt.file          = u1dbqt.qhp
+qhp.U1DbQt.namespace     = net.launchpad.u1db-qt
+qhp.U1DbQt.virtualFolder = u1dbqt
+
