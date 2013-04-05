@@ -2,6 +2,20 @@ project = U1Db-Qt
 description = U1Db-Qt plugin documentation
 
 sourcedirs = ..
+headers = ../database.h \
+          ../document.h \
+          ../index.h \
+          ../query.h \
+          ../global.h
+Cpp.ignoretokens = Q_DECL_EXPORT \
+                   Q_PROPERTY \
+                   QT_BEGIN_NAMESPACE_U1DB \
+                   
+defines = Q_QDOC
+Cpp.ignoredirectives = Q_ENUMS \
+                       Q_FLAGS \
+                       QT_PREPEND_NAMESPACE_U1DB \
+                       Q_DISABLE_COPY
 exampledirs = ../examples
 imagedirs = images 
 
@@ -12,3 +26,11 @@ examples.imageextensions = "*.png *.jpeg *.jpg *.gif *.mng"
 
 outputdir  =    output/html
 outputformats = HTML
+syntaxhighlighting = true
+HTML.stylesheets   = base.css
+
+qhp.projects             = U1DbQt
+qhp.U1DbQt.file          = u1dbqt.qhp
+qhp.U1DbQt.namespace     = net.launchpad.u1db-qt
+qhp.U1DbQt.virtualFolder = u1dbqt
+

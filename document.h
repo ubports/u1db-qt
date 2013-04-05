@@ -30,7 +30,11 @@ QT_BEGIN_NAMESPACE_U1DB
 
 class Q_DECL_EXPORT Document : public QObject {
     Q_OBJECT
+#ifdef Q_QDOC
+    Q_PROPERTY(Database* database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
+#else
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
+#endif
     Q_PROPERTY(QString docId READ getDocId WRITE setDocId NOTIFY docIdChanged)
     Q_PROPERTY(bool create READ getCreate WRITE setCreate NOTIFY createChanged)
     Q_PROPERTY(QVariant defaults READ getDefaults WRITE setDefaults NOTIFY defaultsChanged)
