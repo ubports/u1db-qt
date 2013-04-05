@@ -33,7 +33,6 @@ QT_BEGIN_NAMESPACE_U1DB
 
 /*!
     \class Query
-    \inmodule U1db
 
     \brief The Query class generates a filtered list of documents based on either
     a query or a range, and using the given Index.
@@ -47,27 +46,27 @@ Query::Query(QObject *parent) :
 }
 
 /*!
-    Used to implement QAbstractListModel
-    Implements the variables exposed to the Delegate in a model
-    QVariant contents
-    QString docId
-    int index (built-in)
+ * \brief Query::data
+ * \param index
+ * \param role
+ * \return
+ *Used to implement QAbstractListModel
+ *Implements the variables exposed to the Delegate in a model
  */
 QVariant
 Query::data(const QModelIndex & index, int role) const
 {
-    QString docId(m_hash.value(index.row()));
+    QVariantMap result(m_hash.value(index.row()));
     if (role == 0) // contents
     {
         Database* db(m_index->getDatabase());
         if (db)
         {
-            qDebug() << "Query::getData" << docId;
-            return db->getDocUnchecked(docId);
+            return result;
         }
     }
     if (role == 1) // docId
-        return docId;
+        //return docId;
     return QVariant();
 }
 
@@ -105,10 +104,14 @@ void
 Query::onDataInvalidated()
 {
     m_hash.clear();
-    Database* db(m_index->getDatabase());
-    if (db)
-        ;
-    // TODO
+
+    QListIterator<QVariantMap> i(m_index->getAllResults());
+
+    while (i.hasNext()) {
+        QVariantMap result = i.next();
+        m_hash.insert(m_hash.count(),result);
+    }
+
 }
 
 /*!
@@ -124,10 +127,13 @@ Query::setIndex(Index* index)
     if (m_index)
         QObject::disconnect(m_index, 0, this, 0);
     m_index = index;
-    if (m_index)
+    if (m_index){
         QObject::connect(m_index, &Index::dataInvalidated, this, &Query::onDataInvalidated);
+        QObject::connect(m_index, &Index::dataIndexed, this, &Query::onDataInvalidated);
+    }
     Q_EMIT indexChanged(index);
     onDataInvalidated();
+
 }
 
 QVariant

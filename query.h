@@ -29,11 +29,7 @@ QT_BEGIN_NAMESPACE_U1DB
 
 class Q_DECL_EXPORT Query : public QAbstractListModel {
     Q_OBJECT
-#ifdef Q_QDOC
-    Q_PROPERTY(Index* index READ getIndex WRITE setIndex NOTIFY indexChanged)
-#else
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Index*) index READ getIndex WRITE setIndex NOTIFY indexChanged)
-#endif
     Q_PROPERTY(QVariant query READ getQuery WRITE setQuery NOTIFY queryChanged)
     Q_PROPERTY(QVariant range READ getRange WRITE setRange NOTIFY rangeChanged)
 public:
@@ -58,7 +54,7 @@ Q_SIGNALS:
 private:
     Q_DISABLE_COPY(Query)
     Index* m_index;
-    QHash<int, QString> m_hash;
+    QHash<int, QVariantMap> m_hash;
     QVariant m_query;
     QVariant m_range;
 

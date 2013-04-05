@@ -32,7 +32,6 @@ QT_BEGIN_NAMESPACE_U1DB
 
 /*!
     \class Index
-    \inmodule U1db
 
     \brief The Index class defines an index to be stored in the database and
     queried using Query. Changes in documents affected by the index also update
@@ -89,6 +88,7 @@ Index::setDatabase(Database* database)
         QObject::connect(m_database, &Database::docChanged, this, &Index::onDocChanged);
         Q_EMIT dataInvalidated();
     }
+
 }
 
 QString
@@ -126,10 +126,14 @@ Index::getExpression()
 /*!
     Sets the expression used. Both an expression and a name must be specified
     for an index to be created.
+
+    Also starts the process of creating the Index result list, which can then be queried or populate the Query model as is.
+
  */
 void
 Index::setExpression(QStringList expression)
 {
+
     if (m_expression == expression)
         return;
 
@@ -140,7 +144,154 @@ Index::setExpression(QStringList expression)
     }
 
     m_expression = expression;
+
+    generateIndexResults();
+
     Q_EMIT expressionChanged(expression);
+    Q_EMIT dataIndexed();
+}
+
+/*!
+ * \brief Index::generateIndexResults
+ *
+ * Iterates through the documents stored in the database and creates the list of results based on the Index expressions.
+ */
+
+void Index::generateIndexResults()
+{
+
+    Database *db(getDatabase());
+
+    if(db){
+
+        QList<QString> documents = db->listDocs();
+
+        Q_FOREACH (QString docId, documents){
+
+            QVariant document = db->getDocUnchecked(docId);
+
+            QStringList fieldsList;
+
+            appendResultsFromMap(fieldsList, document.toMap(),"");
+
+        }
+
+    }
+
+}
+/*!
+ * \brief Index::getAllResults
+ * \return
+ */
+
+QList<QVariantMap> Index::getAllResults(){
+    return m_results;
+}
+
+/*!
+ * \brief Index::getResult
+ * \param index
+ * \return
+ */
+QVariantMap Index::getResult(int index){
+    return m_results[index];
+}
+
+/*!
+ * \brief Index::appendResultsFromMap
+ * \param fieldsList
+ * \param current_section
+ * \param current_field
+ * \return
+ *
+ *This method is desinged to recursively iterate through a document, or section of a document, which represents a QVariantMap. As it iterates through the entire document, the method keeps track of the current index expression, and populates a local QVariantMap should the current expression be found in the Index's list of expressions.
+ *
+ *If that QVariantMap contains more than one entry it is added to the global results, which can then be utilized by a Query. This needs to be modified to ensure all expressions are found, whereas at the moment if more than one expressions are defined and any of them are found then the map is added to the results list.
+ *
+ */
+QStringList Index::appendResultsFromMap(QStringList fieldsList, QVariantMap current_section, QString current_field)
+{
+
+    QMapIterator<QString, QVariant> i(current_section);
+
+    QString original_field = current_field;
+
+    QVariantMap results_map;
+
+    while (i.hasNext()) {
+
+        i.next();
+
+        if(fieldsList.count()>0){
+            current_field = original_field + "." + i.key();
+        }
+        else{
+            current_field = i.key();
+        }
+
+        fieldsList.append(current_field);
+
+        QVariant value = i.value();
+
+        if(value.userType()==8) // QVariantMap
+        {
+            fieldsList = appendResultsFromMap(fieldsList, value.toMap(),current_field);
+        }
+        else if(value.userType()==9) // QVariantList
+        {
+            fieldsList = getFieldsFromList(fieldsList, value.toList(),current_field);
+        }
+        else
+        {
+            if(m_expression.contains(current_field)==true){
+                results_map.insert(i.key(),value);
+            }
+
+        }
+    }
+
+    if(results_map.count()>0){
+       m_results.append(results_map);
+    }
+
+    return fieldsList;
+}
+/*!
+ * \brief Index::getFieldsFromList
+ * \param fieldsList
+ * \param current_section
+ * \param current_field
+ * \return
+ *
+ *This recursive method is used in conjuntion with Index::appendResultsFromMap, to aid in iterating through a document when an embedded list is found.
+ *
+ */
+
+
+QStringList Index::getFieldsFromList(QStringList fieldsList, QVariantList current_section, QString current_field)
+{
+
+    QListIterator<QVariant> i(current_section);
+
+    while (i.hasNext()) {
+
+        QVariant value = i.next();
+
+        if(value.userType()==8) // QVariantMap
+        {
+            fieldsList = appendResultsFromMap(fieldsList, value.toMap(),current_field);
+        }
+        else if(value.userType()==9) // QVariantList
+        {
+            fieldsList = getFieldsFromList(fieldsList, value.toList(),current_field);
+        }
+        else
+        {
+
+        }
+    }
+
+    return fieldsList;
 }
 
 QT_END_NAMESPACE_U1DB
