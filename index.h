@@ -30,7 +30,11 @@ QT_BEGIN_NAMESPACE_U1DB
 
 class Q_DECL_EXPORT Index : public QObject {
     Q_OBJECT
+#ifdef Q_QDOC
+    Q_PROPERTY(Database* database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
+#else
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
+#endif
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QStringList expression READ getExpression WRITE setExpression NOTIFY expressionChanged)
 public:

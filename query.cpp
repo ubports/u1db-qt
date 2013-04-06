@@ -33,6 +33,7 @@ QT_BEGIN_NAMESPACE_U1DB
 
 /*!
     \class Query
+    \inmodule U1db
 
     \brief The Query class generates a filtered list of documents based on either
     a query or a range, and using the given Index.
