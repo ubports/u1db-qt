@@ -145,8 +145,6 @@ Index::setExpression(QStringList expression)
 
     m_expression = expression;
 
-    generateIndexResults();
-
     Q_EMIT expressionChanged(expression);
     Q_EMIT dataIndexed();
 }
@@ -179,6 +177,13 @@ void Index::generateIndexResults()
     }
 
 }
+
+void Index::clearResults()
+{
+    m_results.clear();
+}
+
+
 /*!
  * \brief Index::getAllResults
  * \return

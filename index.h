@@ -50,6 +50,7 @@ public:
     void generateIndexResults();
     QStringList appendResultsFromMap(QStringList fieldsList, QVariantMap current_section, QString current_field);
     QStringList getFieldsFromList(QStringList fieldsList, QVariantList current_section, QString current_field);
+    void clearResults();
     QVariantMap getResult(int index);
     QList<QVariantMap> getAllResults();
 

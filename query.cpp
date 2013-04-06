@@ -58,6 +58,7 @@ QVariant
 Query::data(const QModelIndex & index, int role) const
 {
     QVariantMap result(m_hash.value(index.row()));
+
     if (role == 0) // contents
     {
         Database* db(m_index->getDatabase());
@@ -106,6 +107,17 @@ Query::onDataInvalidated()
 {
     m_hash.clear();
 
+    Database *db = m_index->getDatabase();
+    if(db){
+        if(db->documentCount>0){
+            QObject::connect(db, &Database::documentsAvailable, this, &Query::onDataInvalidated);
+        }
+    }
+
+    m_index->clearResults();
+
+    m_index->generateIndexResults();
+
     QListIterator<QVariantMap> i(m_index->getAllResults());
 
     while (i.hasNext()) {
@@ -133,6 +145,8 @@ Query::setIndex(Index* index)
         QObject::connect(m_index, &Index::dataIndexed, this, &Query::onDataInvalidated);
     }
     Q_EMIT indexChanged(index);
+
+
     onDataInvalidated();
 
 }
