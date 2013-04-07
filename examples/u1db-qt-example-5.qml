@@ -131,7 +131,7 @@ Item {
 
        /*!
 
-         As mentioned above, lists can also be nested in Document data. Lists provide a convenient method for producing multiple instances of the same key (AKA 'field' or 'sub-field'). The example code below shows valid use of the 'message' key (or field) multiple times within the same list.
+         As mentioned above, lists can also be nested in Document data. Lists provide a convenient method for producing multiple instances of the same key (AKA 'field' or 'sub-field'). The example code below shows valid use of the 'message' and 'id' sub-fields multiple times within the same object.
 
        \code
        U1db.Document {
@@ -143,6 +143,21 @@ Item {
 
         }
         \endcode
+
+        When the default Javascript Object Notation itself is formatted with appropriate line breaks and indentation, it becomes easier to visualize an embedded list, containing sub-fields 'message' and 'id' (and their respective values):
+
+       \code
+        {"hello":
+            { "world":
+                [
+                    { "message":"Hello World", "id": 2 },
+                    { "message":"Hello World", "id": 2.5 }
+                ]
+            }
+        }
+        \endcode
+
+    In dot notation these sub-fields are represented by 'hello.world.message' and 'hello.world.id' respectively. Later in this tutorial these will be utilized within the 'expression' property of U1Db-Qt's Index element, in close collaboration with a QML ListView's delegates.
 
          */
 
@@ -156,7 +171,20 @@ Item {
 
        /*!
 
+        Normally when a docId already exists in a database, and when the set flag is set to true, the value in 'defaults' will be ignored (and the existing data in the database will remain untouched). Sometimes a developer needs to easily overwrite the data in an existing document. The 'revise' property is a boolean for just that purpose. When 'revise' is set to true the value of 'defaults' will replace existing data for the document identified by the docId.
 
+        Warning: This is an experimental property. It might not be supported in some installations of U1Db-Qt, and may be deprecated and/or the semantics changed.
+
+        \code
+       U1db.Document {
+            id: aDocument3
+            database: aDatabase
+            docId: 'helloworld3'
+            create: true
+            revise: true
+            defaults:{"hello": { "world": [{ "message":"Hello World", "id": 3 },{ "message":"Hello World", "id": 3.33 },{ "message":"Hello World", "id": 3.66 }] } }
+        }
+        \endcode
 
          */
 
@@ -171,7 +199,14 @@ Item {
 
        /*!
 
+         This snippet simply represents the absence of the 'create' property, which is synonymous with 'create: false'. The Document can still be recognized within the application, but until applicable properties (such as those outlined above) are added and/or modified then nothing will be added or modified in the database, and this instance may have very little practical value.
 
+       U1db.Document {
+            id: aDocument4
+            database: aDatabase
+            docId: 'helloworld4'
+            defaults:{"hello": { "world": { "message":"Hello World", "id": 4 } } }
+        }
 
          */
 
