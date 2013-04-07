@@ -246,35 +246,76 @@ Item {
 
                 page: Page {
                     id: helloPage
+
+                    /*
+
+                      This simple snippet represents how to attach a ListModel to a ListView. In this instance the model 'helloListModel' is representative of the Index defined earlier. It is a common QML concept, and not specific to U1Db-Qt.
+
+                    ListView {
+
+                         width: units.gu(45)
+                         height: units.gu(80)
+
+                         model: helloListModel
+
+                    }
+
+                     */
+
                    ListView {
                         width: units.gu(45)
                         height: units.gu(80)
 
-                        /*
-                        Here is the reference to the Database model mentioned earlier.
-                        */
+
                         model: helloListModel
+
+                        /*
+                           When using QML ListView, delegates will be created based on particular properties such as the size of the application window, ListView, and delegate itself (amongst other factors). Each delegate can then represent a Document retrieved from the Database based on the record's index. This example demonstrates some of the property definitions that contribute to determining the number of delegates a ListView will contain:
+
+
+                        /code
+                        ListView {
+
+                             width: units.gu(45)
+                             height: units.gu(80)
+
+                             model: helloListModel
+
+                            delegate: Text {
+                                x: 66; y: 77
+                            }
+
+                        }
+                        /endcode
+
+                        When the number of Documents is less than or equal to the number of delegates then there is a one to one mapping of index to delegate (e.g. the first delegate will represent the Document with an index = 0; the second, index = 1; and so on).
+
+                        When there are more Documents than delegates the ListView will request a new index depending on the situation (e.g. a user scrolls up or down). For example, if a ListView has 10 delegates, but 32 Documents to handle, when a user initially scrolls the first delegate will change from representing the Document with index = 0 to the Document that might have index = 8; the second, from index = 1 to index = 9; ...; the 10th delegate from index = 9 to index = 17. A second scrolling gesture the first index may change to 15, and the final index 24. And so on. Scrolling in the opposite direction will have a similar effect, but the Document index numbers for each delegate will obviously start to decline (towards their original values).
+
+                         The following snippet, which modifies the above delegate definition, could demonstrate this effect if there were enough Documents to do so (i.e. some number greater than the number of delegates):
+
+                         \code
+                         ListView {
+                             width: units.gu(45)
+                             height: units.gu(80)
+
+                             model: helloListModel
+
+                            delegate: Text {
+                                x: 66; y: 77
+                                text: index
+                            }
+
+                        }
+                         \endcode
+
+                         */
 
                         delegate: Text {
                             x: 66; y: 77
                             text: {
 
                                 /*!
-
-                                  When using QML ListView, delegates will be created based on particular properties such as the size of the application window, ListView, and delegate itself (amongst other factors). Each delegate can then represent a Document retrieved from the Database based on the record's index. When the number of Documents is less than or equal to the number of delegates then there is a one to one mapping of index to delegate (e.g. the first delegate will represent the Document with an index = 0; the second, index = 1; and so on).
-
-                                  When there are more Documents than delegates the ListView will request a new index depending on the situation (e.g. a user scrolls up or down). For example, if a ListView has 10 delegates, but 32 Documents to handle, when a user initially scrolls the first delegate will change from representing the Document with index = 0 to the Document that might have index = 8; the second, from index = 1 to index = 9; ...; the 10th delegate from index = 9 to index = 17. A second scrolling gesture the first index may change to 15, and the final index 24. And so on. Scrolling in the opposite direction will have a similar effect, but the Document index numbers for each delegate will obviously start to decline (towards their original values).
-
-                                  The following snippet could demonstrate this effect if there were enough Documents to do so (i.e. some number greater than the number of delegates):
-
-
-
-                                  \code
-                                  delegate: Text {
-                                      x: 66; y: 77
-                                      text: index
-                                  }
-                                  \endcode
 
                                   The object called 'contents' contains one or more properties. This example demonstrates the retrieval of data based on the U1db.Index defined earlier (id: by-helloworld). In this instance the Index contained two expressions simultaniously, "hello.world.id" and "hello.world.message"
 
