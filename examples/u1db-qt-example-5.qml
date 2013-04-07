@@ -81,7 +81,7 @@ Item {
 
         /*!
 
-           This is a very basic but still practical Document definition that contains several essential properties. In addition to 'id' and 'docId' (discussed above), the 'database', 'create', and 'defaults' properties are introduced.
+           A basic but still practical Document definition contains several essential properties. In addition to 'id' and 'docId' (discussed above), the 'database', 'create', and 'defaults' properties are also very important, and are introduced below.
 
 
         The 'database' property ensures that the Document is attached to am already defined (or possibly soon to be defined one) identified by its id (in this case 'aDatabase'). For example:
@@ -129,10 +129,9 @@ Item {
 
         }
 
-
        /*!
 
-         As mentioned above, lists can also be nested in the data. Lists provide a convenient method for producing multiple instance of the same key (AKA 'field' or 'sub-field'). The example code below shows the valid use of the 'message' key (or field) multiple times within the same list.
+         As mentioned above, lists can also be nested in Document data. Lists provide a convenient method for producing multiple instances of the same key (AKA 'field' or 'sub-field'). The example code below shows valid use of the 'message' key (or field) multiple times within the same list.
 
        \code
        U1db.Document {
@@ -145,10 +144,7 @@ Item {
         }
         \endcode
 
-
-
          */
-
 
        U1db.Document {
             id: aDocument2
@@ -156,7 +152,6 @@ Item {
             docId: 'helloworld2'
             create: true
             defaults:{"hello": { "world": [{ "message":"Hello World", "id": 2 },{ "message":"Hello World", "id": 2.5 }] } }
-
         }
 
        /*!
@@ -172,7 +167,6 @@ Item {
             create: true
             revise: true
             defaults:{"hello": { "world": [{ "message":"Hello World", "id": 3 },{ "message":"Hello World", "id": 3.33 },{ "message":"Hello World", "id": 3.66 }] } }
-
         }
 
        /*!
@@ -186,9 +180,7 @@ Item {
             database: aDatabase
             docId: 'helloworld4'
             defaults:{"hello": { "world": { "message":"Hello World", "id": 4 } } }
-
         }
-
        U1db.Index{
            database: aDatabase
            id: by_helloworld
