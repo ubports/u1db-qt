@@ -48,10 +48,12 @@ Item {
 
             A Database is very simple to create. It only needs an id and a path where the file will be created. A Database is a model, which can be used by elements, such as the ListView further in this example.
 
+            \code
             U1db.Database {
                 id: aDatabase
                 path: "aDatabase4"
             }
+            \endcode
 
         */
 
@@ -68,10 +70,12 @@ Item {
 
             This example of a very simple Document will not initially do anything, until more properties are added and defined:
 
+            \code
             U1db.Document {
                 id: aDocument1
                 docId: 'helloworld1'
             }
+            \endcode
 
         */
 
@@ -82,23 +86,28 @@ Item {
 
         The 'database' property ensures that the Document is attached to am already defined (or possibly soon to be defined one) identified by its id (in this case 'aDatabase'). For example:
 
+        \code
        U1db.Document {
             id: aDocument1
             database: aDatabase
             docId: 'helloworld1'
         }
+        \endcode
 
         Should the Database not already contain a Document with the same docId ('hellowworld1' in this example) when a 'create' property is present and set to true it will be generated. For example:
 
+        \code
        U1db.Document {
             id: aDocument1
             database: aDatabase
             docId: 'helloworld1'
             create: true
         }
+        \endcode
 
         However, the Document still requires some data to be useful, which is what the 'defaults' property provides. The value of 'defaults' is a map of data that will be stored in the database (again when the create property is et to true). It contain key:value pairs, where the value can be a string, number, or nested object (e.g. additional fields, lists). For example:
 
+        \code
        U1db.Document {
             id: aDocument1
             database: aDatabase
@@ -107,6 +116,7 @@ Item {
             defaults:{"hello": { "world": { "message":"Hello World", "id": 1 } } }
 
         }
+        \endcode
 
           */
 
@@ -220,19 +230,23 @@ Item {
 
 
 
+                                  \code
                                   delegate: Text {
                                       x: 66; y: 77
                                       text: index
                                   }
+                                  \endcode
 
                                   The object called 'contents' contains one or more properties. This example demonstrates the retrieval of data based on the U1db.Index defined earlier (id: by-helloworld). In this instance the Index contained two expressions simultaniously, "hello.world.id" and "hello.world.message"
 
+                                  \code
                                   delegate: Text {
                                       x: 66; y: 77
                                       text: {
                                            text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
                                       }
                                   }
+                                  \endcode
 
                                 */
 
