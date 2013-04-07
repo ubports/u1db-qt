@@ -23,6 +23,14 @@ import Ubuntu.Components 0.1
 
 /*!
 
+\page u1db-qt-index-tutorial.html
+
+\title U1Db-Qt Index Tutorial
+
+*/
+
+/*!
+
 This example and tutorial is designed to show a wide variety of U1Db-Qt functionality and usage. The example demonstrates:
 
 \list 1
@@ -54,40 +62,108 @@ Item {
 
         /*!
 
-            A Document can be declared at runtime. It requires at the very least a unique 'docId', but that alone won't do anything special. The snipet below snippet demonstrates the basic requirements.
+            A Document can be instantiated at runtime, or generated dynamically. The examples below demonstrate the former.
 
-            In addition to this, this example displays text from the database for a specific docId and id key in a text area called 'documentContent. To update the text area at startup with either the default value or a value from the database the onCompleted function is utilized, which is also demonstrated below.
+            A very basic Document could include its unique 'id' and 'docId' properties. While it is not mandatory to define these properties, in some cases they can be convenient references. More advanced applications would likely find these very useful, and in some cases may be an absolute necessity to achieve the objectives of the program.
+
+            This example of a very simple Document will not initially do anything, until more properties are added and defined:
 
             U1db.Document {
-                id: aDocument
-                database: aDatabase
-                docId: 'helloworld'
-                create: true
-                defaults: { "helloworld":"Hello World" }
-
-                Component.onCompleted: {
-                    documentContent.text = aDocument.contents.helloworld
-                }
-
+                id: aDocument1
+                docId: 'helloworld1'
             }
 
         */
 
+        /*!
+
+           This is a very basic but still practical Document definition that contains several essential properties. In addition to 'id' and 'docId' (discussed above), the 'database', 'create', and 'defaults' properties are introduced.
+
+
+        The 'database' property ensures that the Document is attached to am already defined (or possibly soon to be defined one) identified by its id (in this case 'aDatabase'). For example:
 
        U1db.Document {
-            id: aDocument
+            id: aDocument1
             database: aDatabase
-            docId: 'helloworld'
+            docId: 'helloworld1'
+        }
+
+        Should the Database not already contain a Document with the same docId ('hellowworld1' in this example) when a 'create' property is present and set to true it will be generated. For example:
+
+       U1db.Document {
+            id: aDocument1
+            database: aDatabase
+            docId: 'helloworld1'
             create: true
-            defaults:{"hello": { "world": [{ "message":"Hello World", "id": 1 }] } }
+        }
+
+        However, the Document still requires some data to be useful, which is what the 'defaults' property provides. The value of 'defaults' is a map of data that will be stored in the database (again when the create property is et to true). It contain key:value pairs, where the value can be a string, number, or nested object (e.g. additional fields, lists). For example:
+
+       U1db.Document {
+            id: aDocument1
+            database: aDatabase
+            docId: 'helloworld1'
+            create: true
+            defaults:{"hello": { "world": { "message":"Hello World", "id": 1 } } }
 
         }
+
+          */
+
+
+       U1db.Document {
+            id: aDocument1
+            database: aDatabase
+            docId: 'helloworld1'
+            create: true            
+            defaults:{"hello": { "world": { "message":"Hello World", "id": 1 } } }
+
+        }
+
+
+       /*!
+
+
+
+         */
+
+
        U1db.Document {
             id: aDocument2
             database: aDatabase
             docId: 'helloworld2'
             create: true
-            defaults:{"hello": { "world": [{ "message":"Hello World", "id": 2 }] } }
+            defaults:{"hello": { "world": [{ "message":"Hello World", "id": 2 },{ "message":"Hello World", "id": 2.5 }] } }
+
+        }
+
+       /*!
+
+
+
+         */
+
+       U1db.Document {
+            id: aDocument3
+            database: aDatabase
+            docId: 'helloworld3'
+            create: true
+            revise: true
+            defaults:{"hello": { "world": [{ "message":"Hello World", "id": 3 },{ "message":"Hello World", "id": 3.33 },{ "message":"Hello World", "id": 3.66 }] } }
+
+        }
+
+       /*!
+
+
+
+         */
+
+       U1db.Document {
+            id: aDocument4
+            database: aDatabase
+            docId: 'helloworld4'
+            defaults:{"hello": { "world": { "message":"Hello World", "id": 4 } } }
 
         }
 
@@ -130,38 +206,48 @@ Item {
                         */
                         model: helloListModel
 
-                       /* A delegate will be created for each Document retrieved from the Database */
                         delegate: Text {
                             x: 66; y: 77
                             text: {
-                                /*!
-                                    The object called 'contents' contains a string as demonstrated here. In this example 'hello' is our search string.
 
-                                    text: contents.hello
+                                /*!
+
+                                  A delegate will be created based on particular properties such as the size of the application window, ListView, and delegate itself (amongst other factors). Each delegate can then represent a Document retrieved from the Database based on the record's index. When the number of Documents is less than or equal to the number of delegates then there is a one to one mapping of index to delegate (e.g. the first delegate will represent the Document with an index = 0; the second, index = 1; and so on).
+
+                                  When there are more Documents than delegates the ListView will request a new index depending on the situation (e.g. a user scrolls up or down). For example, if a ListView has 10 delegates, but 32 Documents to handle, when a user initially scrolls the first delegate will change from representing the Document with index = 0 to the Document that might have index = 8; the second, from index = 1 to index = 9; ...; the 10th delegate from index = 9 to index = 17. A second scrolling gesture the first index may change to 15, and the final index 24. And so on. Scrolling in the opposite direction will have a similar effect, but the Document index numbers for each delegate will obviously start to decline (towards their original values).
+
+                                  The following snippet could demonstrate this effect if there were enough Documents to do so (i.e. some number greater than the number of delegates):
+
+
+
+                                  delegate: Text {
+                                      x: 66; y: 77
+                                      text: index
+                                  }
+
+                                  The object called 'contents' contains one or more properties. This example demonstrates the retrieval of data based on the U1db.Index defined earlier (id: by-helloworld). In this instance the Index contained two expressions simultaniously, "hello.world.id" and "hello.world.message"
+
+                                  delegate: Text {
+                                      x: 66; y: 77
+                                      text: {
+                                           text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
+                                      }
+                                  }
+
                                 */
 
-                                text: contents.id + " " + contents.message
+                                text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
                             }
                         }
                     }
                 }
 
-
-                }
-
             }
-
-
-
 
         }
 
-
-
-
-
-
-
     }
+
+}
 
 
