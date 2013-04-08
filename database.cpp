@@ -348,6 +348,11 @@ Database::putDoc(QVariant newDoc, const QString& newOrEmptyDocId)
     beginInsertRows(QModelIndex(), rowCount(), 0);
     endInsertRows();
     */
+
+    QList<QString> documents = listDocs();
+
+    documentCount = documents.count();
+
     Q_EMIT docChanged(docId, newDoc);
 
     return newRev;

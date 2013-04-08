@@ -47,17 +47,26 @@ public:
     void setName(const QString& name);
     QStringList getExpression();
     void setExpression(QStringList expression);
+    void generateIndexResults();
+    QStringList appendResultsFromMap(QStringList fieldsList, QVariantMap current_section, QString current_field);
+    QStringList getFieldsFromList(QStringList fieldsList, QVariantList current_section, QString current_field);
+    void clearResults();
+    QVariantMap getResult(int index);
+    QList<QVariantMap> getAllResults();
+
 Q_SIGNALS:
     void databaseChanged(Database* database);
     void nameChanged(const QString& name);
     void expressionChanged(QVariant expression);
     // Either of the above has changed:
     void dataInvalidated();
+    void dataIndexed();
 private:
     Q_DISABLE_COPY(Index)
     Database* m_database;
     QString m_name;
     QStringList m_expression;
+    QList<QVariantMap> m_results;
 
     void onPathChanged(const QString& path);
     void onDocChanged(const QString& docId, QVariant content);

@@ -58,7 +58,7 @@ Q_SIGNALS:
 private:
     Q_DISABLE_COPY(Query)
     Index* m_index;
-    QHash<int, QString> m_hash;
+    QHash<int, QVariantMap> m_hash;
     QVariant m_query;
     QVariant m_range;
 
