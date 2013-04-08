@@ -21,6 +21,8 @@ import QtQuick 2.0
 import U1db 1.0 as U1db
 import Ubuntu.Components 0.1
 
+
+
 /*!
 
 This example and tutorial is designed to show a wide variety of U1Db-Qt functionality and usage. The example demonstrates:
@@ -43,14 +45,14 @@ Item {
 
             U1db.Database {
                 id: aDatabase
-                path: "aDatabase4"
+                path: "aDatabase3"
             }
 
         */
 
         U1db.Database {
             id: aDatabase
-            path: "aDatabase4"
+            path: "aDatabase3"
         }
 
         /*!
@@ -74,7 +76,6 @@ Item {
 
         */
 
-
        U1db.Document {
             id: aDocument
             database: aDatabase
@@ -88,29 +89,6 @@ Item {
 
         }
 
-       /*!
-
-         It should be possible to use a document without a database, as demonstrated in this snippet. Additionally this document will use the concept of sub-keys, as exemplified by the "bookmarks" id key + contents. This example will attempt to use the bookmark document to store docId values from the database, which will be displayed in a ListView on the second tab of the application. The user will be able to select a value from the ListView and the first tab will be modified accordingly.
-
-       U1db.Document {
-            id: aBookmarkDocument
-            docId: 'bookmarks'
-            create: true
-            defaults: { "bookmarks": [{}] }
-       }
-
-
-         */
-
-
-       U1db.Document {
-            id: aBookmarkDocument
-            docId: 'bookmarks'
-            create: true
-            defaults: { "bookmarks": [{}] }
-       }
-
-
        function switchToPreviousDocument(documentObject){
 
           aDocument.docId = getPreviousDocumentId(documentObject)
@@ -122,6 +100,7 @@ Item {
           aDocument.docId = getNextDocumentId(aDocument)
 
         }
+
 
        function getPreviousDocumentId(documentObject){
 
@@ -174,6 +153,7 @@ Item {
                return ''
            }
 
+
        }
 
        function getNextDocumentId(documentObject){
@@ -204,6 +184,7 @@ Item {
                return ''
            }
 
+
        }
 
         function getCurrentDocumentKey(contentsObject){
@@ -221,7 +202,10 @@ Item {
                 return ''
             }
 
+
+
         }
+
 
         function updateContentWindow(documentText, addressBarText) {
 
@@ -378,7 +362,7 @@ Item {
 
                              */
 
-                            TextArea {
+                            TextArea{
 
                                 id: documentContent
 
@@ -394,7 +378,7 @@ Item {
 
                          }
 
-                         // This rectangle contains the navigation controls
+                         // This rectangle contains our navigation controls
 
                          Rectangle {
 
@@ -404,7 +388,7 @@ Item {
                               x: units.gu(1.5)
                               color: "#00FFFFFF"
 
-                              Row {
+                              Row{
 
                                  width: units.gu(43)
                                  height: units.gu(5)
@@ -427,6 +411,8 @@ Item {
                                  text: ">"
                                  onClicked: updateContentWindow(switchToNextDocument(aDocument), addressBar.text)
                                  }
+
+
 
                               }
 
@@ -451,8 +437,7 @@ Item {
                                     hasClearButton: false
 
                                     /*!
-
-                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  In this example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
+                                        There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'helloworld', which represents a search string.  In our example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
 
                                     text: displayKey(aDocument.contents)
 
@@ -489,27 +474,7 @@ Item {
 
             }
 
-            Tab {
-                objectName: "Tab2"
-
-                title: i18n.tr("Bookmarks")
-
-                page: Page {
-
-                    id: bookmarkPage
-
-                }
-
-            }
-
-
         }
-
-
-
-
-
-
 
     }
 

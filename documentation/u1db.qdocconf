@@ -16,18 +16,45 @@ Cpp.ignoredirectives = Q_ENUMS \
                        Q_FLAGS \
                        QT_PREPEND_NAMESPACE_U1DB \
                        Q_DISABLE_COPY
-exampledirs = ../examples
+exampledirs = ../examples/u1db-qt-example-1 \
+../examples/u1db-qt-example-2 \
+../examples/u1db-qt-example-2b \
+../examples/u1db-qt-example-3 \
+../examples/u1db-qt-example-4 \
+../examples/u1db-qt-example-5
+
 imagedirs = images 
 
 sources.fileextensions = "*.cpp *.qdoc *.mm *.qml"
 headers.fileextensions = "*.h *.ch *.h++ *.hh *.hpp *.hxx"
-examples.fileextensions = "*.cpp *.h *.js *.xq *.svg *.xml *.ui *.qhp *.qhcp *.qml"
+examples.fileextensions = "*.cpp *.h *.js *.xq *.svg *.xml *.ui *.qhp *.qhcp"
 examples.imageextensions = "*.png *.jpeg *.jpg *.gif *.mng"
 
 outputdir  =    output/html
 outputformats = HTML
 syntaxhighlighting = true
-HTML.stylesheets   = base.css
+
+HTML.postheader = "<div class=\"wrapper\">\n" \
+   "<div class=\"main-content\">\n"
+
+HTML.footer = "</div>\n" \
+"</div>\n"
+
+HTML.headerstyles = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style/css.css\">\n" \
+"<link rel=\"stylesheet\" type=\"text/css\" href=\"style/css_002.css\">\n" \
+"<link rel=\"stylesheet\" type=\"text/css\" href=\"style/reset.css\">\n" \
+"<link rel=\"stylesheet\" type=\"text/css\" href=\"style/qtquick.css\">\n" \
+"<link rel=\"stylesheet\" type=\"text/css\" href=\"style/base.css\">\n" \
+"<link rel=\"stylesheet\" type=\"text/css\" href=\"style/scratch.css\">\n"
+
+
+HTML.stylesheets   = style/base.css \
+style/css.css \
+style/css_002.css \
+style/reset.css \
+style/qtquick.css \
+style/base.css \
+style/scratch.css \
 
 qhp.projects             = U1DbQt
 qhp.U1DbQt.file          = u1dbqt.qhp
