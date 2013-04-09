@@ -8,6 +8,8 @@ Build-Depends: debhelper (>= 9),
                qtbase5-dev,
                dbus-test-runner,
                qt5-default,
+               qtdeclarative5-test-plugin,
+               qtdeclarative5-qtquick2-plugin,
                qtdeclarative5-dev-tools
 Standards-Version: 3.9.3
 Vcs-Bzr: https://launchpad.net/u1db-qt/trunk
@@ -16,6 +18,7 @@ Package: libu1db-qt5-1
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
+         qtdeclarative5-qtquick2-plugin,
          libqt5sql5-sqlite
 Description: Qt5 binding and QtQuick2 plugin for U1DB - shared library
  Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
