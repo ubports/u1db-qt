@@ -2,7 +2,7 @@ find_package(Qt5Test REQUIRED)
 set(OUR_QT_TEST_LIB ${Qt5Test_LIBRARIES})
 set(OUR_QT_TEST_INCLUDES ${Qt5Test_INCLUDE_DIRS})
 
-add_test(NAME plugintest COMMAND "qmltestrunner" "-import" "../modules" "-xunitxml" "-o" "plugintest-xunit.xml" "-input" "${CMAKE_CURRENT_SOURCE_DIR}")
+add_test(NAME plugintest COMMAND "qmltestrunner" "-maxwarnings" "20" "-platform" "minimal" "-import" "../modules" "-xunitxml" "-o" "plugintest-xunit.xml" "-input" "${CMAKE_CURRENT_SOURCE_DIR}")
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
