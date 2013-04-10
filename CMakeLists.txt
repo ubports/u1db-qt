@@ -92,7 +92,7 @@ install(TARGETS ${U1DB_QT_LIBNAME}
     LIBRARY DESTINATION lib${LIB_SUFFIX}
     )
 
-install(FILES database.h document.h index.h query.h
+install(FILES global.h database.h document.h index.h query.h
     DESTINATION ${INCLUDE_INSTALL_DIR}
     )
 
