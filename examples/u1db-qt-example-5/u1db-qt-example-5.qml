@@ -46,14 +46,21 @@ Item {
             database: aDatabase
             docId: 'helloworld2'
             create: true
-            defaults:{"hello": { "world": [{ "message":"Hello World", "id": 2 },{ "message":"Hello World", "id": 2.5 }] } }
+            defaults:{"hello": { "world": [
+                        { "message":"Hello World", "id": 2 },
+                        { "message":"Hello World", "id": 2.5 }
+                    ] } }
         }
 
        U1db.Document {
             id: aDocument3
             database: aDatabase
             docId: 'helloworld3'
-            contents:{"hello": { "world": [{ "message":"Hello World", "id": 3 },{ "message":"Hello World", "id": 3.33 },{ "message":"Hello World", "id": 3.66 }] } }
+            contents:{"hello": { "world": [
+                        { "message":"Hello World", "id": 3 },
+                        { "message":"Hello World", "id": 3.33 },
+                        { "message":"Hello World", "id": 3.66 }
+                    ] } }
         }
 
        U1db.Document {
