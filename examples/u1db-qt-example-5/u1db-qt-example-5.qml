@@ -53,9 +53,7 @@ Item {
             id: aDocument3
             database: aDatabase
             docId: 'helloworld3'
-            create: true
-            revise: true
-            defaults:{"hello": { "world": [{ "message":"Hello World", "id": 3 },{ "message":"Hello World", "id": 3.33 },{ "message":"Hello World", "id": 3.66 }] } }
+            contents:{"hello": { "world": [{ "message":"Hello World", "id": 3 },{ "message":"Hello World", "id": 3.33 },{ "message":"Hello World", "id": 3.66 }] } }
         }
 
        U1db.Document {
@@ -64,16 +62,18 @@ Item {
             docId: 'helloworld4'
             defaults:{"hello": { "world": { "message":"Hello World", "id": 4 } } }
         }
+
        U1db.Index{
            database: aDatabase
            id: by_helloworld
-           name: "by-helloworld"
+           //name: "by-helloworld" /* Note: The 'name' property is not currently suupported */
            expression: ["hello.world.id","hello.world.message"]
        }
+
        U1db.Query{
            id: aQuery
            index: by_helloworld
-           //query: "*"
+           //query: "*" /* Note: The 'query' property is not currently suupported */
        }
 
     MainView {
