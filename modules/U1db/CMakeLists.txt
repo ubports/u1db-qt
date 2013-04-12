@@ -22,6 +22,8 @@ target_link_libraries(U1DBPlugin
   )
 
 include_directories(
+    ${CMAKE_SOURCE_DIR}/src
+    ${U1DB_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${OUR_QT_QUICK_INCLUDE}
     )

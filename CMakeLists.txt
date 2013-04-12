@@ -23,18 +23,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wundef -std=c
 
 # Sources
 set(U1DB_QT_SRCS
-    database.cpp
-    document.cpp
-    index.cpp
-    query.cpp
+    src/database.cpp
+    src/document.cpp
+    src/index.cpp
+    src/query.cpp
     )
 
 # Generated files
 set(U1DB_QT_GENERATED
-    moc_database.cpp
-    moc_document.cpp
-    moc_index.cpp
-    moc_query.cpp
+    src/moc_database.cpp
+    src/moc_document.cpp
+    src/moc_index.cpp
+    src/moc_query.cpp
     )
 
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${U1DB_QT_GENERATED}")
@@ -45,11 +45,6 @@ set(U1DB_QT_RESOURCES
     )
 
 QT5_ADD_RESOURCES(U1DB_QT_RCC ${U1DB_QT_RESOURCES})
-
-## QtU1DBQml
-set(QtU1DBQml_SRCS
-    plugin.cpp
-    )
 
 # Build
 add_definitions(-DQT_NO_KEYWORDS)
@@ -92,7 +87,7 @@ install(TARGETS ${U1DB_QT_LIBNAME}
     LIBRARY DESTINATION lib${LIB_SUFFIX}
     )
 
-install(FILES global.h database.h document.h index.h query.h
+install(FILES src/global.h src/database.h src/document.h src/index.h src/query.h
     DESTINATION ${INCLUDE_INSTALL_DIR}
     )
 
