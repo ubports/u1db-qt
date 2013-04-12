@@ -79,6 +79,7 @@ add_custom_target(doc "qdoc" "u1db.qdocconf"
     WORKING_DIRECTORY "documentation")
 add_subdirectory(modules)
 add_subdirectory(tests)
+add_subdirectory(examples)
 
 # Install
 set(INCLUDE_INSTALL_DIR include/lib${U1DB_QT_LIBNAME})
