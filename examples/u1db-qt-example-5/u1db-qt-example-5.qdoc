@@ -12,6 +12,12 @@ This tutorial is designed to demonstrate a variety of essential U1Db-Qt function
     \li Partnering the U1db-Qt Index element and a QML ListView element 
 \endlist
 
+\section1 Storing Data
+
+\section2 The Database Element
+
+\section3 Creating a Database
+
 A Database is very simple to create. It only needs an id and a path where the file will be created. A Database is a model, which can be used by elements, such as the ListView further in this example.
 
 \qml
@@ -20,6 +26,10 @@ U1db.Database {
     path: "aDatabase4"
 }
 \endqml
+
+\section1 The Document Element
+
+\section2 Declaring Documents (at Runtime)
 
 A Document can be instantiated at runtime, or generated dynamically. The examples below demonstrate the former.
 
@@ -143,6 +153,8 @@ U1db.Document {
 }
 \endqml
 
+\section3 Samples of Stored Documents
+
 The data stored in the database after defining the above Document elements (and then running the application, will consist of the following:
 
 \table
@@ -215,7 +227,13 @@ The data stored in the database after defining the above Document elements (and 
 
 \endtable
 
+\section1 Retrieving Data
+
 To retrieve the Documents that were declared earlier requires two additional elements: Index and Query.
+
+\section2 The Index Element
+
+\section3 Creating and Index Element
 
 The Index element requires both a unique 'id' and a pointer to a 'database' in order to begin becoming useful, as demonstrated here:
 
@@ -246,6 +264,10 @@ U1db.Index{
     expression: ["hello.world.id","hello.world.message"]
 }
 \endqml
+
+\section2 The QueryElement
+
+\section3 Creating a Query Element
 
 The Query element has two responsibilities: a bridge from Database+Index to other parts of the application, as well as further filtering of data in the database (in addition to what Index provides).
 
@@ -291,6 +313,12 @@ U1db.Query{
 
 Note: again, the 'query' property is commented out in the above two snippets due to its current status
 
+\section1 Using Data
+
+\section2 Data and the Application UI
+
+\section3 Using Data With Models and Views
+
 This simple snippet represents how to attach a ListModel to a ListView. In this instance the model 'aQuery' is representative of the Query + Index combination defined earlier:
 
 \qml
@@ -300,6 +328,8 @@ ListView {
     model: aQuery
 }
 \endqml
+
+\section4 Data and Delegates
 
 How a model and ListView + delegates work together is a common QML concept, and not specific to U1Db-Qt. However, the asynchronous nature of this relationship is important to understand. When using QML ListView, delegates will be created based on particular properties such as the size of the application window, ListView, and delegate itself (amongst other factors). Each delegate can then represent a Document retrieved from the Database based on the record's index. This example demonstrates some of the property definitions that contribute to determining the number of delegates a ListView will contain:
 
