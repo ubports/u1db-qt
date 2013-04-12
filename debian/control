@@ -46,3 +46,14 @@ Description: Qt5 binding and QtQuick2 plugin for U1DB - examples
  .
  This package contains the examples demonstrating the use of the Qt binding for U1DB
 
+Package: libu1db-qt5-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends},
+         libu1db-qt5-1 (= ${binary:Version}),
+         qttools5-dev-tools
+Description: Qt5 binding and QtQuick2 plugin for U1DB - offline documentation
+ Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
+ .
+ This package contains the offline documentation for the Qt binding for U1DB
+
