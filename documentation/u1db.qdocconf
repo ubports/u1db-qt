@@ -1,12 +1,12 @@
 project = U1Db-Qt
 description = U1Db-Qt plugin documentation
 
-sourcedirs = ..
-headers = ../database.h \
-          ../document.h \
-          ../index.h \
-          ../query.h \
-          ../global.h
+sourcedirs = ../src
+headers = ../src/database.h \
+          ../src/document.h \
+          ../src/index.h \
+          ../src/query.h \
+          ../src/global.h
 Cpp.ignoretokens = Q_DECL_EXPORT \
                    Q_PROPERTY \
                    QT_BEGIN_NAMESPACE_U1DB \

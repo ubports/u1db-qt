@@ -7,6 +7,7 @@ add_test(NAME plugintest COMMAND "qmltestrunner" "-maxwarnings" "20" "-platform"
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${OUR_QT_TEST_INCLUDES}
+    ${CMAKE_SOURCE_DIR}/src
     ${OUR_QT_QUICK_INCLUDE}
     )
 
