@@ -72,6 +72,17 @@ Item {
         range: [['a', 'b'], ['*']]
     }
 
+    U1db.Query {
+        id: allQuery
+        index: myIndex
+        query: '*'
+    }
+
+    U1db.Query {
+        id: defaultAllQuery
+        index: myIndex
+    }
+
     ListView {
         id: myList
         model: myDatabase
