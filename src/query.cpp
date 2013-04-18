@@ -117,6 +117,13 @@ Query::onDataInvalidated()
         }
     }
 
+    generateQueryResults();
+
+}
+
+void Query::generateQueryResults()
+{
+
     m_index->clearResults();
 
     m_index->generateIndexResults();
@@ -133,7 +140,8 @@ Query::onDataInvalidated()
 
         while(j.hasNext()){
             j.next();
-            if(checkMapMatch(i_map, j.key(), j.value()) == false){
+
+            if(queryField(j.key(), j.value()) == false){
                 match = false;
             }
         }
@@ -146,45 +154,40 @@ Query::onDataInvalidated()
 
 }
 
-bool Query::checkMapMatch(QVariantMap result_map, QString check_key, QVariant check_value){
+bool Query::queryField(QString field, QVariant value){
 
     bool match = false;
 
-    QString check_string = check_value.toString();
-
+    QString value_string = value.toString();
     QVariant queries = getQueries();
-
     QList<QVariant> query_list = queries.toList();
-
     QListIterator<QVariant> j(query_list);
 
     while (j.hasNext()) {
 
-        QVariant value = j.next();
-
-        QVariantMap value_map = value.toMap();
-
+        QVariant j_value = j.next();
+        QVariantMap value_map = j_value.toMap();
         QMapIterator<QString,QVariant> k(value_map);
 
         while(k.hasNext()){
             k.next();
-            QString key = k.key();
+
+            QString k_key = k.key();
             QVariant k_variant = k.value();
             QString query = k_variant.toString();
 
-            if(check_key == key){
+            if(field == k_key){
                 if(query == "*"){
                     return true;
                 }
-                else if(query == check_string){
-
+                else if(query == value_string){
                     return true;
                 }
                 else if(query.contains("*")){
 
                     QStringList k_string_list = query.split("*");
                     QString k_string = k_string_list[0];
-                    match = check_string.startsWith(k_string,Qt::CaseSensitive);
+                    match = value_string.startsWith(k_string,Qt::CaseSensitive);
 
                     return match;
 
@@ -192,8 +195,6 @@ bool Query::checkMapMatch(QVariantMap result_map, QString check_key, QVariant ch
 
             }
         }
-
-
 
     }
 

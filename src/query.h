@@ -55,7 +55,8 @@ public:
     QVariant getRange();
     void setRange(QVariant range);
 
-    bool checkMapMatch(QVariantMap result_map, QString check_key, QVariant check_value);
+    void generateQueryResults();
+    bool queryField(QString field, QVariant value);
 
 Q_SIGNALS:
     void indexChanged(Index* index);
