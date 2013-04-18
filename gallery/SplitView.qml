@@ -29,8 +29,7 @@ Tab {
     title: "Example %1".arg(example)
     Row {
         id: splitView
-        property string qml: Qt.resolvedUrl('../examples/u1db-qt-example-%1/u1db-qt-example-%1.qml'.arg(example))
-        // TODO: open HTML U1Db docs
+        property string qml: Qt.resolvedUrl('../examples/u1db-qt-example-%1.qml'.arg(example))
         property string html: 'file:////usr/share/u1db-qt/examples/u1db-qt-example-%1.html'.arg(example)
         anchors.fill: parent
         Loader {

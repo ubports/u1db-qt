@@ -87,6 +87,7 @@ add_custom_target(doc ${ALL} "mkdir" "-p" "${U1DB_DOCS}"
 add_subdirectory(modules)
 add_subdirectory(tests)
 add_subdirectory(examples)
+add_subdirectory(gallery)
 
 # Install
 set(INCLUDE_INSTALL_DIR include/lib${U1DB_QT_LIBNAME})
