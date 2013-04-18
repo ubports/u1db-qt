@@ -148,7 +148,7 @@ Query::onDataInvalidated()
 
 bool Query::checkMapMatch(QVariantMap result_map, QString check_key, QVariant check_value){
 
-    bool match = true;
+    bool match = false;
 
     QString check_string = check_value.toString();
 
@@ -177,13 +177,13 @@ bool Query::checkMapMatch(QVariantMap result_map, QString check_key, QVariant ch
                     return true;
                 }
                 else if(query == check_string){
+
                     return true;
                 }
-                else{
+                else if(query.contains("*")){
 
-                    QString k_string = k_variant.toString();
-                    QStringList k_string_list = k_string.split("*");
-                    k_string = k_string_list[0];
+                    QStringList k_string_list = query.split("*");
+                    QString k_string = k_string_list[0];
                     match = check_string.startsWith(k_string,Qt::CaseSensitive);
 
                     return match;

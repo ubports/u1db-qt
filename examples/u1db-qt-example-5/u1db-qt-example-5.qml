@@ -37,7 +37,7 @@ Item {
             database: aDatabase
             docId: 'helloworld1'
             create: true            
-            defaults:{"hello": { "world": { "message":"Hello World", "id": 1 } } }
+            defaults:{"hello": { "world": { "message":"Hello World!", "id": 1 } } }
 
         }
 
@@ -47,8 +47,8 @@ Item {
             docId: 'helloworld2'
             create: true
             defaults:{"hello": { "world": [
-                        { "message":"Hello World", "id": 2 },
-                        { "message":"Hello World", "id": 2.5 }
+                        { "message":"Hello World!!", "id": 2 },
+                        { "message":"Hello World!!", "id": 2.5 }
                     ] } }
         }
 
@@ -57,9 +57,9 @@ Item {
             database: aDatabase
             docId: 'helloworld3'
             contents:{"hello": { "world": [
-                        { "message":"Hello World", "id": 3 },
-                        { "message":"Hello World", "id": 3.33 },
-                        { "message":"Hello World", "id": 3.66 }
+                        { "message":"Hello World!!!", "id": 3 },
+                        { "message":"Hello World!!!", "id": 3.33 },
+                        { "message":"Hello World!!!", "id": 3.66 }
                     ] } }
         }
 
@@ -67,7 +67,7 @@ Item {
             id: aDocument4
             database: aDatabase
             docId: 'helloworld4'
-            defaults:{"hello": { "world": { "message":"Hello World", "id": 4 } } }
+            contents:{"hello": { "world": { "message":"Hello World!", "id": 4 } } }
         }
 
        U1db.Index{
@@ -80,7 +80,7 @@ Item {
        U1db.Query{
            id: aQuery
            index: by_helloworld
-           queries: [{"id":"*"},{"message":"Hel*"}] /* Note: The 'queries' property is a proposed feature */
+           queries: [{"id":"*"},{"message":"Hello World!"}] /* Note: The 'queries' property is a proposed feature */
        }
 
     MainView {
