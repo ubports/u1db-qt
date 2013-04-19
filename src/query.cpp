@@ -139,11 +139,15 @@ void Query::generateQueryResults()
         bool match = true;
 
         while(j.hasNext()){
+
             j.next();
 
-            if(queryField(j.key(), j.value()) == false){
+            bool tmp_match = queryField(j.key(), j.value());
+
+            if(tmp_match == false){
                 match = false;
             }
+
         }
 
         if(match == true){
@@ -159,47 +163,119 @@ bool Query::queryField(QString field, QVariant value){
     bool match = false;
 
     QString value_string = value.toString();
-    QVariant queries = getQueries();
-    QList<QVariant> query_list = queries.toList();
+    QVariant query = getQuery();
+    QString typeName = query.typeName();
+
+
+    if(typeName == "QString")
+    {
+        QString query_string = query.toString();
+        match = queryString(query_string, value_string);
+    }
+    else if(typeName == "QVariantList")
+    {
+        match = iterateQueryList(query, field, value_string);
+    }
+
+    return match;
+
+}
+
+bool Query::iterateQueryList(QVariant query, QString field, QString value)
+{
+
+    bool match = false;
+
+    QList<QVariant> query_list = query.toList();
     QListIterator<QVariant> j(query_list);
 
     while (j.hasNext()) {
 
         QVariant j_value = j.next();
-        QVariantMap value_map = j_value.toMap();
-        QMapIterator<QString,QVariant> k(value_map);
 
-        while(k.hasNext()){
-            k.next();
+        QString typeName = j_value.typeName();
 
-            QString k_key = k.key();
-            QVariant k_variant = k.value();
-            QString query = k_variant.toString();
+        if(typeName == "QVariantMap")
+        {
+            match = queryMap(j_value.toMap(), value, field);
 
-            if(field == k_key){
-                if(query == "*"){
-                    return true;
-                }
-                else if(query == value_string){
-                    return true;
-                }
-                else if(query.contains("*")){
-
-                    QStringList k_string_list = query.split("*");
-                    QString k_string = k_string_list[0];
-                    match = value_string.startsWith(k_string,Qt::CaseSensitive);
-
-                    return match;
-
-                }
-
+            if(match == true){
+                break;
             }
+
+        }
+        else if(typeName == "QString"){
+
+            match = queryString(j_value.toString(), value);
+
+            if(match == true){
+                break;
+            }
+
         }
 
     }
 
     return match;
+}
 
+bool Query::queryString(QString query, QString value)
+{
+
+    bool match = false;
+
+        if(query == "*"){
+            return true;
+        }
+        else if(query == value){
+            return true;
+        }
+        else if(query.contains("*")){
+            QStringList k_string_list = query.split("*");
+            QString k_string = k_string_list[0];
+            match = value.startsWith(k_string,Qt::CaseSensitive);
+
+            return match;
+
+        }
+
+
+    return match;
+}
+
+bool Query::queryMap(QVariantMap map, QString value, QString field)
+{
+
+    bool match = false;
+
+    QMapIterator<QString,QVariant> k(map);
+
+    while(k.hasNext()){
+        k.next();
+
+        QString k_key = k.key();
+        QVariant k_variant = k.value();
+        QString query = k_variant.toString();
+
+        if(field == k_key){
+
+            if(query == "*"){
+                return true;
+            }
+            else if(query == value){
+                return true;
+            }
+            else if(query.contains("*")){
+                QStringList k_string_list = query.split("*");
+                QString k_string = k_string_list[0];
+                match = value.startsWith(k_string,Qt::CaseSensitive);
+                return match;
+            }
+
+        }
+    }
+
+    return match;
 }
 
 /*!
@@ -232,10 +308,6 @@ Query::getQuery()
     return m_query;
 }
 
-QVariant Query::getQueries()
-{
-    return m_queries;
-}
 
 /*!
     Sets a range, such as ['match', false].
@@ -252,21 +324,6 @@ Query::setQuery(QVariant query)
 
     m_query = query;
     Q_EMIT queryChanged(query);
-    onDataInvalidated();
-}
-
-
-void
-Query::setQueries(QVariant queries)
-{
-    if (m_queries == queries)
-        return;
-
-    if (m_range.isValid())
-        m_range = QVariant();
-
-    m_queries = queries;
-    Q_EMIT queriesChanged(queries);
     onDataInvalidated();
 }
 

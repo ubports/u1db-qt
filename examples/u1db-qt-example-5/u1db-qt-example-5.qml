@@ -80,7 +80,9 @@ Item {
        U1db.Query{
            id: aQuery
            index: by_helloworld
-           queries: [{"id":"*"},{"message":"Hel*"}] /* Note: The 'queries' property is a proposed feature */
+           //queries: [{"id":"*"},{"message":"Hel*"}] /* Note: The 'queries' property is a proposed feature */
+           query: "Hel*" /* Note: The 'queries' property is a proposed feature */
+           //queries: "Hel*" /* Note: The 'queries' property is a proposed feature */
        }
 
     MainView {
