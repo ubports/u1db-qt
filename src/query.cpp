@@ -117,6 +117,13 @@ Query::onDataInvalidated()
         }
     }
 
+    generateQueryResults();
+
+}
+
+void Query::generateQueryResults()
+{
+
     m_index->clearResults();
 
     m_index->generateIndexResults();
@@ -124,10 +131,151 @@ Query::onDataInvalidated()
     QListIterator<QVariantMap> i(m_index->getAllResults());
 
     while (i.hasNext()) {
-        QVariantMap result = i.next();
-        m_hash.insert(m_hash.count(),result);
+
+        QVariantMap i_map = i.next();
+
+        QMapIterator<QString,QVariant> j(i_map);
+
+        bool match = true;
+
+        while(j.hasNext()){
+
+            j.next();
+
+            bool tmp_match = queryField(j.key(), j.value());
+
+            if(tmp_match == false){
+                match = false;
+            }
+
+        }
+
+        if(match == true){
+            m_hash.insert(m_hash.count(),i_map);
+        }
+
     }
 
+}
+
+bool Query::queryField(QString field, QVariant value){
+
+    bool match = false;
+
+    QString value_string = value.toString();
+    QVariant query = getQuery();
+    QString typeName = query.typeName();
+
+
+    if(typeName == "QString")
+    {
+        QString query_string = query.toString();
+        match = queryString(query_string, value_string);
+    }
+    else if(typeName == "QVariantList")
+    {
+        match = iterateQueryList(query, field, value_string);
+    }
+
+    return match;
+
+}
+
+bool Query::iterateQueryList(QVariant query, QString field, QString value)
+{
+
+    bool match = false;
+
+    QList<QVariant> query_list = query.toList();
+    QListIterator<QVariant> j(query_list);
+
+    while (j.hasNext()) {
+
+        QVariant j_value = j.next();
+
+        QString typeName = j_value.typeName();
+
+        if(typeName == "QVariantMap")
+        {
+            match = queryMap(j_value.toMap(), value, field);
+
+            if(match == true){
+                break;
+            }
+
+        }
+        else if(typeName == "QString"){
+
+            match = queryString(j_value.toString(), value);
+
+            if(match == true){
+                break;
+            }
+
+        }
+
+    }
+
+    return match;
+}
+
+bool Query::queryString(QString query, QString value)
+{
+
+    bool match = false;
+
+        if(query == "*"){
+            return true;
+        }
+        else if(query == value){
+            return true;
+        }
+        else if(query.contains("*")){
+            QStringList k_string_list = query.split("*");
+            QString k_string = k_string_list[0];
+            match = value.startsWith(k_string,Qt::CaseSensitive);
+
+            return match;
+
+        }
+
+
+    return match;
+}
+
+bool Query::queryMap(QVariantMap map, QString value, QString field)
+{
+
+    bool match = false;
+
+    QMapIterator<QString,QVariant> k(map);
+
+    while(k.hasNext()){
+        k.next();
+
+        QString k_key = k.key();
+        QVariant k_variant = k.value();
+        QString query = k_variant.toString();
+
+        if(field == k_key){
+
+            if(query == "*"){
+                return true;
+            }
+            else if(query == value){
+                return true;
+            }
+            else if(query.contains("*")){
+                QStringList k_string_list = query.split("*");
+                QString k_string = k_string_list[0];
+                match = value.startsWith(k_string,Qt::CaseSensitive);
+                return match;
+            }
+
+        }
+    }
+
+    return match;
 }
 
 /*!
@@ -159,6 +307,7 @@ Query::getQuery()
 {
     return m_query;
 }
+
 
 /*!
     Sets a range, such as ['match', false].

@@ -51,6 +51,13 @@ public:
     void setQuery(QVariant query);
     QVariant getRange();
     void setRange(QVariant range);
+
+    void generateQueryResults();
+    bool iterateQueryList(QVariant query, QString field, QString value);
+    bool queryString(QString query, QString value);
+    bool queryMap(QVariantMap map, QString value, QString field);
+    bool queryField(QString field, QVariant value);
+
 Q_SIGNALS:
     void indexChanged(Index* index);
     void queryChanged(QVariant query);
