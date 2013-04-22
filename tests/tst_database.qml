@@ -52,37 +52,6 @@ Item {
         defaults: { "eggs": "spam" }
     }
 
-
-    U1db.Index {
-        id: myIndex
-        database: myDatabase
-        name: 'by-title-field'
-        expression: ['title', 'bool(field)']
-    }
-
-    U1db.Query {
-        id: firstQuery
-        index: myIndex
-        query: ['match', false]
-    }
-
-    U1db.Query {
-        id: secondQuery
-        index: myIndex
-        range: [['a', 'b'], ['*']]
-    }
-
-    U1db.Query {
-        id: allQuery
-        index: myIndex
-        query: '*'
-    }
-
-    U1db.Query {
-        id: defaultAllQuery
-        index: myIndex
-    }
-
     ListView {
         id: myList
         model: myDatabase

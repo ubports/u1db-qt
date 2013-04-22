@@ -36,6 +36,7 @@ class Q_DECL_EXPORT Query : public QAbstractListModel {
 #endif
     Q_PROPERTY(QVariant query READ getQuery WRITE setQuery NOTIFY queryChanged)
     Q_PROPERTY(QVariant range READ getRange WRITE setRange NOTIFY rangeChanged)
+    Q_PROPERTY(QList<QVariant> results READ getResults NOTIFY resultsChanged)
 public:
     Query(QObject* parent = 0);
     ~Query() { }
@@ -51,6 +52,7 @@ public:
     void setQuery(QVariant query);
     QVariant getRange();
     void setRange(QVariant range);
+    Q_INVOKABLE QList<QVariant> getResults();
 
     void generateQueryResults();
     bool iterateQueryList(QVariant query, QString field, QString value);
@@ -62,10 +64,11 @@ Q_SIGNALS:
     void indexChanged(Index* index);
     void queryChanged(QVariant query);
     void rangeChanged(QVariant range);
+    void resultsChanged(QList<QVariant> results);
 private:
     Q_DISABLE_COPY(Query)
     Index* m_index;
-    QHash<int, QVariantMap> m_hash;
+    QList<QVariant> m_results;
     QVariant m_query;
     QVariant m_range;
 
