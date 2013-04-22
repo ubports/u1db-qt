@@ -32,6 +32,8 @@ QT_BEGIN_NAMESPACE_U1DB
 
 /*!
     \class Index
+    \inmodule U1Db
+    \ingroup modules
 
     \brief The Index class defines an index to be stored in the database and
     queried using Query. Changes in documents affected by the index also update

@@ -33,6 +33,7 @@ QT_BEGIN_NAMESPACE_U1DB
 /*!
     \class Document
     \inmodule U1db
+    \ingroup modules
 
     \brief The Document class proxies a single document stored in the Database.
 
