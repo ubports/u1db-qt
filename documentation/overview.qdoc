@@ -24,8 +24,10 @@
 
      \part General Topics
      \list
-     \li \l {U1Db-Qt Tutorial} gives a quick start guide from storing a document
+     \li \l {Tutorial} gives a quick start guide from storing a document
      to querying a database and displaying it in Ubuntu Components.
+     \li \l {Design Concepts} provides an overview of the design and
+     terminology.
      \endlist
 
      \part Document Storage
