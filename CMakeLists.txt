@@ -100,6 +100,13 @@ if (BUILD_DOCS)
     install(FILES "${U1DB_DOCS}/u1dbqt.qch"
         DESTINATION "${CMAKE_INSTALL_PREFIX}/share/qt5/phrasebooks/"
         )
+    file(GLOB ALL_HTML ${U1DB_DOCS}/*.html)
+    install(FILES ${ALL_HTML}
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/u1db-qt/doc/html
+        )
+    install(DIRECTORY "${U1DB_DOCS}/style"
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/share/u1db-qt/doc/html"
+        )
     file(GLOB ALL_EXAMPLES ${U1DB_DOCS}/*example-*.html)
     install(FILES ${ALL_EXAMPLES}
         DESTINATION ${CMAKE_INSTALL_PREFIX}/share/u1db-qt/examples
