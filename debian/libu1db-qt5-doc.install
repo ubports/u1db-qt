@@ -1,2 +1,3 @@
 usr/share/qt5/phrasebooks/*
-usr/share/u1db-qt/doc/html/*
+usr/share/u1db-qt/doc/html/*.html
+usr/share/u1db-qt/doc/html/style/*.css
