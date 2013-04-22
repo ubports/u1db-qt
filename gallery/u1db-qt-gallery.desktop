@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Exec=qmlscene /usr/share/u1db-qt/gallery/gallery.qml
+Path=/usr/share/u1db-qt/gallery
+Name=U1Db QML Example Gallery
+Icon=/usr/share/icons/unity-icon-theme/places/svg/service-u1.svg
+Terminal=false
+

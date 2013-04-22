@@ -70,16 +70,24 @@ set_target_properties(${U1DB_QT_LIBNAME} PROPERTIES
 
 # Unit-Test
 enable_testing()
-
 add_custom_target(check COMMAND "env" "CTEST_OUTPUT_ON_FAILURE=1" "${CMAKE_CTEST_COMMAND}")
-add_custom_target(doc "qdoc" "u1db.qdocconf"
-    COMMAND "sed" "-r" "-i" "'s@(</head>)@<link rel=\"stylesheet\" type=\"text/css\" href=\"style/base.css\" />\\1@'" "./output/html/*.html"
-    COMMAND "qhelpgenerator" "./output/html/u1dbqt.qhp"
-    COMMAND "assistant" "-register" "./output/html/u1dbqt.qch"
-    WORKING_DIRECTORY "documentation")
+
+option(BUILD_DOCS "Build documentation" OFF)
+if (BUILD_DOCS)
+    set(ALL "ALL")
+endif ()
+set(U1DB_DOCS "${PROJECT_BINARY_DIR}/documentation/output")
+add_custom_target(doc ${ALL} "mkdir" "-p" "${U1DB_DOCS}"
+    COMMAND "qdoc" "-outputdir" "${U1DB_DOCS}" "${CMAKE_SOURCE_DIR}/documentation/u1db.qdocconf" "1>/dev/null" "2>/dev/null"
+    COMMAND "sed" "-r" "-i" "'s@(</head>)@<link rel=\"stylesheet\" type=\"text/css\" href=\"style/base.css\" />\\1@'" "${U1DB_DOCS}/*.html"
+    COMMAND "qhelpgenerator" "${U1DB_DOCS}/u1dbqt.qhp"
+    COMMAND "assistant" "-register" "${U1DB_DOCS}/u1dbqt.qch"
+    SOURCES "${CMAKE_SOURCE_DIR}/documentation/u1db.qdocconf"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/documentation")
 add_subdirectory(modules)
 add_subdirectory(tests)
 add_subdirectory(examples)
+add_subdirectory(gallery)
 
 # Install
 set(INCLUDE_INSTALL_DIR include/lib${U1DB_QT_LIBNAME})
@@ -87,6 +95,24 @@ set(INCLUDE_INSTALL_DIR include/lib${U1DB_QT_LIBNAME})
 install(TARGETS ${U1DB_QT_LIBNAME}
     LIBRARY DESTINATION lib${LIB_SUFFIX}
     )
+
+if (BUILD_DOCS)
+    install(FILES "${U1DB_DOCS}/u1dbqt.qch"
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/share/qt5/phrasebooks/"
+        )
+    file(GLOB ALL_HTML ${U1DB_DOCS}/*.html)
+    install(FILES ${ALL_HTML}
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/u1db-qt/doc/html
+        )
+    install(DIRECTORY "${U1DB_DOCS}/style"
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/share/u1db-qt/doc/html"
+        )
+    file(GLOB ALL_EXAMPLES ${U1DB_DOCS}/*example-*.html)
+    install(FILES ${ALL_EXAMPLES}
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/u1db-qt/examples
+        )
+endif ()
+
 
 install(FILES src/global.h src/database.h src/document.h src/index.h src/query.h
     DESTINATION ${INCLUDE_INSTALL_DIR}
