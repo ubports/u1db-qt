@@ -32,18 +32,6 @@
 QT_BEGIN_NAMESPACE_U1DB
 
 /*!
-    \page classes.html
-    \title All Classes
-    \ingroup classlists
-
-    \brief If you know the name of the class you want, find it here.
-
-    This is a list of all U1db classes.
-
-    \generatelist annotatedclasses
-*/
-
-/*!
     \class Database
     \inmodule U1Db
     \ingroup modules
