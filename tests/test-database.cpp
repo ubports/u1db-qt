@@ -21,6 +21,8 @@
 #include <QObject>
 
 #include "database.h"
+#include "index.h"
+#include "query.h"
 
 QT_USE_NAMESPACE_U1DB
 
@@ -40,11 +42,20 @@ private Q_SLOTS:
 
         Database db;
         QCOMPARE(db.getPath(), QString(""));
-        QSignalSpy modelReset(&db, SIGNAL(pathChanged()));
+        QSignalSpy modelReset(&db, SIGNAL(pathChanged(const QString&)));
         QTemporaryFile file;
         db.setPath(file.fileName());
         QCOMPARE(db.getPath(), file.fileName());
-    }
+
+        Index index;
+        index.setDatabase(&db);
+        index.setName("py-phone-number");
+        index.setExpression(QStringList("managers.phone_number"));
+
+        Query query;
+        query.setIndex(&index);
+        query.setQuery("*");
+     }
 
     void cleanupTestCase()
     {
