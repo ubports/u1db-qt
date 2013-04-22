@@ -39,7 +39,8 @@ QT_BEGIN_NAMESPACE_U1DB
     \brief The Query class generates a filtered list of documents based on either
     a query or a range, and using the given Index.
 
-    This is the declarative API equivalent of FIXME
+    Query can be used as a QAbstractListModel, delegates will then have access to \a docId and \a contents
+    analogous to the properties of Document.
 */
 
 Query::Query(QObject *parent) :
@@ -48,10 +49,7 @@ Query::Query(QObject *parent) :
 }
 
 /*!
- * \brief Query::data
- * \param index
- * \param role
- * \return
+    \internal
  *Used to implement QAbstractListModel
  *Implements the variables exposed to the Delegate in a model
  */
@@ -74,6 +72,7 @@ Query::data(const QModelIndex & index, int role) const
 }
 
 /*!
+    \internal
     Used to implement QAbstractListModel
     Defines \b{contents} and \b{docId} as variables exposed to the Delegate in a model
     \b{index} is supported out of the box.
@@ -88,6 +87,7 @@ Query::roleNames() const
 }
 
 /*!
+    \internal
     Used to implement QAbstractListModel
     The number of rows: the number of documents given by the query.
  */
@@ -97,12 +97,19 @@ Query::rowCount(const QModelIndex & parent) const
     return m_hash.count();
 }
 
+/*!
+    Returns the Index used to query the database.
+ */
 Index*
 Query::getIndex()
 {
     return m_index;
 }
 
+/*!
+    Emitted whenever the index or documents change, and the results
+    need to be updated.
+ */
 void
 Query::onDataInvalidated()
 {
@@ -155,6 +162,9 @@ Query::setIndex(Index* index)
 
 }
 
+/*!
+    Returns the query used, in the form of a string, list or variant.
+ */
 QVariant
 Query::getQuery()
 {
