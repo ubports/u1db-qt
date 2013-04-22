@@ -152,8 +152,7 @@ Index::setExpression(QStringList expression)
 }
 
 /*!
- * \brief Index::generateIndexResults
- *
+   \internal
  * Iterates through the documents stored in the database and creates the list of results based on the Index expressions.
  */
 
@@ -180,6 +179,9 @@ void Index::generateIndexResults()
 
 }
 
+/*!
+    \internal
+ */
 void Index::clearResults()
 {
     m_results.clear();
@@ -187,8 +189,7 @@ void Index::clearResults()
 
 
 /*!
- * \brief Index::getAllResults
- * \return
+   \internal
  */
 
 QList<QVariantMap> Index::getAllResults(){
@@ -196,20 +197,14 @@ QList<QVariantMap> Index::getAllResults(){
 }
 
 /*!
- * \brief Index::getResult
- * \param index
- * \return
+   \internal
  */
 QVariantMap Index::getResult(int index){
     return m_results[index];
 }
 
 /*!
- * \brief Index::appendResultsFromMap
- * \param fieldsList
- * \param current_section
- * \param current_field
- * \return
+   \internal
  *
  *This method is desinged to recursively iterate through a document, or section of a document, which represents a QVariantMap. As it iterates through the entire document, the method keeps track of the current index expression, and populates a local QVariantMap should the current expression be found in the Index's list of expressions.
  *
@@ -264,11 +259,7 @@ QStringList Index::appendResultsFromMap(QStringList fieldsList, QVariantMap curr
     return fieldsList;
 }
 /*!
- * \brief Index::getFieldsFromList
- * \param fieldsList
- * \param current_section
- * \param current_field
- * \return
+   \internal
  *
  *This recursive method is used in conjuntion with Index::appendResultsFromMap, to aid in iterating through a document when an embedded list is found.
  *

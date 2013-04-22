@@ -11,6 +11,7 @@ headers = ../src/database.h \
 Cpp.ignoretokens = Q_DECL_EXPORT \
                    Q_PROPERTY \
                    QT_BEGIN_NAMESPACE_U1DB \
+                   Q_INVOKABLE \
                    
 defines = Q_QDOC
 Cpp.ignoredirectives = Q_ENUMS \
