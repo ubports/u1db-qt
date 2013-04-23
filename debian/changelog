@@ -1,3 +1,8 @@
+u1db-qt (0.1.2) quantal; urgency=low
+  * Documentation packages -doc and -examples
+ 
+ -- Christian Dywan <christian.dywan@canonical.com>  Tue, 23 Apr 2013 12:58:11  +0100
+
 u1db-qt (0.1.1-0ubuntu1) quantal; urgency=low
   * Added .install files
   * Corrected dependencies

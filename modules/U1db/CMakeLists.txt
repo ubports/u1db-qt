@@ -1,5 +1,4 @@
 find_package(Qt5Quick REQUIRED)
-set(OUR_QT_QUICK_LIB ${Qt5Quick_LIBRARIES})
 
 get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
 # See http://doc-snapshot.qt-project.org/5.0/qtcore/qlibraryinfo.html#LibraryLocation-enum
@@ -7,10 +6,13 @@ get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
 exec_program(${QMAKE_EXECUTABLE} ARGS "-query QT_INSTALL_QML" OUTPUT_VARIABLE QT_IMPORTS_DIR)
 file(TO_CMAKE_PATH "${QT_IMPORTS_DIR}" QT_IMPORTS_DIR)
 
-set(OUR_QT_QUICK_INCLUDE ${Qt5Quick_INCLUDE_DIRS})
-
 set(U1DBPlugin_SRCS
     plugin.cpp
+    )
+
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${Qt5Sql_INCLUDE_DIRS}
     )
 
 add_library(U1DBPlugin SHARED ${U1DBPlugin_SRCS})
@@ -18,14 +20,14 @@ add_dependencies(check U1DBPlugin)
 
 target_link_libraries(U1DBPlugin
   ${U1DB_QT_LIBNAME}
-  ${OUR_QT_QUICK_LIB}
+  ${Qt5Quick_LIBRARIES}
   )
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
     ${U1DB_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${OUR_QT_QUICK_INCLUDE}
+    ${Qt5Quick_INCLUDE_DIRS}
     )
 
 # copy qmldir file into build directory for shadow builds
