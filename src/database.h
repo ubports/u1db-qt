@@ -57,7 +57,6 @@ Q_SIGNALS:
     void errorChanged(const QString& error);
     void docChanged(const QString& docId, QVariant content);
     void docLoaded(const QString& docId, QVariant content) const;
-    void documentsAvailable();
 private:
     Q_DISABLE_COPY(Database)
     QString m_path;

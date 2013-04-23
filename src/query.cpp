@@ -316,7 +316,6 @@ Query::setIndex(Index* index)
     m_index = index;
     if (m_index){
         QObject::connect(m_index, &Index::dataInvalidated, this, &Query::onDataInvalidated);
-        QObject::connect(m_index, &Index::dataIndexed, this, &Query::onDataInvalidated);
     }
     Q_EMIT indexChanged(index);
 

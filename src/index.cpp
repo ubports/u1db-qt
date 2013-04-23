@@ -148,7 +148,6 @@ Index::setExpression(QStringList expression)
     m_expression = expression;
 
     Q_EMIT expressionChanged(expression);
-    Q_EMIT dataIndexed();
 }
 
 /*!

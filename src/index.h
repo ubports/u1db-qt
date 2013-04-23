@@ -58,9 +58,7 @@ Q_SIGNALS:
     void databaseChanged(Database* database);
     void nameChanged(const QString& name);
     void expressionChanged(QVariant expression);
-    // Either of the above has changed:
     void dataInvalidated();
-    void dataIndexed();
 private:
     Q_DISABLE_COPY(Index)
     Database* m_database;
