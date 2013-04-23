@@ -189,4 +189,5 @@ U1Db-Qt is the QML implementation of U1DB. It is a QML plugin written in C++ and
 
                                     }
                                     \endqml
+ */
 
