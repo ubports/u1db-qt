@@ -141,6 +141,10 @@ Database::initializeIfNeeded(const QString& path)
     return true;
 }
 
+/*!
+    Instantiate a new Database with an optional \a parent,
+    usually by declaring it as a QML item.
+ */
 Database::Database(QObject *parent) :
     QAbstractListModel(parent), m_path("")
 {
@@ -350,6 +354,9 @@ Database::putDoc(QVariant contents, const QString& docId)
     return newRev;
 }
 
+/*!
+    Returns a list of all stored documents by their docId.
+ */
 QList<QString>
 Database::listDocs()
 {

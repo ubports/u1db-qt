@@ -41,6 +41,10 @@ QT_BEGIN_NAMESPACE_U1DB
     Database::getDoc().
 */
 
+/*!
+    Instantiate a new Document with an optional \a parent,
+    usually by declaring it as a QML item.
+ */
 Document::Document(QObject *parent) :
     QObject(parent), m_database(0), m_create(false)
 {

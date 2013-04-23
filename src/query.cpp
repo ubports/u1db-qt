@@ -42,6 +42,10 @@ QT_BEGIN_NAMESPACE_U1DB
     analogous to the properties of Document.
 */
 
+/*!
+    Instantiate a new Query with an optional \a parent,
+    usually by declaring it as a QML item.
+ */
 Query::Query(QObject *parent) :
     QAbstractListModel(parent), m_index(0)
 {
@@ -128,6 +132,10 @@ Query::onDataInvalidated()
 
 }
 
+/*!
+    \internal
+    Manually triggers reloading of the query.
+ */
 void Query::generateQueryResults()
 {
 
@@ -165,6 +173,10 @@ void Query::generateQueryResults()
 
 }
 
+/*!
+    \internal
+    Query a single field.
+ */
 bool Query::queryField(QString field, QVariant value){
 
     bool match = false;
@@ -188,6 +200,10 @@ bool Query::queryField(QString field, QVariant value){
 
 }
 
+/*!
+    \internal
+    Loop through the query assuming it's a list.
+ */
 bool Query::iterateQueryList(QVariant query, QString field, QString value)
 {
 
@@ -226,6 +242,10 @@ bool Query::iterateQueryList(QVariant query, QString field, QString value)
     return match;
 }
 
+/*!
+    \internal
+    Handle different types of string values including wildcards.
+ */
 bool Query::queryString(QString query, QString value)
 {
 
@@ -250,6 +270,10 @@ bool Query::queryString(QString query, QString value)
     return match;
 }
 
+/*!
+    \internal
+    Loop through the given map of keys and queries.
+ */
 bool Query::queryMap(QVariantMap map, QString value, QString field)
 {
 
