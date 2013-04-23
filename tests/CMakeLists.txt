@@ -27,7 +27,10 @@ add_dependencies(check test-database)
 find_package(PythonLibs)
 if (PYTHONLIBS_FOUND)
     set(U1DB_QT_PY_SRCS qt-backend-wrapper.cpp)
-    include_directories(${PYTHON_INCLUDE_DIRS})
+    include_directories(
+        ${PYTHON_INCLUDE_DIRS}
+        ${Qt5Sql_INCLUDE_DIRS}
+        )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -Wall -Wundef -std=c++0x")
     add_library(u1dbqt SHARED ${U1DB_QT_PY_SRCS})
     target_link_libraries(u1dbqt ${OUR_QT_CORE_LIB} ${OUR_QT_SQL_LIB} ${U1DB_QT_LIBNAME} ${PYTHON_LDFLAGS})

@@ -11,79 +11,19 @@ find_package(Qt5Sql REQUIRED)
 add_definitions(-DWITHQT5=1)
 
 set(U1DB_QT_LIBNAME u1db-qt5)
-set(OUR_QT_INCLUDES ${Qt5Core_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS})
-set(OUR_QT_CORE_LIB ${Qt5Core_LIBRARIES})
-set(OUR_QT_SQL_LIB ${Qt5Sql_LIBRARIES})
 set(QT_PKGCONFIG_DEPENDENCIES "Qt5Core Qt5Quick Qt5Sql")
-
 set(QT_U1DB_PKGCONFIG_FILE lib${U1DB_QT_LIBNAME}.pc)
 
 # Build flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wundef -std=c++0x")
-
-# Sources
-set(U1DB_QT_SRCS
-    src/database.cpp
-    src/document.cpp
-    src/index.cpp
-    src/query.cpp
-    )
-
-# Generated files
-set(U1DB_QT_GENERATED
-    src/moc_database.cpp
-    src/moc_document.cpp
-    src/moc_index.cpp
-    src/moc_query.cpp
-    )
-
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${U1DB_QT_GENERATED}")
-
-# Resources
-set(U1DB_QT_RESOURCES
-    sql.qrc
-    )
-
-QT5_ADD_RESOURCES(U1DB_QT_RCC ${U1DB_QT_RESOURCES})
-
-# Build
 add_definitions(-DQT_NO_KEYWORDS)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${OUR_QT_INCLUDES}
-    ${U1DB_INCLUDE_DIRS}
-    )
-
-add_library(${U1DB_QT_LIBNAME} SHARED ${U1DB_QT_SRCS} ${U1DB_QT_RCC})
-target_link_libraries(${U1DB_QT_LIBNAME}
-    ${OUR_QT_CORE_LIB}
-    ${OUR_QT_SQL_LIB}
-    ${U1DB_LDFLAGS}
-    )
-
-set_target_properties(${U1DB_QT_LIBNAME} PROPERTIES
-  SOVERSION 3
-  VERSION 3.0.0
-  )
-
+add_subdirectory(src)
 add_subdirectory(tests)
 add_subdirectory(modules)
 add_subdirectory(examples)
 add_subdirectory(gallery)
 add_subdirectory(documentation)
-
-# Install
-set(INCLUDE_INSTALL_DIR include/lib${U1DB_QT_LIBNAME})
-
-install(TARGETS ${U1DB_QT_LIBNAME}
-    LIBRARY DESTINATION lib${LIB_SUFFIX}
-    )
-
-install(FILES src/global.h src/database.h src/document.h src/index.h src/query.h
-    DESTINATION ${INCLUDE_INSTALL_DIR}
-    )
 
 # PkgConfig file
 set (PREFIX "${CMAKE_INSTALL_PREFIX}")
