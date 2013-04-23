@@ -56,18 +56,8 @@ Query::Query(QObject *parent) :
 QVariant
 Query::data(const QModelIndex & index, int role) const
 {
-    QVariantMap result(m_hash.value(index.row()));
-
     if (role == 0) // contents
-    {
-        Database* db(m_index->getDatabase());
-        if (db)
-        {
-            return result;
-        }
-    }
-    if (role == 1) // docId
-        //return docId;
+        return m_results.at(index.row());
     return QVariant();
 }
 
@@ -94,7 +84,7 @@ Query::roleNames() const
 int
 Query::rowCount(const QModelIndex & parent) const
 {
-    return m_hash.count();
+    return m_results.count();
 }
 
 /*!
@@ -113,7 +103,7 @@ Query::getIndex()
 void
 Query::onDataInvalidated()
 {
-    m_hash.clear();
+    m_results.clear();
 
     if (!m_index)
         return;
@@ -159,11 +149,12 @@ void Query::generateQueryResults()
         }
 
         if(match == true){
-            m_hash.insert(m_hash.count(),i_map);
+            m_results.append(i_map);
         }
 
     }
 
+    Q_EMIT resultsChanged(m_results);
 }
 
 bool Query::queryField(QString field, QVariant value){
@@ -360,6 +351,12 @@ Query::setRange(QVariant range)
     m_range = range;
     Q_EMIT rangeChanged(range);
     onDataInvalidated();
+}
+
+QList<QVariant>
+Query::getResults()
+{
+    return m_results;
 }
 
 QT_END_NAMESPACE_U1DB
