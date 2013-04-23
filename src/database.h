@@ -35,7 +35,6 @@ class Q_DECL_EXPORT Database : public QAbstractListModel {
     Q_PROPERTY(QString error READ lastError NOTIFY errorChanged)
 public:
     Database(QObject* parent = 0);
-    ~Database() { }
 
     // QAbstractListModel
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
@@ -55,7 +54,13 @@ public:
 Q_SIGNALS:
     void pathChanged(const QString& path);
     void errorChanged(const QString& error);
+    /*!
+        A document's contents were modified.
+     */
     void docChanged(const QString& docId, QVariant content);
+    /*!
+        A document was loaded via its docID.
+     */
     void docLoaded(const QString& docId, QVariant content) const;
 private:
     Q_DISABLE_COPY(Database)

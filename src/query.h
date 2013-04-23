@@ -37,7 +37,6 @@ class Q_DECL_EXPORT Query : public QAbstractListModel {
     Q_PROPERTY(QVariant query READ getQuery WRITE setQuery NOTIFY queryChanged)
 public:
     Query(QObject* parent = 0);
-    ~Query() { }
 
     // QAbstractListModel
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;

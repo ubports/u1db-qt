@@ -39,7 +39,6 @@ class Q_DECL_EXPORT Index : public QObject {
     Q_PROPERTY(QStringList expression READ getExpression WRITE setExpression NOTIFY expressionChanged)
 public:
     Index(QObject* parent = 0);
-    ~Index() { }
 
     Database* getDatabase();
     void setDatabase(Database* database);
@@ -58,6 +57,9 @@ Q_SIGNALS:
     void databaseChanged(Database* database);
     void nameChanged(const QString& name);
     void expressionChanged(QVariant expression);
+    /*!
+        The database, an indexed document or the expressions changed.
+     */
     void dataInvalidated();
 private:
     Q_DISABLE_COPY(Index)

@@ -100,9 +100,6 @@ Query::rowCount(const QModelIndex & parent) const
     return m_hash.count();
 }
 
-/*!
-    Returns the Index used to query the database.
- */
 Index*
 Query::getIndex()
 {
@@ -302,6 +299,7 @@ bool Query::queryMap(QVariantMap map, QString value, QString field)
 }
 
 /*!
+    \property Query::index
     Sets the Index to use. The index must have a valid name and index expressions.
     If no query is set, the default is all results of the index.
  */
@@ -324,18 +322,16 @@ Query::setIndex(Index* index)
 
 }
 
-/*!
-    Returns the query used, in the form of a string, list or variant.
- */
 QVariant
 Query::getQuery()
 {
     return m_query;
 }
 
-
 /*!
-    Sets a query, in one of the allowed forms such as 'value', ['value'] or [{'sub-field': 'value'].
+    \property Query::query
+    A query in one of the allowed forms:
+    'value', ['value'] or [{'sub-field': 'value'}].
     The default is equivalent to '*'.
  */
 void
