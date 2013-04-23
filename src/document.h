@@ -41,7 +41,6 @@ class Q_DECL_EXPORT Document : public QObject {
     Q_PROPERTY(QVariant contents READ getContents WRITE setContents NOTIFY contentsChanged)
 public:
     Document(QObject* parent = 0);
-    ~Document() { }
 
     Database* getDatabase();
     void setDatabase(Database* database);

@@ -81,7 +81,8 @@ Database::setError(const QString& error)
 }
 
 /*!
-    Describes the error as a string if the last operation failed.
+    \property Database::error
+    The last error as a string if the last operation failed.
  */
 QString
 Database::lastError()
@@ -141,6 +142,10 @@ Database::initializeIfNeeded(const QString& path)
     return true;
 }
 
+/*!
+    Instantiate a new Database with an optional \a parent,
+    usually by declaring it as a QML item.
+ */
 Database::Database(QObject *parent) :
     QAbstractListModel(parent), m_path("")
 {
@@ -341,15 +346,14 @@ Database::putDoc(QVariant contents, const QString& docId)
     endInsertRows();
     */
 
-    QList<QString> documents = listDocs();
-
-    documentCount = documents.count();
-
     Q_EMIT docChanged(newOrEmptyDocId, contents);
 
     return newRev;
 }
 
+/*!
+    Returns a list of all stored documents by their docId.
+ */
 QList<QString>
 Database::listDocs()
 {
@@ -374,11 +378,9 @@ Database::listDocs()
 }
 
 /*!
-    A relative filename or absolute path advises the database to store documents
-    and indexes persistently on disk. Internally, an SQlite database is written.
-
-    If no path is set, as is the default, all database contents are written in
-    memory only. The same affect can be achieved by passing the string ":memory:".
+    \property Database::path
+    A relative filename or absolute path to store documents
+    and indexes persistently on disk. By default documents are stored in memory.
  */
 void
 Database::setPath(const QString& path)
@@ -396,10 +398,6 @@ Database::setPath(const QString& path)
     Q_EMIT pathChanged(path);
 }
 
-/*!
-   The persistent storage location if set. By default the database is only
-   storted in memory. See setPath().
- */
 QString
 Database::getPath()
 {

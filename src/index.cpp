@@ -43,6 +43,10 @@ QT_BEGIN_NAMESPACE_U1DB
     Database::getIndexExpressions().
 */
 
+/*!
+    Instantiate a new Index with an optional \a parent,
+    usually by declaring it as a QML item.
+ */
 Index::Index(QObject *parent) :
     QObject(parent), m_database(0)
 {
@@ -67,6 +71,7 @@ Index::onDocChanged(const QString& docId, QVariant content)
 }
 
 /*!
+    \property Index::database
     Sets the Database to lookup documents from and store the index in. The
     dataInvalidated() signal will be emitted on all changes that could affect
     the index.
@@ -100,6 +105,7 @@ Index::getName()
 }
 
 /*!
+    \property Index::name
     Sets the name used. Both an expression and a name must be specified
     for an index to be created.
  */
@@ -126,6 +132,7 @@ Index::getExpression()
 }
 
 /*!
+    \property Index::expression
     Sets the expression used. Both an expression and a name must be specified
     for an index to be created.
 
@@ -148,7 +155,6 @@ Index::setExpression(QStringList expression)
     m_expression = expression;
 
     Q_EMIT expressionChanged(expression);
-    Q_EMIT dataIndexed();
 }
 
 /*!

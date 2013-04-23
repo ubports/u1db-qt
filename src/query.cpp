@@ -36,13 +36,16 @@ QT_BEGIN_NAMESPACE_U1DB
     \inmodule U1db
     \ingroup modules
 
-    \brief The Query class generates a filtered list of documents based on either
-    a query or a range, and using the given Index.
+    \brief The Query class generates a filtered list of documents based on a query using the given Index.
 
     Query can be used as a QAbstractListModel, delegates will then have access to \a docId and \a contents
     analogous to the properties of Document.
 */
 
+/*!
+    Instantiate a new Query with an optional \a parent,
+    usually by declaring it as a QML item.
+ */
 Query::Query(QObject *parent) :
     QAbstractListModel(parent), m_index(0)
 {
@@ -87,9 +90,6 @@ Query::rowCount(const QModelIndex & parent) const
     return m_results.count();
 }
 
-/*!
-    Returns the Index used to query the database.
- */
 Index*
 Query::getIndex()
 {
@@ -107,18 +107,14 @@ Query::onDataInvalidated()
 
     if (!m_index)
         return;
-
-    Database *db = m_index->getDatabase();
-    if(db){
-        if(db->documentCount>0){
-            QObject::connect(db, &Database::documentsAvailable, this, &Query::onDataInvalidated);
-        }
-    }
-
     generateQueryResults();
 
 }
 
+/*!
+    \internal
+    Manually triggers reloading of the query.
+ */
 void Query::generateQueryResults()
 {
 
@@ -157,6 +153,10 @@ void Query::generateQueryResults()
     Q_EMIT resultsChanged(m_results);
 }
 
+/*!
+    \internal
+    Query a single field.
+ */
 bool Query::queryField(QString field, QVariant value){
 
     bool match = false;
@@ -180,6 +180,10 @@ bool Query::queryField(QString field, QVariant value){
 
 }
 
+/*!
+    \internal
+    Loop through the query assuming it's a list.
+ */
 bool Query::iterateQueryList(QVariant query, QString field, QString value)
 {
 
@@ -218,6 +222,10 @@ bool Query::iterateQueryList(QVariant query, QString field, QString value)
     return match;
 }
 
+/*!
+    \internal
+    Handle different types of string values including wildcards.
+ */
 bool Query::queryString(QString query, QString value)
 {
 
@@ -242,6 +250,10 @@ bool Query::queryString(QString query, QString value)
     return match;
 }
 
+/*!
+    \internal
+    Loop through the given map of keys and queries.
+ */
 bool Query::queryMap(QVariantMap map, QString value, QString field)
 {
 
@@ -278,8 +290,9 @@ bool Query::queryMap(QVariantMap map, QString value, QString field)
 }
 
 /*!
-    Sets the Index to use. The index must have a valid name and index expressions,
-    then either a range or query can be set.
+    \property Query::index
+    Sets the Index to use. The index must have a valid name and index expressions.
+    If no query is set, the default is all results of the index.
  */
 void
 Query::setIndex(Index* index)
@@ -292,7 +305,6 @@ Query::setIndex(Index* index)
     m_index = index;
     if (m_index){
         QObject::connect(m_index, &Index::dataInvalidated, this, &Query::onDataInvalidated);
-        QObject::connect(m_index, &Index::dataIndexed, this, &Query::onDataInvalidated);
     }
     Q_EMIT indexChanged(index);
 
@@ -301,19 +313,17 @@ Query::setIndex(Index* index)
 
 }
 
-/*!
-    Returns the query used, in the form of a string, list or variant.
- */
 QVariant
 Query::getQuery()
 {
     return m_query;
 }
 
-
 /*!
-    Sets a range, such as ['match', false].
-    Only one of query and range is used - setting range unsets the query.
+    \property Query::query
+    A query in one of the allowed forms:
+    'value', ['value'] or [{'sub-field': 'value'}].
+    The default is equivalent to '*'.
  */
 void
 Query::setQuery(QVariant query)
@@ -321,38 +331,15 @@ Query::setQuery(QVariant query)
     if (m_query == query)
         return;
 
-    if (m_range.isValid())
-        m_range = QVariant();
-
     m_query = query;
     Q_EMIT queryChanged(query);
     onDataInvalidated();
 }
 
-QVariant
-Query::getRange()
-{
-    return m_range;
-}
-
 /*!
-    Sets a range, such as [['a', 'b'], ['*']].
-    Only one of query and range is used - setting range unsets the query.
+    \property Query::results
+    The results of the query as a list.
  */
-void
-Query::setRange(QVariant range)
-{
-    if (m_range == range)
-        return;
-
-    if (m_query.isValid())
-        m_query = QVariant();
-
-    m_range = range;
-    Q_EMIT rangeChanged(range);
-    onDataInvalidated();
-}
-
 QList<QVariant>
 Query::getResults()
 {

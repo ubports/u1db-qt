@@ -35,11 +35,9 @@ class Q_DECL_EXPORT Query : public QAbstractListModel {
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Index*) index READ getIndex WRITE setIndex NOTIFY indexChanged)
 #endif
     Q_PROPERTY(QVariant query READ getQuery WRITE setQuery NOTIFY queryChanged)
-    Q_PROPERTY(QVariant range READ getRange WRITE setRange NOTIFY rangeChanged)
     Q_PROPERTY(QList<QVariant> results READ getResults NOTIFY resultsChanged)
 public:
     Query(QObject* parent = 0);
-    ~Query() { }
 
     // QAbstractListModel
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
@@ -50,8 +48,6 @@ public:
     void setIndex(Index* index);
     QVariant getQuery();
     void setQuery(QVariant query);
-    QVariant getRange();
-    void setRange(QVariant range);
     Q_INVOKABLE QList<QVariant> getResults();
 
     void generateQueryResults();
@@ -63,14 +59,12 @@ public:
 Q_SIGNALS:
     void indexChanged(Index* index);
     void queryChanged(QVariant query);
-    void rangeChanged(QVariant range);
     void resultsChanged(QList<QVariant> results);
 private:
     Q_DISABLE_COPY(Query)
     Index* m_index;
     QList<QVariant> m_results;
     QVariant m_query;
-    QVariant m_range;
 
     void onDataInvalidated();
 };

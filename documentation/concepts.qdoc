@@ -91,10 +91,8 @@ U1Db-Qt is the QML implementation of U1DB. It is a QML plugin written in C++ and
 
                  The listDocs method retrieves all the docId values from the current database. In this demonstration the values are put into an array, which is then checked to locate the docId for the current and previous documents within the database.
 
-               \qml
-               var documentIds = {}
-
-               documentIds = documentObject.database.listDocs()
+               \code
+               var documentIds = documentObject.database.listDocs()
 
                for(var i = 0; i < documentIds.length; i++){
 
@@ -106,40 +104,40 @@ U1Db-Qt is the QML implementation of U1DB. It is a QML plugin written in C++ and
                    }
 
                }
-               \endqml
+               \endcode
 
                 These steps demonstrate the creation of a temporary document, based on a copy of the global document. This will then be used to determine if there is already a document in the database with the same docId as the address bar, and additionally with a key id with the same name.
 
-                \qml
+                \code
                 var tempFieldName = addressBarText;
 
                 var tempDocument = aDocument
                 tempDocument.docId = addressBarText;
 
                 var tempContents = tempDocument.contents
-                \endqml
+                \endcode
 
                 \b{Note: For simplicity sake this example sometimes uses the same value for both the docId and the key id, as seen here. Real life implimentations can and will differ, and this will be demonstrated elsewhere in the example code.}
 
                     Here the contents of the temporary document are modified, which then replaces the global document.
 
-                    \qml
+                    \code
                     documentContent.text = 'More Hello World...';
 
                     var tempContents = {}
                     tempContents[tempFieldName] = documentContent.text
                     tempDocument.contents = tempContents
                     aDocument = tempDocument
-                    \endqml
+                    \endcode
 
                 In this instance the current document's content is updated from the text view. The unique key and docId are not modified because the database already contains a record with those properties.
 
-                \qml
+                \code
                 var tempContents = {}
                 tempFieldName = getCurrentDocumentKey(aDocument.contents)
                 tempContents[tempFieldName] = documentContent.text
                 aDocument.contents = tempContents
-                \endqml
+                \endcode
 
                     Here a rectangle is defined that represents the lower portion of our application. It will contain all the main parts of the application.
 
@@ -179,6 +177,7 @@ U1Db-Qt is the QML implementation of U1DB. It is a QML plugin written in C++ and
                                         There is an object within in the 'aDocument' model defined earlier called 'contents', which contains a key called 'hello', which represents a search string.  In this example the key will represent the name of a document in the database, which will be displayed in the address bar. Displaying the key is demonstrated here:
 
                                     \qml
+                            TextArea{
                                     text: displayKey(aDocument.contents)
 
                                     function displayKey(documentObject){
@@ -188,5 +187,7 @@ U1Db-Qt is the QML implementation of U1DB. It is a QML plugin written in C++ and
                                         return keys[0]
 
                                     }
+                            }
                                     \endqml
+ */
 
