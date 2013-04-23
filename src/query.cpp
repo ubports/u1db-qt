@@ -36,8 +36,7 @@ QT_BEGIN_NAMESPACE_U1DB
     \inmodule U1db
     \ingroup modules
 
-    \brief The Query class generates a filtered list of documents based on either
-    a query or a range, and using the given Index.
+    \brief The Query class generates a filtered list of documents based on a query using the given Index.
 
     Query can be used as a QAbstractListModel, delegates will then have access to \a docId and \a contents
     analogous to the properties of Document.
@@ -287,8 +286,8 @@ bool Query::queryMap(QVariantMap map, QString value, QString field)
 }
 
 /*!
-    Sets the Index to use. The index must have a valid name and index expressions,
-    then either a range or query can be set.
+    Sets the Index to use. The index must have a valid name and index expressions.
+    If no query is set, the default is all results of the index.
  */
 void
 Query::setIndex(Index* index)
@@ -321,8 +320,8 @@ Query::getQuery()
 
 
 /*!
-    Sets a range, such as ['match', false].
-    Only one of query and range is used - setting range unsets the query.
+    Sets a query, in one of the allowed forms such as 'value', ['value'] or [{'sub-field': 'value'].
+    The default is equivalent to '*'.
  */
 void
 Query::setQuery(QVariant query)
@@ -330,35 +329,8 @@ Query::setQuery(QVariant query)
     if (m_query == query)
         return;
 
-    if (m_range.isValid())
-        m_range = QVariant();
-
     m_query = query;
     Q_EMIT queryChanged(query);
-    onDataInvalidated();
-}
-
-QVariant
-Query::getRange()
-{
-    return m_range;
-}
-
-/*!
-    Sets a range, such as [['a', 'b'], ['*']].
-    Only one of query and range is used - setting range unsets the query.
- */
-void
-Query::setRange(QVariant range)
-{
-    if (m_range == range)
-        return;
-
-    if (m_query.isValid())
-        m_query = QVariant();
-
-    m_range = range;
-    Q_EMIT rangeChanged(range);
     onDataInvalidated();
 }
 
