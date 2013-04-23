@@ -5,7 +5,7 @@ endif ()
 
 set(U1DB_DOCS "${CMAKE_CURRENT_BINARY_DIR}/output")
 add_custom_target(doc ${ALL} "mkdir" "-p" "${U1DB_DOCS}"
-    COMMAND "qdoc" "-outputdir" "${U1DB_DOCS}" "${CMAKE_CURRENT_SOURCE_DIR}/u1db.qdocconf" "1>/dev/null" "2>/dev/null"
+    COMMAND "qdoc" "-outputdir" "${U1DB_DOCS}" "${CMAKE_CURRENT_SOURCE_DIR}/u1db.qdocconf"
     COMMAND "sed" "-r" "-i" "'s@(</head>)@<link rel=\"stylesheet\" type=\"text/css\" href=\"style/base.css\" />\\1@'" "${U1DB_DOCS}/*.html"
     COMMAND "qhelpgenerator" "${U1DB_DOCS}/u1dbqt.qhp"
     COMMAND "assistant" "-register" "${U1DB_DOCS}/u1dbqt.qch"
