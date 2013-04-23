@@ -336,6 +336,10 @@ Query::setQuery(QVariant query)
     onDataInvalidated();
 }
 
+/*!
+    \property Query::results
+    The results of the query as a list.
+ */
 QList<QVariant>
 Query::getResults()
 {
