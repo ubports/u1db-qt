@@ -37,8 +37,6 @@ public:
     Database(QObject* parent = 0);
     ~Database() { }
 
-    int documentCount = 0;
-
     // QAbstractListModel
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray>roleNames() const;

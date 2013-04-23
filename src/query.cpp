@@ -120,14 +120,6 @@ Query::onDataInvalidated()
 
     if (!m_index)
         return;
-
-    Database *db = m_index->getDatabase();
-    if(db){
-        if(db->documentCount>0){
-            QObject::connect(db, &Database::documentsAvailable, this, &Query::onDataInvalidated);
-        }
-    }
-
     generateQueryResults();
 
 }
