@@ -1,3 +1,6 @@
+enable_testing()
+add_custom_target(check COMMAND "env" "CTEST_OUTPUT_ON_FAILURE=1" "${CMAKE_CTEST_COMMAND}")
+
 find_package(Qt5Test REQUIRED)
 set(OUR_QT_TEST_LIB ${Qt5Test_LIBRARIES})
 set(OUR_QT_TEST_INCLUDES ${Qt5Test_INCLUDE_DIRS})
