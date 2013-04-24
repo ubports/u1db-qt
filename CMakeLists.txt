@@ -19,6 +19,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wundef -std=c
 add_definitions(-DQT_NO_KEYWORDS)
 
 add_subdirectory(src)
+enable_testing()
 add_subdirectory(tests)
 add_subdirectory(modules)
 add_subdirectory(examples)
