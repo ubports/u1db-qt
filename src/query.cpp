@@ -337,6 +337,10 @@ Query::setQuery(QVariant query)
     onDataInvalidated();
 }
 
+/*!
+    \property Query::documents
+    The docId's of all matched documents.
+ */
 QStringList
 Query::getDocuments()
 {
