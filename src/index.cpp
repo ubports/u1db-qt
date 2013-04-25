@@ -178,7 +178,7 @@ void Index::generateIndexResults()
 
             QStringList fieldsList;
 
-            appendResultsFromMap(fieldsList, document.toMap(),"");
+            appendResultsFromMap(docId, fieldsList, document.toMap(),"");
 
         }
 
@@ -203,7 +203,7 @@ QList<QVariantMap> Index::getAllResults(){
  *If that QVariantMap contains more than one entry it is added to the global results, which can then be utilized by a Query. This needs to be modified to ensure all expressions are found, whereas at the moment if more than one expressions are defined and any of them are found then the map is added to the results list.
  *
  */
-QStringList Index::appendResultsFromMap(QStringList fieldsList, QVariantMap current_section, QString current_field)
+QStringList Index::appendResultsFromMap(QString docId, QStringList fieldsList, QVariantMap current_section, QString current_field)
 {
 
     QMapIterator<QString, QVariant> i(current_section);
@@ -229,11 +229,11 @@ QStringList Index::appendResultsFromMap(QStringList fieldsList, QVariantMap curr
 
         if(value.userType()==8) // QVariantMap
         {
-            fieldsList = appendResultsFromMap(fieldsList, value.toMap(),current_field);
+            fieldsList = appendResultsFromMap(docId, fieldsList, value.toMap(),current_field);
         }
         else if(value.userType()==9) // QVariantList
         {
-            fieldsList = getFieldsFromList(fieldsList, value.toList(),current_field);
+            fieldsList = getFieldsFromList(docId, fieldsList, value.toList(),current_field);
         }
         else
         {
@@ -245,7 +245,10 @@ QStringList Index::appendResultsFromMap(QStringList fieldsList, QVariantMap curr
     }
 
     if(results_map.count()>0){
-       m_results.append(results_map);
+        QVariantMap mapIdResult;
+        mapIdResult.insert("docId", docId);
+        mapIdResult.insert("result", results_map);
+        m_results.append(mapIdResult);
     }
 
     return fieldsList;
@@ -258,7 +261,7 @@ QStringList Index::appendResultsFromMap(QStringList fieldsList, QVariantMap curr
  */
 
 
-QStringList Index::getFieldsFromList(QStringList fieldsList, QVariantList current_section, QString current_field)
+QStringList Index::getFieldsFromList(QString docId, QStringList fieldsList, QVariantList current_section, QString current_field)
 {
 
     QListIterator<QVariant> i(current_section);
@@ -269,11 +272,11 @@ QStringList Index::getFieldsFromList(QStringList fieldsList, QVariantList curren
 
         if(value.userType()==8) // QVariantMap
         {
-            fieldsList = appendResultsFromMap(fieldsList, value.toMap(),current_field);
+            fieldsList = appendResultsFromMap(docId, fieldsList, value.toMap(),current_field);
         }
         else if(value.userType()==9) // QVariantList
         {
-            fieldsList = getFieldsFromList(fieldsList, value.toList(),current_field);
+            fieldsList = getFieldsFromList(docId, fieldsList, value.toList(),current_field);
         }
         else
         {

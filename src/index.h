@@ -66,8 +66,8 @@ private:
     void onPathChanged(const QString& path);
     void onDocChanged(const QString& docId, QVariant content);
 
-    QStringList appendResultsFromMap(QStringList fieldsList, QVariantMap current_section, QString current_field);
-    QStringList getFieldsFromList(QStringList fieldsList, QVariantList current_section, QString current_field);
+    QStringList appendResultsFromMap(QString docId, QStringList fieldsList, QVariantMap current_section, QString current_field);
+    QStringList getFieldsFromList(QString docId, QStringList fieldsList, QVariantList current_section, QString current_field);
     void generateIndexResults();
 };
 
