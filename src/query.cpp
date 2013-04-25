@@ -117,12 +117,8 @@ Query::onDataInvalidated()
  */
 void Query::generateQueryResults()
 {
-
-    m_index->clearResults();
-
-    m_index->generateIndexResults();
-
-    QListIterator<QVariantMap> i(m_index->getAllResults());
+    QList<QVariantMap> results(m_index->getAllResults());
+    QListIterator<QVariantMap> i(results);
 
     while (i.hasNext()) {
 

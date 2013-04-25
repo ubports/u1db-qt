@@ -46,11 +46,6 @@ public:
     void setName(const QString& name);
     QStringList getExpression();
     void setExpression(QStringList expression);
-    void generateIndexResults();
-    QStringList appendResultsFromMap(QStringList fieldsList, QVariantMap current_section, QString current_field);
-    QStringList getFieldsFromList(QStringList fieldsList, QVariantList current_section, QString current_field);
-    void clearResults();
-    QVariantMap getResult(int index);
     QList<QVariantMap> getAllResults();
 
 Q_SIGNALS:
@@ -70,6 +65,10 @@ private:
 
     void onPathChanged(const QString& path);
     void onDocChanged(const QString& docId, QVariant content);
+
+    QStringList appendResultsFromMap(QStringList fieldsList, QVariantMap current_section, QString current_field);
+    QStringList getFieldsFromList(QStringList fieldsList, QVariantList current_section, QString current_field);
+    void generateIndexResults();
 };
 
 QT_END_NAMESPACE_U1DB

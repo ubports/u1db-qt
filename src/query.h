@@ -48,13 +48,7 @@ public:
     void setIndex(Index* index);
     QVariant getQuery();
     void setQuery(QVariant query);
-    Q_INVOKABLE QList<QVariant> getResults();
-
-    void generateQueryResults();
-    bool iterateQueryList(QVariant query, QString field, QString value);
-    bool queryString(QString query, QString value);
-    bool queryMap(QVariantMap map, QString value, QString field);
-    bool queryField(QString field, QVariant value);
+    QList<QVariant> getResults();
 
 Q_SIGNALS:
     void indexChanged(Index* index);
@@ -67,6 +61,12 @@ private:
     QVariant m_query;
 
     void onDataInvalidated();
+
+    void generateQueryResults();
+    bool iterateQueryList(QVariant query, QString field, QString value);
+    bool queryString(QString query, QString value);
+    bool queryMap(QVariantMap map, QString value, QString field);
+    bool queryField(QString field, QVariant value);
 };
 
 QT_END_NAMESPACE_U1DB

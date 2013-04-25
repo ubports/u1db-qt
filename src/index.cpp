@@ -164,6 +164,7 @@ Index::setExpression(QStringList expression)
 
 void Index::generateIndexResults()
 {
+    m_results.clear();
 
     Database *db(getDatabase());
 
@@ -186,27 +187,12 @@ void Index::generateIndexResults()
 }
 
 /*!
-    \internal
- */
-void Index::clearResults()
-{
-    m_results.clear();
-}
-
-
-/*!
    \internal
  */
 
 QList<QVariantMap> Index::getAllResults(){
+    generateIndexResults();
     return m_results;
-}
-
-/*!
-   \internal
- */
-QVariantMap Index::getResult(int index){
-    return m_results[index];
 }
 
 /*!
