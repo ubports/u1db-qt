@@ -35,6 +35,7 @@ class Q_DECL_EXPORT Query : public QAbstractListModel {
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Index*) index READ getIndex WRITE setIndex NOTIFY indexChanged)
 #endif
     Q_PROPERTY(QVariant query READ getQuery WRITE setQuery NOTIFY queryChanged)
+    Q_PROPERTY(QStringList documents READ getDocuments NOTIFY documentsChanged)
     Q_PROPERTY(QList<QVariant> results READ getResults NOTIFY resultsChanged)
 public:
     Query(QObject* parent = 0);
@@ -48,25 +49,28 @@ public:
     void setIndex(Index* index);
     QVariant getQuery();
     void setQuery(QVariant query);
-    Q_INVOKABLE QList<QVariant> getResults();
+    QStringList getDocuments();
+    QList<QVariant> getResults();
+
+Q_SIGNALS:
+    void indexChanged(Index* index);
+    void queryChanged(QVariant query);
+    void documentsChanged(QStringList documents);
+    void resultsChanged(QList<QVariant> results);
+private:
+    Q_DISABLE_COPY(Query)
+    Index* m_index;
+    QStringList m_documents;
+    QList<QVariant> m_results;
+    QVariant m_query;
+
+    void onDataInvalidated();
 
     void generateQueryResults();
     bool iterateQueryList(QVariant query, QString field, QString value);
     bool queryString(QString query, QString value);
     bool queryMap(QVariantMap map, QString value, QString field);
     bool queryField(QString field, QVariant value);
-
-Q_SIGNALS:
-    void indexChanged(Index* index);
-    void queryChanged(QVariant query);
-    void resultsChanged(QList<QVariant> results);
-private:
-    Q_DISABLE_COPY(Query)
-    Index* m_index;
-    QList<QVariant> m_results;
-    QVariant m_query;
-
-    void onDataInvalidated();
 };
 
 QT_END_NAMESPACE_U1DB

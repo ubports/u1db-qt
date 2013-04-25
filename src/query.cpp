@@ -61,6 +61,8 @@ Query::data(const QModelIndex & index, int role) const
 {
     if (role == 0) // contents
         return m_results.at(index.row());
+    if (role == 1) // docId
+        return m_documents.at(index.row());
     return QVariant();
 }
 
@@ -103,6 +105,7 @@ Query::getIndex()
 void
 Query::onDataInvalidated()
 {
+    m_documents.clear();
     m_results.clear();
 
     if (!m_index)
@@ -117,18 +120,13 @@ Query::onDataInvalidated()
  */
 void Query::generateQueryResults()
 {
+    QList<QVariantMap> results(m_index->getAllResults());
+    Q_FOREACH (QVariantMap mapIdResult, results) {
+        QString docId((mapIdResult["docId"]).toString());
+        QVariant result_variant(mapIdResult["result"]);
+        QVariantMap result(result_variant.toMap());
 
-    m_index->clearResults();
-
-    m_index->generateIndexResults();
-
-    QListIterator<QVariantMap> i(m_index->getAllResults());
-
-    while (i.hasNext()) {
-
-        QVariantMap i_map = i.next();
-
-        QMapIterator<QString,QVariant> j(i_map);
+        QMapIterator<QString,QVariant> j(result);
 
         bool match = true;
 
@@ -145,11 +143,14 @@ void Query::generateQueryResults()
         }
 
         if(match == true){
-            m_results.append(i_map);
+            if (!m_documents.contains(docId))
+                m_documents.append(docId);
+            m_results.append(result);
         }
 
     }
 
+    Q_EMIT documentsChanged(m_documents);
     Q_EMIT resultsChanged(m_results);
 }
 
@@ -334,6 +335,16 @@ Query::setQuery(QVariant query)
     m_query = query;
     Q_EMIT queryChanged(query);
     onDataInvalidated();
+}
+
+/*!
+    \property Query::documents
+    The docId's of all matched documents.
+ */
+QStringList
+Query::getDocuments()
+{
+    return m_documents;
 }
 
 /*!
