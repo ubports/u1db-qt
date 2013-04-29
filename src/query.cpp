@@ -164,8 +164,10 @@ bool Query::queryField(QString field, QVariant value){
 
     QString value_string = value.toString();
     QVariant query = getQuery();
+    // * is the default if query is empty
+    if (!query.isValid())
+        query = QVariant(QString("*"));
     QString typeName = query.typeName();
-
 
     if(typeName == "QString")
     {

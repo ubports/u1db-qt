@@ -133,10 +133,8 @@ TestCase {
 
     function test_1_defaults () {
         // We should get all documents
-        /* FIXME: */ defaultPhone.query = '*'
         workaroundQueryAndWait(defaultPhone)
         compare(defaultPhone.documents, ['1', '_', 'a'], 'uno')
-        console.log(defaultPhone.results)
         compare(defaultPhone.results.length, 5, 'dos')
         // FIXME: compare(defaultPhone.results, [], 'dos')
         // These queries are functionally equivalent
@@ -145,6 +143,7 @@ TestCase {
         workaroundQueryAndWait(allPhoneKeywords)
         // FIXME: compare(defaultPhone.documents, allPhoneKeywords.documents, 'cinco')
         // Results are also equivalent
+        // FIXME: compare(defaultPhone.results.length, allPhoneKeywords.results.length , 'siete')
         // FIXME: compare(defaultPhone.results, allPhoneKeywords.results, 'seis')
     }
 
