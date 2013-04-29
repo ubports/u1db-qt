@@ -174,6 +174,11 @@ bool Query::queryField(QString field, QVariant value){
         QString query_string = query.toString();
         match = queryString(query_string, value_string);
     }
+    else if(typeName == "int")
+    {
+        QString query_string = query.toString();
+        match = queryString(query_string, value_string);
+    }
     else if(typeName == "QVariantList")
     {
         match = iterateQueryList(query, field, value_string);

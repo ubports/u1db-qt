@@ -151,7 +151,7 @@ TestCase {
         // We should get '1'
         compare(s12345Phone.documents, ['1'], 'uno')
         // It's okay to mix strings and numerical values
-        // FIXME: compare(s12345Phone.documents, i12345Phone.documents, 'dos')
+        compare(s12345Phone.documents, i12345Phone.documents, 'dos')
     }
 
     function test_3_wildcards () {
