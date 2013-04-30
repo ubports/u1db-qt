@@ -80,7 +80,7 @@ Item {
     U1db.Query {
         id: allPhoneKeywords
         index: byPhone
-        query: { 'phone': '*' }
+        query: [ { 'phone': '*' } ]
     }
 
     U1db.Query {
@@ -110,7 +110,7 @@ Item {
     U1db.Query {
         id: ivankaAllNamePhoneKeywords
         index: byNamePhone
-        query: { 'name': 'Ivanka', 'phone': '*' }
+        query: [ { 'name': 'Ivanka', 'phone': '*' } ]
     }
 
     SignalSpy {
@@ -141,10 +141,10 @@ TestCase {
         compare(defaultPhone.documents, allPhone.documents, 'tres')
         compare(defaultPhone.documents, allPhoneList.documents, 'quatro')
         workaroundQueryAndWait(allPhoneKeywords)
-        // FIXME: compare(defaultPhone.documents, allPhoneKeywords.documents, 'cinco')
+        compare(defaultPhone.documents, allPhoneKeywords.documents, 'cinco')
         // Results are also equivalent
-        // FIXME: compare(defaultPhone.results.length, allPhoneKeywords.results.length , 'siete')
-        // FIXME: compare(defaultPhone.results, allPhoneKeywords.results, 'seis')
+        compare(defaultPhone.results.length, allPhoneKeywords.results.length , 'siete')
+        compare(defaultPhone.results, allPhoneKeywords.results, 'seis')
     }
 
     function test_2_numbers () {
