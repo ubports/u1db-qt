@@ -2,8 +2,7 @@ add_custom_target(check COMMAND "env" "CTEST_OUTPUT_ON_FAILURE=1" "${CMAKE_CTEST
 
 find_package(Qt5Test REQUIRED)
 
-add_test(NAME plugintest COMMAND "qmltestrunner" "-maxwarnings" "20" "-platform" "minimal" "-import" "../modules" "-xunitxml" "-o" "plugintest-xunit.xml" "-input" "${CMAKE_CURRENT_SOURCE_DIR}")
-add_test(NAME fatalwarnings COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/test-fatal-warnings.sh" "${CMAKE_CURRENT_BINARY_DIR}/plugintest-xunit.xml")
+add_test(NAME plugintest COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/strict-qmltestrunner" "-platform" "minimal" "-import" "../modules" "-xunitxml" "-o" "plugintest-xunit.xml" "-input" "${CMAKE_CURRENT_SOURCE_DIR}")
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
