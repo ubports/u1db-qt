@@ -184,7 +184,10 @@ bool Query::queryField(QString field, QVariant value){
         match = iterateQueryList(query, field, value_string);
     }
     else
-        qWarning("u1db: Unexpected type %s", qPrintable(typeName));
+    {
+        m_query = "";
+        qWarning("u1db: Unexpected type %s for query", qPrintable(typeName));
+    }
 
     return match;
 
@@ -227,7 +230,10 @@ bool Query::iterateQueryList(QVariant query, QString field, QString value)
 
         }
         else
-            qWarning("u1db: Unexpected type %s", qPrintable(typeName));
+        {
+            m_query = "";
+            qWarning("u1db: Unexpected type %s for query", qPrintable(typeName));
+        }
 
     }
 
