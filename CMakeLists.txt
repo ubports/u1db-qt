@@ -25,6 +25,7 @@ add_subdirectory(modules)
 add_subdirectory(examples)
 add_subdirectory(gallery)
 add_subdirectory(documentation)
+add_subdirectory(qtcreator)
 
 # PkgConfig file
 set (PREFIX "${CMAKE_INSTALL_PREFIX}")
