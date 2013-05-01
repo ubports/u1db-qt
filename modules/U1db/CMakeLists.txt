@@ -42,3 +42,14 @@ install(TARGETS U1DBPlugin
 install(FILES qmldir
     DESTINATION ${QT_IMPORTS_DIR}/U1db
     )
+
+add_custom_command(
+    TARGET U1DBPlugin
+    POST_BUILD
+    COMMAND "qmlplugindump" "U1db" "1.0" "${CMAKE_BINARY_DIR}/modules" ">" "plugins.qmltypes"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    )
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins.qmltypes
+    DESTINATION ${QT_IMPORTS_DIR}/U1db
+    )
