@@ -17,6 +17,8 @@ set(QT_U1DB_PKGCONFIG_FILE lib${U1DB_QT_LIBNAME}.pc)
 # Build flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wundef -std=c++0x")
 add_definitions(-DQT_NO_KEYWORDS)
+# Disable building during install to avoid file permission chaos
+set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY 1)
 
 add_subdirectory(src)
 enable_testing()
