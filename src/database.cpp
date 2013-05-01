@@ -74,7 +74,7 @@ Database::isInitialized()
 bool
 Database::setError(const QString& error)
 {
-    qDebug() << "u1db: " << error;
+    qWarning("u1db: %s", qPrintable(error));
     m_error = error;
     Q_EMIT errorChanged(error);
     return false;
@@ -103,8 +103,10 @@ Database::initializeIfNeeded(const QString& path)
     if (m_db.isOpen())
         return true;
 
+    /* A unique ID is used for the connection name to ensure that we aren't
+       re-using or replacing other opend databases. */
     if (!m_db.isValid())
-        m_db = QSqlDatabase::addDatabase("QSQLITE");
+        m_db = QSqlDatabase::addDatabase("QSQLITE", QUuid::createUuid().toString());
     if (!m_db.isValid())
         return setError("QSqlDatabase error");
     m_db.setDatabaseName(path);

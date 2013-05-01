@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+qmltestrunner $* || exit 1
+test 0 -eq $(grep -c qwarn plugintest-xunit.xml) || exit 1

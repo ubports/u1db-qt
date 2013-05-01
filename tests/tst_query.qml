@@ -80,7 +80,7 @@ Item {
     U1db.Query {
         id: allPhoneKeywords
         index: byPhone
-        query: { 'phone': '*' }
+        query: [ { 'phone': '*' } ]
     }
 
     U1db.Query {
@@ -110,7 +110,7 @@ Item {
     U1db.Query {
         id: ivankaAllNamePhoneKeywords
         index: byNamePhone
-        query: { 'name': 'Ivanka', 'phone': '*' }
+        query: [ { 'name': 'Ivanka', 'phone': '*' } ]
     }
 
     SignalSpy {
@@ -133,26 +133,25 @@ TestCase {
 
     function test_1_defaults () {
         // We should get all documents
-        /* FIXME: */ defaultPhone.query = '*'
         workaroundQueryAndWait(defaultPhone)
         compare(defaultPhone.documents, ['1', '_', 'a'], 'uno')
-        console.log(defaultPhone.results)
         compare(defaultPhone.results.length, 5, 'dos')
         // FIXME: compare(defaultPhone.results, [], 'dos')
         // These queries are functionally equivalent
         compare(defaultPhone.documents, allPhone.documents, 'tres')
         compare(defaultPhone.documents, allPhoneList.documents, 'quatro')
         workaroundQueryAndWait(allPhoneKeywords)
-        // FIXME: compare(defaultPhone.documents, allPhoneKeywords.documents, 'cinco')
+        compare(defaultPhone.documents, allPhoneKeywords.documents, 'cinco')
         // Results are also equivalent
-        // FIXME: compare(defaultPhone.results, allPhoneKeywords.results, 'seis')
+        compare(defaultPhone.results.length, allPhoneKeywords.results.length , 'siete')
+        compare(defaultPhone.results, allPhoneKeywords.results, 'seis')
     }
 
     function test_2_numbers () {
         // We should get '1'
         compare(s12345Phone.documents, ['1'], 'uno')
         // It's okay to mix strings and numerical values
-        // FIXME: compare(s12345Phone.documents, i12345Phone.documents, 'dos')
+        compare(s12345Phone.documents, i12345Phone.documents, 'dos')
     }
 
     function test_3_wildcards () {
