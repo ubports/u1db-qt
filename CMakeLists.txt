@@ -36,4 +36,3 @@ configure_file (libu1db-qt.pc.in
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${QT_U1DB_PKGCONFIG_FILE}
     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig
     )
-

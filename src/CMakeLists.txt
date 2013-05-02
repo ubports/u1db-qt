@@ -6,6 +6,7 @@ set(U1DB_QT_SRCS
     document.cpp
     index.cpp
     query.cpp
+    synchronizer.cpp
     )
 
 # Generated files
@@ -14,6 +15,7 @@ set(U1DB_QT_GENERATED
     moc_document.cpp
     moc_index.cpp
     moc_query.cpp
+    moc_synchronizer.cpp
     )
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${U1DB_QT_GENERATED}")
 
@@ -50,7 +52,7 @@ install(TARGETS ${U1DB_QT_LIBNAME}
     LIBRARY DESTINATION lib${LIB_SUFFIX}
     )
 
-install(FILES global.h database.h document.h index.h query.h
+install(FILES global.h database.h document.h index.h query.h synchronizer.h
     DESTINATION ${INCLUDE_INSTALL_DIR}
     )
 

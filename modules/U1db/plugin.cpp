@@ -21,6 +21,7 @@
 #include "document.h"
 #include "index.h"
 #include "query.h"
+#include "synchronizer.h"
 #include "plugin.h"
 #include <qqml.h>
 
@@ -32,5 +33,6 @@ void U1DBPlugin::registerTypes(const char *uri)
     qmlRegisterType<Document>(uri, 1, 0, "Document");
     qmlRegisterType<Index>(uri, 1, 0, "Index");
     qmlRegisterType<Query>(uri, 1, 0, "Query");
+    qmlRegisterType<Query>(uri, 1, 0, "Synchronizer");
 }
 
