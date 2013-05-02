@@ -21,11 +21,9 @@ import QtQuick 2.0
 import U1db 1.0 as U1db
 import Ubuntu.Components 0.1
 
-
-Item {
-
-        width: units.gu(45)
-        height: units.gu(80)
+MainView {
+    width: units.gu(45)
+    height: units.gu(80)
 
         U1db.Database {
             id: aDatabase
@@ -83,47 +81,25 @@ Item {
            query: [{"id":"*"},{"message":"Hel*"}]
        }
 
-    MainView {
-
-        id: u1dbView
-        width: units.gu(45)
-        height: units.gu(80)
-        anchors.top: parent.top;
-
         Tabs {
             id: tabs
-            anchors.fill: parent
 
             Tab {
-                objectName: "Tab1"
-
                 title: i18n.tr("Hello U1Db!")
 
                 page: Page {
                     id: helloPage
 
-                   ListView {
+                    ListView {
                         width: units.gu(45)
                         height: units.gu(80)
-
-
                         model: aQuery
-
                         delegate: Text {
-                            x: 66; y: 77
-                            text: {
-                                text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
-                            }
-                        }
+                            text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
                     }
                 }
-
             }
-
         }
-
     }
-
 }
-
 
