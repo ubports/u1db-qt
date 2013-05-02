@@ -31,16 +31,15 @@ QT_BEGIN_NAMESPACE_U1DB
 class Q_DECL_EXPORT Synchronizer : public QObject {
     Q_OBJECT
 #ifdef Q_QDOC
-    Q_PROPERTY(Database source READ getSource WRITE setSource NOTIFY sourceChanged)
-    Q_PROPERTY(Database target READ getTarget WRITE setTarget NOTIFY targetChanged)
-    Q_PROPERTY(Database resolver READ getResolver WRITE setResolver NOTIFY resolverChanged)
+    Q_PROPERTY(Database* source READ getSource WRITE setSource NOTIFY sourceChanged)
+    Q_PROPERTY(Database* target READ getTarget WRITE setTarget NOTIFY targetChanged)
+    Q_PROPERTY(Database* resolver READ getResolver WRITE setResolver NOTIFY resolverChanged)
 #else
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) source READ getSource WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) target READ getTarget WRITE setTarget NOTIFY targetChanged)
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) resolver READ getResolver WRITE setResolver NOTIFY resolverChanged)
 #endif
     Q_PROPERTY(bool synchronize READ getSync WRITE setSync NOTIFY syncChanged)
-
 public:
     Synchronizer(QObject* parent = 0);
     Database* getSource();
