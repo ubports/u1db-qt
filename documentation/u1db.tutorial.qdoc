@@ -25,7 +25,7 @@ import U1db 1.0 as U1db
 
 In U1Db-Qt, the Database element is the the central figure that works in conjunction with Document elements, and in the future indexing (currently under development), and querying (currently under development) elements.	 It is the Database element that defines the location of the data repository.
 
-A Database element is also a valuable tool for cases where specific data from a repository needs to be retrieved quickly, without indexing or querying ahead of time.	The 'contents' object associated with the Database element can be used together with standard elements (see: Standard Elements -> TextField & TextArea) and model-based elements (see: Model-Based Elements -> ListView).		
+A Database element is also a valuable tool for cases where specific data from a repository needs to be retrieved quickly, without indexing or querying ahead of time.	The 'contents' object associated with the Database element can be used together with base items such as TextField or TextArea and model-based items like ListView and \l {Standard}{ListItems.Standard}.
    
 \section1 2.0.1 Database Properties
 
