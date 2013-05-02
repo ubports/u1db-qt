@@ -3,3 +3,4 @@ usr/include/lib*/*.h
 usr/lib/pkgconfig/lib*.pc
 usr/lib/*/qt5/qml/*/plugins.qmltypes
 usr/share/qtcreator/templates/qml/*
+usr/share/qt5/doc/qch/*
