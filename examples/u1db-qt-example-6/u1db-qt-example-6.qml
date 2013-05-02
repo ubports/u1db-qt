@@ -31,7 +31,7 @@ Item {
             id: aDatabase
             path: "aDatabase6"
         }
-        
+
         U1db.Database {
             id: aTargetDatabase
             path: "aTargetDatabase6"
@@ -40,16 +40,16 @@ Item {
        U1db.Document {
             id: aDocument1
             database: aDatabase
-            docId: 'helloworld1'
-            create: true            
+            docId: 'helloworld'
+            create: true
             defaults:{"hello": { "world": { "message":"Hello World", "id": 1 } } }
 
         }
 
        U1db.Document {
             id: aDocument2
-            database: aDatabase
-            docId: 'helloworld2'
+            database: aTargetDatabase
+            docId: 'helloworld'
             create: true
             defaults:{"hello": { "world": [
                         { "message":"Hello World", "id": 2 },
@@ -57,28 +57,9 @@ Item {
                     ] } }
         }
 
-       U1db.Document {
-            id: aDocument3
-            database: aDatabase
-            docId: 'helloworld3'
-            contents:{"hello": { "world": [
-                        { "message":"Hello World", "id": 3 },
-                        { "message":"Hello World", "id": 3.33 },
-                        { "message":"Hello World", "id": 3.66 }
-                    ] } }
-        }
-
-       U1db.Document {
-            id: aDocument4
-            database: aDatabase
-            docId: 'helloworld4'
-            defaults:{"hello": { "world": { "message":"Hello World", "id": 4 } } }
-        }
-
        U1db.Index{
            database: aDatabase
            id: by_helloworld
-           //name: "by-helloworld" /* Note: The 'name' property is not currently suupported */
            expression: ["hello.world.id","hello.world.message"]
        }
 
@@ -87,13 +68,25 @@ Item {
            index: by_helloworld
            query: [{"id":"*"},{"message":"Hel*"}]
        }
-       
+
+       U1db.Index{
+           database: aTargetDatabase
+           id: by_target_helloworld
+           expression: ["hello.world.id","hello.world.message"]
+       }
+
+       U1db.Query{
+           id: aTargetQuery
+           index: by_target_helloworld
+           query: [{"id":"*"},{"message":"Hel*"}]
+       }
+
        U1db.Synchronizer{
            id: aSynchronizer
            source: aDatabase
            target: aTargetDatabase
            resolver: aDatabase
-           synchronize: true   
+           synchronize: false
        }
 
     MainView {
@@ -115,20 +108,55 @@ Item {
                 page: Page {
                     id: helloPage
 
-                   ListView {
-                        width: units.gu(45)
-                        height: units.gu(80)
+                    Rectangle {
+                         width: units.gu(45)
+                         height: units.gu(70)
+                         anchors.top: parent.top;
 
+                        ListView {
+                            width: units.gu(45)
+                            height: units.gu(35)
+                            anchors.top: parent.top;
+                            model: aQuery
 
-                        model: aQuery
+                            delegate: Text {
+                                x: 66; y: 77
+                                text: {
+                                    text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
+                                }
+                            }
+                        }
 
-                        delegate: Text {
-                            x: 66; y: 77
-                            text: {
-                                text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
+                        ListView {
+                            width: units.gu(45)
+                            height: units.gu(35)
+                            anchors.bottom: parent.bottom;
+                            model: aTargetQuery
+
+                            delegate: Text {
+                                x: 66; y: 77
+                                text: {
+                                    text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
+                                }
                             }
                         }
                     }
+
+                   Rectangle {
+                       width: units.gu(45)
+                       height: units.gu(5)
+                       anchors.bottom: parent.bottom;
+                       color: "white"
+
+                       Button{
+                           text: "Sync"
+                           onClicked: aSynchronizer.synchronize = true
+                           anchors.left: parent.left
+                           anchors.right: parent.right
+
+                       }
+
+                   }
                 }
 
             }

@@ -55,6 +55,7 @@ QT_BEGIN_NAMESPACE_U1DB
 Synchronizer::Synchronizer(QObject *parent) :
     QObject(parent), m_source(0), m_target(0), m_resolver(0), m_synchronize(false)
 {
+    qDebug()<<"Synchronizer::Synchronizer";
 }
 
 /*!
@@ -62,6 +63,7 @@ Synchronizer::Synchronizer(QObject *parent) :
  */
 void Synchronizer::setSource(Database* source)
 {
+    qDebug()<<"Synchronizer::setSource";
 	
 	if (m_source == source)
 		return;
@@ -78,7 +80,8 @@ void Synchronizer::setSource(Database* source)
  */
 void Synchronizer::setTarget(Database* target)
 {
-	
+    qDebug()<<"Synchronizer::setTarget";
+
 	if (m_target == target)
 		return;
 
@@ -94,6 +97,8 @@ void Synchronizer::setTarget(Database* target)
 void Synchronizer::setResolver(Database* resolver)
 {
 
+    qDebug()<<"Synchronizer::setResolver";
+
 	if (m_resolver == resolver)
 		return;
 
@@ -108,6 +113,7 @@ void Synchronizer::setResolver(Database* resolver)
  */
 void Synchronizer::setSync(bool synchronize)
 {
+    qDebug()<<"Synchronizer::setSync";
 
 	if (m_synchronize == synchronize)
 		return;
@@ -121,6 +127,8 @@ void Synchronizer::setSync(bool synchronize)
  */
 Database* Synchronizer::getSource()
 {
+    qDebug()<<"Synchronizer::getSource";
+
 	return m_source;
 }
 
@@ -129,6 +137,8 @@ Database* Synchronizer::getSource()
  */
 Database* Synchronizer::getTarget()
 {
+    qDebug()<<"Synchronizer::setTarget";
+
 	return m_target;
 }
 
@@ -137,6 +147,9 @@ Database* Synchronizer::getTarget()
  */
 Database* Synchronizer::getResolver()
 {
+
+    qDebug()<<"Synchronizer::setResolver";
+
 	return m_resolver;
 }
 
@@ -145,6 +158,8 @@ Database* Synchronizer::getResolver()
  */
 bool Synchronizer::getSync()
 {
+    qDebug()<<"Synchronizer::getSync";
+
 	return m_synchronize;
 }
 
