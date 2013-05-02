@@ -29,6 +29,10 @@ if (BUILD_DOCS)
         DESTINATION "${CMAKE_INSTALL_PREFIX}/share/u1db-qt/doc/html"
         FILES_MATCHING PATTERN "*.html"
         )
+    install(DIRECTORY "${U1DB_DOCS}/"
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/share/u1db-qt/doc/html"
+        FILES_MATCHING PATTERN "*.index"
+        )
     install(DIRECTORY "${U1DB_DOCS}/style/"
         DESTINATION "${CMAKE_INSTALL_PREFIX}/share/u1db-qt/doc/html/style"
         FILES_MATCHING PATTERN "*.css"
