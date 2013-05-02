@@ -113,6 +113,11 @@ Item {
         query: [ { 'name': 'Ivanka', 'phone': '*' } ]
     }
 
+    U1db.Query {
+        id: wrongQuery
+        index: byNamePhone
+    }
+
     SignalSpy {
         id: spyDocumentsChanged
         target: defaultPhone
@@ -129,6 +134,13 @@ TestCase {
         buggyQuery.query = '*'
         buggyQuery.query = realQuery;
         spyDocumentsChanged.wait();
+    }
+
+    function test_0_wrongUse () {
+        ignoreWarning('u1db: Unexpected type QVariantMap for query')
+        wrongQuery.query = { 'name': 'Ivanka' }
+        ignoreWarning('u1db: Unexpected type QObject* for query')
+        wrongQuery.query = defaultPhone
     }
 
     function test_1_defaults () {
