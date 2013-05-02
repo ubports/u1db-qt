@@ -31,7 +31,6 @@ MainView {
         }
 
        U1db.Document {
-            id: aDocument1
             database: aDatabase
             docId: 'helloworld1'
             create: true            
@@ -40,7 +39,6 @@ MainView {
         }
 
        U1db.Document {
-            id: aDocument2
             database: aDatabase
             docId: 'helloworld2'
             create: true
@@ -51,7 +49,6 @@ MainView {
         }
 
        U1db.Document {
-            id: aDocument3
             database: aDatabase
             docId: 'helloworld3'
             contents:{"hello": { "world": [
@@ -62,7 +59,6 @@ MainView {
         }
 
        U1db.Document {
-            id: aDocument4
             database: aDatabase
             docId: 'helloworld4'
             defaults:{"hello": { "world": { "message":"Hello World", "id": 4 } } }
@@ -71,7 +67,6 @@ MainView {
        U1db.Index{
            database: aDatabase
            id: by_helloworld
-           //name: "by-helloworld" /* Note: The 'name' property is not currently suupported */
            expression: ["hello.world.id","hello.world.message"]
        }
 
