@@ -12,6 +12,7 @@ Build-Depends: debhelper (>= 9),
                qtdeclarative5-qtquick2-plugin,
                libqt5sql5-sqlite,
                qttools5-dev-tools,
+               ubuntu-ui-toolkit-doc,
                qtdeclarative5-dev-tools
 Standards-Version: 3.9.3
 Vcs-Bzr: https://launchpad.net/u1db-qt/trunk
