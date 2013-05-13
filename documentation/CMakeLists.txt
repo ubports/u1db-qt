@@ -25,6 +25,9 @@ if (BUILD_DOCS)
     install(FILES "${U1DB_DOCS}/u1dbqt.qch"
         DESTINATION "${CMAKE_INSTALL_PREFIX}/share/qt5/phrasebooks/"
         )
+    install(FILES "${U1DB_DOCS}/u1dbqt.qch"
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/share/qt5/doc/qch/"
+        )
     install(DIRECTORY "${U1DB_DOCS}/"
         DESTINATION "${CMAKE_INSTALL_PREFIX}/share/u1db-qt/doc/html"
         FILES_MATCHING PATTERN "*.html"

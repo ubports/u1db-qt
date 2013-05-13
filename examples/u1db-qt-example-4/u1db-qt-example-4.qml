@@ -21,8 +21,6 @@ import QtQuick 2.0
 import U1db 1.0 as U1db
 import Ubuntu.Components 0.1
 
-
-
 /*!
 
 This example and tutorial is designed to show a wide variety of U1Db-Qt functionality and usage. The example demonstrates:
@@ -34,8 +32,7 @@ This example and tutorial is designed to show a wide variety of U1Db-Qt function
 
   */
 
-Item {
-
+MainView {
         width: units.gu(45)
         height: units.gu(80)
 
@@ -310,20 +307,10 @@ Item {
 
         }
 
-    MainView {
-
-        id: u1dbView
-        width: units.gu(45)
-        height: units.gu(80)
-        anchors.top: parent.top;
-
         Tabs {
             id: tabs
-            anchors.fill: parent
 
             Tab {
-                objectName: "Tab1"
-
                 title: i18n.tr("Hello U1Db!")
 
                 page: Page {
@@ -350,7 +337,7 @@ Item {
 
                          width: units.gu(45)
                          height: units.gu(70)
-                         anchors.bottom: parent.bottom
+                         anchors.fill: parent
 
                          color: "#00FFFFFF"
 
@@ -476,43 +463,22 @@ Item {
                                         onClicked: updateContentWindow(getCurrentDocumentKey(aDocument.contents),addressBar.text)
 
                                     }
-
-
                                 }
-
-
                         }
-
-
                     }
-
-
                 }
-
             }
 
             Tab {
-                objectName: "Tab2"
-
                 title: i18n.tr("Bookmarks")
-
                 page: Page {
-
                     id: bookmarkPage
 
+                    Label {
+                        text: aDocument.contents.helloworld
+                    }
+
                 }
-
             }
-
-
         }
-
-
-
-
-
-
-
-    }
-
 }
