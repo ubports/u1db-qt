@@ -1,3 +1,8 @@
+u1db-qt (0.1.5) quantal; urgency=low
+  * Add .index file for cross-linking to -doc package and set URL
+
+ -- Christian Dywan <christian.dywan@canonical.com>  Mon, 13 May 2013 10:58:01  +0200
+
 u1db-qt (0.1.4) quantal; urgency=low
   * Add qch file for QtCreator to -dev package
  
