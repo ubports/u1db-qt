@@ -26,6 +26,7 @@ Item {
 
     U1db.Database {
         id: gents
+        path: 'aDatabaseU'
     }
 
     U1db.Document {
@@ -131,12 +132,11 @@ TestCase {
     function workaroundQueryAndWait (buggyQuery) {
         var realQuery = buggyQuery.query;
         spyDocumentsChanged.target = buggyQuery
-        buggyQuery.query = '*'
-        buggyQuery.query = realQuery;
         spyDocumentsChanged.wait();
     }
 
     function test_0_wrongUse () {
+        workaroundQueryAndWait(wrongQuery)
         ignoreWarning('u1db: Unexpected type QVariantMap for query')
         wrongQuery.query = { 'name': 'Ivanka' }
         ignoreWarning('u1db: Unexpected type QObject* for query')
