@@ -31,37 +31,46 @@ QT_BEGIN_NAMESPACE_U1DB
 class Q_DECL_EXPORT Synchronizer : public QObject {
     Q_OBJECT
 #ifdef Q_QDOC
-    Q_PROPERTY(Database* source READ getSource WRITE setSource NOTIFY sourceChanged)
-    Q_PROPERTY(Database* target READ getTarget WRITE setTarget NOTIFY targetChanged)
-    Q_PROPERTY(Database* resolver READ getResolver WRITE setResolver NOTIFY resolverChanged)
+    Q_PROPERTY(Database* source READ getSource WRITE setSource NOTIFY sourceChanged)   
 #else
-    Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) source READ getSource WRITE setSource NOTIFY sourceChanged)
-    Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) target READ getTarget WRITE setTarget NOTIFY targetChanged)
-    Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) resolver READ getResolver WRITE setResolver NOTIFY resolverChanged)
+    Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) source READ getSource WRITE setSource NOTIFY sourceChanged)  
 #endif
     Q_PROPERTY(bool synchronize READ getSync WRITE setSync NOTIFY syncChanged)
+    Q_PROPERTY(bool resolve_to_source READ getResolveToSource WRITE setResolveToSource NOTIFY resolveToSourceChanged)
+    Q_PROPERTY(QList <QObject*> local_targets READ getLocalTargets WRITE setLocalTargets NOTIFY localTargetsChanged)
+    Q_PROPERTY(QList <QString> remote_targets READ getRemoteTargets WRITE setRemoteTargets NOTIFY remoteTargetsChanged)
+
 public:
     Synchronizer(QObject* parent = 0);
     Database* getSource();
-    Database* getTarget();
-    Database* getResolver();
+    QList<QObject*> getLocalTargets();
+    QList<QString> getRemoteTargets();
     bool getSync();
+    bool getResolveToSource();
     void setSource(Database* source);
-    void setTarget(Database* target);
-    void setResolver(Database* resolver);
+    void setLocalTargets(QList<QObject*> local_targets);
+    void setRemoteTargets(QList<QString> remote_targets);
     void setSync(bool synchronize);
-    
+    void setResolveToSource(bool resolve_to_source);
+
+    void syncWithLocalTarget(Database *source, Database *target, bool resolve_to_source);
+    void syncWithRemoteTarget(Database *source, QString target_url, bool resolve_to_source);
+
 Q_SIGNALS:
     void sourceChanged(Database* source);
-    void targetChanged(Database* target);
-    void resolverChanged(Database* resolver);
+    void localTargetsChanged(QList<QObject*> local_targets);
+    void remoteTargetsChanged(QList<QString> remote_targets);
     void syncChanged(bool synchronize);
+    void resolveToSourceChanged(bool resolve_to_source);
 private:
     Q_DISABLE_COPY(Synchronizer)
     Database* m_source;
-    Database* m_target;
-    Database* m_resolver;
     bool m_synchronize;
+    bool m_resolve_to_source;
+    QList <QObject*> m_local_targets;
+    QList <QString> m_remote_targets;
+
+    void onSyncChanged(bool synchronize);
 
 };
 

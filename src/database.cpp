@@ -104,7 +104,7 @@ Database::initializeIfNeeded(const QString& path)
         return true;
 
     if (!m_db.isValid())
-        m_db = QSqlDatabase::addDatabase("QSQLITE");
+        m_db = QSqlDatabase::addDatabase("QSQLITE",QUuid::createUuid().toString());
     if (!m_db.isValid())
         return setError("QSqlDatabase error");
     m_db.setDatabaseName(path);
