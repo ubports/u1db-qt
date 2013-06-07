@@ -146,13 +146,15 @@ Index::setExpression(QStringList expression)
     if (m_expression == expression)
         return;
 
+    m_expression = expression;
+
     if (m_database)
     {
         m_database->putIndex(m_name, expression);
         Q_EMIT dataInvalidated();
     }
 
-    m_expression = expression;
+
 
     Q_EMIT expressionChanged(expression);
 }

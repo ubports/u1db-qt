@@ -84,8 +84,11 @@ Item {
        U1db.Synchronizer{
            id: aSynchronizer
            source: aDatabase
-           local_targets: [aTargetDatabase]
-           remote_targets: ["http://somewhere"]
+           //local_targets: [aTargetDatabase]
+           //remote_targets: ["http://somewhere"]
+           targets: [{remote:true},
+               {remote:false,location:"database7",resolve_to_source:true},
+               {remote:"OK"}]
            resolve_to_source: true
            synchronize: false
        }

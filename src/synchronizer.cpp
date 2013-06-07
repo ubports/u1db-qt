@@ -113,6 +113,23 @@ void Synchronizer::setRemoteTargets(QList<QString> remote_targets)
 }
 
 /*!
+    \property Synchronizer::targets
+ */
+void Synchronizer::setTargets(QVariant targets)
+{
+    qDebug()<<"Synchronizer::setTargets";
+
+    if (m_targets == targets)
+        return;
+
+    //if (m_targets)
+      //  QObject::disconnect(m_targets, 0, this, 0);
+
+    m_targets = targets;
+    Q_EMIT targetsChanged(targets);
+}
+
+/*!
     \property Synchronizer::synchronize
  */
 void Synchronizer::setSync(bool synchronize)
@@ -173,6 +190,17 @@ QList<QString> Synchronizer::getRemoteTargets()
 /*!
 
  */
+QVariant Synchronizer::getTargets()
+{
+    qDebug()<<"Synchronizer::getTargets";
+
+    return m_targets;
+}
+
+
+/*!
+
+ */
 bool Synchronizer::getSync()
 {
     qDebug()<<"Synchronizer::getSync";
@@ -200,15 +228,118 @@ void Synchronizer::onSyncChanged(bool synchronize){
 
     qDebug() << "Synchronizer::onSyncChanged = " << synchronize;
 
+    /*
+     * `validator` is used to ensure that the QVariant types, for a given key,
+     * within each QMap that represents a target db defintion, are correct.
+     *
+     * Similarily, `mandatory` checks to ensure the minimum necessary properties
+     * have been set with some value.
+     *
+     * There may be a more elegant way to approach this, but for now it will do.
+     *
+     */
+
+    QList<QList<QString>> errors;
+
+    QMap<QString,QString>validator;
+
+    validator.insert("remote","bool");
+    validator.insert("location","QString");
+    validator.insert("resolve_to_source","bool");
+    validator.insert("errors", "QStringList");
+
+    QList<QString>mandatory;
+
+    mandatory.append("remote");
+    mandatory.append("location");
+    mandatory.append("resolve_to_source");
+
     if(synchronize == true){
+
+        int index = 0;
+
 
         Database* source = getSource();
 
+        QList<QVariant> targets = getTargets().toList();
+        QList<QVariant> sync_targets;
+
+        Q_FOREACH (QVariant target_variant, targets)
+        {
+            index++;
+            QString index_number = QString::number(index);
+
+            QMap<QString, QVariant> target = target_variant.toMap();
+
+            QList<QString> error;
+
+            bool valid = true;
+            bool complete = true;
+
+            QMapIterator<QString, QVariant> i(target);
+            while (i.hasNext()) {
+
+                i.next();
+
+                if(validator.contains(i.key())&&validator[i.key()]!=i.value().typeName()){
+                    valid = false;
+
+                    error.append(index_number + ": For Key: " + i.key() + " Expecting Type: " + validator[i.key()] + " Received Type: " + i.value().typeName());
+                    target.insert("sync",false);
+
+                    break;
+                }
+
+                if(valid==false){
+                    targets.removeOne(target);
+                    break;
+                }
+                else{
+                    QListIterator<QString> j(mandatory);
+
+                    while(j.hasNext()){
+                        QString value = j.next();
+                        if(!target.contains(value)){
+                            error.append(index_number + ": Expected Key: `" + value + "` but it is not present.");
+                            target.insert("sync",false);
+                            targets.removeOne(target);
+                            complete = false;
+                            break;
+                        }
+                    }
+                    if(complete==false){
+                        break;
+                    }
+
+                }
+            }
+
+            if(target.contains("sync")&&target["sync"]==false){
+                errors.append(error);
+            }
+            else
+            {
+                target.insert("sync",true);
+                sync_targets.append(target);
+            }
+
+        }
+
+
+
+        Q_FOREACH (QStringList err, errors){
+            Q_FOREACH (QString error, err){
+                qDebug()<<error;
+            }
+        }
+
+        synchronizeTargets(source, sync_targets);
+
 /* The source replica asks the target replica for the information it has stored about the last time these two replicas were synchronised (if ever).*/
 
-        QList<QObject*> local_targets = this->getLocalTargets();
+        //QList<QObject*> local_targets = this->getLocalTargets();
 
-        Q_FOREACH (QObject* local_target, local_targets)
+        /*Q_FOREACH (QObject* local_target, local_targets)
         {
 
             Database *target = (Database*)local_target;
@@ -216,18 +347,18 @@ void Synchronizer::onSyncChanged(bool synchronize){
 
             //syncWithLocalTarget(Database *source, Database *target, bool resolve_to_source)
 
-        }
+        }*/
 
-        QList<QString> remote_targets = this->getRemoteTargets();
+        //QList<QString> remote_targets = this->getRemoteTargets();
 
-        Q_FOREACH (QString remote_target, remote_targets)
+        /*Q_FOREACH (QString remote_target, remote_targets)
         {
 
             qDebug() << "Synchronizer::onSyncChanged Q_FOREACH (QObject* remote_target, remote_targets) = " << remote_target;
 
             //syncWithRemoteTarget(Database *source, QString target_url, bool resolve_to_source)
 
-        }
+        }*/
 
         QMap<QString, QVariant> sync_from_information;
         //sync_from_information.insert("source_replica_uid",source_replica_uid);
@@ -307,6 +438,85 @@ With all the information it has stored for the most recent synchronisation betwe
     else{
 
     }
+}
+
+void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
+
+    qDebug() << "Synchronizer::synchronizeTargets";
+
+    if(targets.typeName()== QStringLiteral("QVariantList")){
+
+        QList<QVariant> target_list = targets.toList();
+
+        QListIterator<QVariant> i(target_list);
+
+        while(i.hasNext()){
+
+            QVariant target = i.next();
+
+            if(target.typeName()== QStringLiteral("QVariantMap")){
+                QMap<QString,QVariant> target_map = target.toMap();
+
+                if(target_map.contains("remote")&&target_map["remote"]==false){
+                    if(target_map.contains("sync")&&target_map["sync"]==true){
+                        syncLocalToLocal(source, target_map);
+                    }
+                }
+                else if(target_map.contains("remote")&&target_map["remote"]==true){
+                    if(target_map.contains("sync")&&target_map["sync"]==true){
+                        qDebug() << "Remote database sync is under construction. Try again later.";
+                    }
+                }
+                else{
+
+                }
+            }
+
+
+        }
+
+    }
+
+
+}
+
+void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> target)
+{
+    qDebug() << "Synchronizer::syncLocalToLocal";
+
+    QSqlDatabase db;
+
+    db = QSqlDatabase::addDatabase("QSQLITE",QUuid::createUuid().toString());
+
+    QString target_db_name = target["location"].toString();
+
+    QFile target_db_file(target_db_name);
+
+    if(!target_db_file.exists())
+    {
+        qDebug()<< "Local database " << target_db_name << " does not exist";
+    }
+    else
+    {
+        db.setDatabaseName(target_db_name);
+        if (!db.open()){
+            qDebug() << db.lastError().text();
+        }
+        else{
+            QString source_uid;
+
+            QSqlQuery query (db.exec("SELECT value FROM u1db_config WHERE name = 'replica_uid'"));
+
+            if(!query.lastError().isValid() && query.next()){
+                source_uid = query.value(0).toString();
+            }
+            else{
+                qDebug() << query.lastError().text();
+            }
+        }
+
+    }
+
 }
 
 
