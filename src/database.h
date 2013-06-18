@@ -51,6 +51,10 @@ public:
     Q_INVOKABLE QString putIndex(const QString& index_name, QStringList expressions);
     Q_INVOKABLE QStringList getIndexExpressions(const QString& indexName);
     Q_INVOKABLE QStringList getIndexKeys(const QString& indexName);
+
+    QString getNextDocRevisionNumber(QString doc_id);
+    QString getCurrentDocRevisionNumber(QString doc_id);
+
 Q_SIGNALS:
     void pathChanged(const QString& path);
     void errorChanged(const QString& error);

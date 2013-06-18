@@ -84,12 +84,10 @@ Item {
        U1db.Synchronizer{
            id: aSynchronizer
            source: aDatabase
-           //local_targets: [aTargetDatabase]
-           //remote_targets: ["http://somewhere"]
            targets: [{remote:true},
-               {remote:false,location:"database7",resolve_to_source:true},
+               {remote:false,location:"aTargetDatabase6",resolve_to_source:true},
+               {remote:true,location:"http://somewhere/aTargetDatabase6",resolve_to_source:true},
                {remote:"OK"}]
-           resolve_to_source: true
            synchronize: false
        }
 
@@ -114,31 +112,52 @@ Item {
 
                     Rectangle {
                          width: units.gu(45)
-                         height: units.gu(70)
+                         height: units.gu(40)
                          anchors.top: parent.top;
+                         border.width: 1
+
+                         Text {
+                             id: sourceLabel
+                             anchors.top: parent.top;
+                             font.bold: true
+                             text: "aDatabase6 Contents"
+                         }
+
 
                         ListView {
+                            id: sourceListView
                             width: units.gu(45)
-                            height: units.gu(35)
-                            anchors.top: parent.top;
+                            height: units.gu(20)
+                            anchors.top: sourceLabel.bottom;
                             model: aQuery
 
                             delegate: Text {
-                                x: 66; y: 77
+                                wrapMode: Text.WordWrap
+                                x: 6; y: 77
                                 text: {
                                     text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
                                 }
                             }
                         }
 
+                        Text {
+                            id: targetLabel
+                            anchors.top: sourceListView.bottom;
+                            font.bold: true
+                            text: "aTargetDatabase6 Contents"
+                        }
+
+
                         ListView {
+
                             width: units.gu(45)
-                            height: units.gu(35)
-                            anchors.bottom: parent.bottom;
+                            height: units.gu(20)
+                            anchors.top: targetLabel.bottom;
                             model: aTargetQuery
 
                             delegate: Text {
-                                x: 66; y: 77
+                                wrapMode: Text.WordWrap
+                                x: 6; y: 77
                                 text: {
                                     text: "(" + index + ") '" + contents.message + " " + contents.id + "'"
                                 }
@@ -147,12 +166,40 @@ Item {
                     }
 
                    Rectangle {
+                       id: lowerRectangle
                        width: units.gu(45)
-                       height: units.gu(5)
+                       height: units.gu(35)
                        anchors.bottom: parent.bottom;
-                       color: "white"
+                       border.width: 1
+
+                       Text {
+                           id: errorsLabel
+                           anchors.top: parent.top;
+                           font.bold: true
+                           text: "Log:"
+                       }
+
+                       ListView {
+
+                           parent: lowerRectangle
+                           width: units.gu(45)
+                           height: units.gu(30)
+                           anchors.top: errorsLabel.bottom;
+                           model: aSynchronizer
+                           delegate:Text {
+                                width: units.gu(40)
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                wrapMode: Text.WordWrap
+                                text: {
+                                    text: errors
+                                }
+                            }
+                        }
 
                        Button{
+                           parent: lowerRectangle
+                           anchors.bottom: parent.bottom;
                            text: "Sync"
                            onClicked: aSynchronizer.synchronize = true
                            anchors.left: parent.left

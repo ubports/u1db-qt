@@ -288,6 +288,59 @@ increaseVectorClockRev(int oldRev)
     return oldRev;
 }
 
+QString Database::getNextDocRevisionNumber(QString doc_id)
+{
+
+    QString revision_number = getReplicaUid()+":1";
+
+    QString current_revision_number = getCurrentDocRevisionNumber(doc_id);
+
+    QStringList current_revision_list = current_revision_number.split("|");
+
+    Q_FOREACH (QString current_revision, current_revision_list) {
+
+        QStringList current_revision_number_list = current_revision.split(":");
+
+        if(current_revision_number_list[0]==getReplicaUid()) {
+
+            int revision_generation_number = current_revision_number_list[1].toInt()+1;
+
+            revision_number = getReplicaUid()+":"+QString::number(revision_generation_number);
+
+        }
+        else {
+            revision_number+="|"+current_revision;
+        }
+
+    }
+
+    revision_number = revision_number.replace("{","");
+
+    revision_number = revision_number.replace("}","");
+
+    return revision_number;
+
+}
+
+QString Database::getCurrentDocRevisionNumber(QString doc_id){
+    if (!initializeIfNeeded())
+        return QString();
+
+    QSqlQuery query(m_db.exec());
+
+    query.prepare("SELECT doc_rev from document WHERE doc_id = :docId");
+    query.bindValue(":docId", doc_id);
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            return query.value("doc_rev").toString();
+        }
+
+    }
+    return QString();
+}
+
 /*!
     Updates the existing \a contents of the document identified by \a docId if
     there's no error.
@@ -305,13 +358,16 @@ Database::putDoc(QVariant contents, const QString& docId)
     QVariant oldDoc = newOrEmptyDocId.isEmpty() ? QVariant() : getDocUnchecked(newOrEmptyDocId);
     /* FIXME: Conflicts */
 
-    int newRev = increaseVectorClockRev(7/*contents.rev*/);
+    int newRev = increaseVectorClockRev(7/*contents.rev*/); // maybe this can be removed as it is replaced by revision_number.
+
+    QString revision_number = getNextDocRevisionNumber(newOrEmptyDocId);
+
     QSqlQuery query(m_db.exec());
     if (oldDoc.isValid())
     {
         query.prepare("UPDATE document SET doc_rev=:docRev, content=:docJson WHERE doc_id = :docId");
         query.bindValue(":docId", newOrEmptyDocId);
-        query.bindValue(":docRev", newRev);
+        query.bindValue(":docRev", revision_number);
         // Parse Variant from QML as JsonDocument, fallback to string
         QString json(QJsonDocument::fromVariant(contents).toJson());
         query.bindValue(":docJson", json.isEmpty() ? contents : json);
@@ -331,7 +387,7 @@ Database::putDoc(QVariant contents, const QString& docId)
 
         query.prepare("INSERT INTO document (doc_id, doc_rev, content) VALUES (:docId, :docRev, :docJson)");
         query.bindValue(":docId", newOrEmptyDocId);
-        query.bindValue(":docRev", newRev);
+        query.bindValue(":docRev", revision_number);
         // Parse Variant from QML as JsonDocument, fallback to string
         QJsonDocument json(QJsonDocument::fromVariant(contents));
         query.bindValue(":docJson", json.isEmpty() ? contents : json.toJson());

@@ -28,7 +28,7 @@
 
 QT_BEGIN_NAMESPACE_U1DB
 
-class Q_DECL_EXPORT Synchronizer : public QObject {
+class Q_DECL_EXPORT Synchronizer : public QAbstractListModel {
     Q_OBJECT
 #ifdef Q_QDOC
     Q_PROPERTY(Database* source READ getSource WRITE setSource NOTIFY sourceChanged)   
@@ -37,46 +37,53 @@ class Q_DECL_EXPORT Synchronizer : public QObject {
 #endif
     Q_PROPERTY(bool synchronize READ getSync WRITE setSync NOTIFY syncChanged)
     Q_PROPERTY(bool resolve_to_source READ getResolveToSource WRITE setResolveToSource NOTIFY resolveToSourceChanged)
-    //Q_PROPERTY(QList <QObject*> local_targets READ getLocalTargets WRITE setLocalTargets NOTIFY localTargetsChanged)
-    //Q_PROPERTY(QList <QString> remote_targets READ getRemoteTargets WRITE setRemoteTargets NOTIFY remoteTargetsChanged)
     Q_PROPERTY(QVariant targets READ getTargets WRITE setTargets NOTIFY targetsChanged)
+    Q_PROPERTY(QList<QString> errors READ getErrors WRITE setErrors NOTIFY errorsChanged)
 
 public:
     Synchronizer(QObject* parent = 0);
+
+    // QAbstractListModel
+    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray>roleNames() const;
+    int rowCount(const QModelIndex & parent = QModelIndex()) const;
+
+    QList<QVariant> getValidTargets(QMap<QString,QString>validator, QList<QString>mandatory);
+    QMap<QString,QVariant> getLastSyncInformation(bool remote, QMap<QString,QVariant> lastSyncInformation,QMap<QString,QVariant> target);
+    QMap<QString,QVariant> getSyncLogInfoFromLocalDb(QMap<QString,QVariant> lastSyncInformation, QString dbFileName);
+
     Database* getSource();
-    QList<QObject*> getLocalTargets();
-    QList<QString> getRemoteTargets();
     QVariant getTargets();
     bool getSync();
     bool getResolveToSource();
+    QList<QString> getErrors();
+
     void setSource(Database* source);
-    void setLocalTargets(QList<QObject*> local_targets);
-    void setRemoteTargets(QList<QString> remote_targets);
     void setTargets(QVariant targets);
     void setSync(bool synchronize);
     void setResolveToSource(bool resolve_to_source);
+    void setErrors(QList<QString> errors);
+
 
     void syncWithLocalTarget(Database *source, Database *target, bool resolve_to_source);
     void syncWithRemoteTarget(Database *source, QString target_url, bool resolve_to_source);
     void syncLocalToLocal(Database *source, QMap<QString,QVariant> target);
     void synchronizeTargets(Database *source, QVariant targets);
+    QString getUidFromLocalDb(QString dbFileName);
 
 Q_SIGNALS:
     void sourceChanged(Database* source);
-    void localTargetsChanged(QList<QObject*> local_targets);
-    void remoteTargetsChanged(QList<QString> remote_targets);
     void targetsChanged(QVariant targets);
     void syncChanged(bool synchronize);
     void resolveToSourceChanged(bool resolve_to_source);
+    void errorsChanged(QList<QString> errors);
 private:
     Q_DISABLE_COPY(Synchronizer)
     Database* m_source;
     bool m_synchronize;
     bool m_resolve_to_source;
-    QList <QObject*> m_local_targets;
-    QList <QString> m_remote_targets;
     QVariant m_targets;
-    QList <QStringList> m_errors;
+    QList<QString> m_errors;
 
     void onSyncChanged(bool synchronize);
 

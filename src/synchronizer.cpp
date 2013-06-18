@@ -53,19 +53,55 @@ QT_BEGIN_NAMESPACE_U1DB
  */
 
 Synchronizer::Synchronizer(QObject *parent) :
-    QObject(parent), m_synchronize(false)
+    QAbstractListModel(parent), m_synchronize(false)
 {
-    qDebug()<<"Synchronizer::Synchronizer";
-
     QObject::connect(this, &Synchronizer::syncChanged, this, &Synchronizer::onSyncChanged);
 }
+
+/*!
+    \internal
+ *Used to implement QAbstractListModel
+ *Implements the variables exposed to the Delegate in a model
+ */
+QVariant
+Synchronizer::data(const QModelIndex & index, int role) const
+{
+    if (role == 0) // errors
+        return m_errors.at(index.row());
+    return QVariant();
+}
+
+/*!
+    \internal
+    Used to implement QAbstractListModel
+    The number of rows: the number of documents given by the query.
+ */
+int
+Synchronizer::rowCount(const QModelIndex & parent) const
+{
+    return m_errors.count();
+}
+
+/*!
+    \internal
+    Used to implement QAbstractListModel
+    Defines \b{errors} as the variable exposed to the Delegate in a model
+    \b{index} is supported out of the box.
+ */
+QHash<int, QByteArray>
+Synchronizer::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles.insert(0, "errors");
+    return roles;
+}
+
 
 /*!
     \property Synchronizer::source
  */
 void Synchronizer::setSource(Database* source)
 {
-    qDebug()<<"Synchronizer::setSource";
 
     if (m_source == source)
         return;
@@ -79,45 +115,10 @@ void Synchronizer::setSource(Database* source)
 }
 
 /*!
-    \property Synchronizer::local_targets
- */
-void Synchronizer::setLocalTargets(QList<QObject*> local_targets)
-{
-    qDebug()<<"Synchronizer::setLocalTargets";
-
-    if (m_local_targets == local_targets)
-        return;
-
-    //if (m_local_targets)
-      //  QObject::disconnect(m_local_targets, 0, this, 0);
-
-    m_local_targets = local_targets;
-    Q_EMIT localTargetsChanged(local_targets);
-}
-
-/*!
-    \property Synchronizer::remote_targets
- */
-void Synchronizer::setRemoteTargets(QList<QString> remote_targets)
-{
-    qDebug()<<"Synchronizer::setRemoteTargets";
-
-    if (m_remote_targets == remote_targets)
-        return;
-
-    //if (m_local_targets)
-      //  QObject::disconnect(m_local_targets, 0, this, 0);
-
-    m_remote_targets = remote_targets;
-    Q_EMIT remoteTargetsChanged(remote_targets);
-}
-
-/*!
     \property Synchronizer::targets
  */
 void Synchronizer::setTargets(QVariant targets)
 {
-    qDebug()<<"Synchronizer::setTargets";
 
     if (m_targets == targets)
         return;
@@ -134,7 +135,6 @@ void Synchronizer::setTargets(QVariant targets)
  */
 void Synchronizer::setSync(bool synchronize)
 {
-    qDebug()<<"Synchronizer::setSync";
 
     if (m_synchronize == synchronize)
         return;
@@ -144,13 +144,11 @@ void Synchronizer::setSync(bool synchronize)
 }
 
 /*!
-    \property Synchronizer::resolve_to_source
+    \property Synchronizer::errors
  */
 void Synchronizer::setResolveToSource(bool resolve_to_source)
 {
-    qDebug()<<"Synchronizer::setResolveToSource";
-
-    if (m_resolve_to_source == resolve_to_source)
+     if (m_resolve_to_source == resolve_to_source)
         return;
 
     m_resolve_to_source = resolve_to_source;
@@ -158,33 +156,23 @@ void Synchronizer::setResolveToSource(bool resolve_to_source)
 }
 
 /*!
+    \property Synchronizer::errors
+ */
+void Synchronizer::setErrors(QList<QString> errors)
+{
+     if (m_errors == errors)
+        return;
+
+    m_errors = errors;
+    Q_EMIT errorsChanged(errors);
+}
+
+/*!
 
  */
 Database* Synchronizer::getSource()
 {
-    qDebug()<<"Synchronizer::getSource";
-
-    return m_source;
-}
-
-/*!
-
- */
-QList<QObject*> Synchronizer::getLocalTargets()
-{
-    qDebug()<<"Synchronizer::getLocalTargets";
-
-    return m_local_targets;
-}
-
-/*!
-
- */
-QList<QString> Synchronizer::getRemoteTargets()
-{
-    qDebug()<<"Synchronizer::getRemoteTargets";
-
-    return m_remote_targets;
+     return m_source;
 }
 
 /*!
@@ -192,9 +180,7 @@ QList<QString> Synchronizer::getRemoteTargets()
  */
 QVariant Synchronizer::getTargets()
 {
-    qDebug()<<"Synchronizer::getTargets";
-
-    return m_targets;
+     return m_targets;
 }
 
 
@@ -203,20 +189,25 @@ QVariant Synchronizer::getTargets()
  */
 bool Synchronizer::getSync()
 {
-    qDebug()<<"Synchronizer::getSync";
-
-    return m_synchronize;
+     return m_synchronize;
 }
+
 
 /*!
 
  */
 bool Synchronizer::getResolveToSource(){
-
-    qDebug()<<"Synchronizer::getResolveToSource";
-
     return m_resolve_to_source;
 }
+
+/*!
+
+ */
+QList<QString> Synchronizer::getErrors(){
+    return m_errors;
+}
+
+
 
 /*
 
@@ -225,8 +216,6 @@ bool Synchronizer::getResolveToSource(){
 */
 
 void Synchronizer::onSyncChanged(bool synchronize){
-
-    qDebug() << "Synchronizer::onSyncChanged = " << synchronize;
 
     /*
      * `validator` is used to ensure that the QVariant types, for a given key,
@@ -239,7 +228,10 @@ void Synchronizer::onSyncChanged(bool synchronize){
      *
      */
 
-    QList<QList<QString>> errors;
+    Database* source = getSource();
+
+    QList<QVariant> sync_targets;
+    //QList<QString> errors;
 
     QMap<QString,QString>validator;
 
@@ -256,183 +248,16 @@ void Synchronizer::onSyncChanged(bool synchronize){
 
     if(synchronize == true){
 
-        int index = 0;
-
-
-        Database* source = getSource();
-
-        QList<QVariant> targets = getTargets().toList();
-        QList<QVariant> sync_targets;
-
-        Q_FOREACH (QVariant target_variant, targets)
-        {
-            index++;
-            QString index_number = QString::number(index);
-
-            QMap<QString, QVariant> target = target_variant.toMap();
-
-            QList<QString> error;
-
-            bool valid = true;
-            bool complete = true;
-
-            QMapIterator<QString, QVariant> i(target);
-            while (i.hasNext()) {
-
-                i.next();
-
-                if(validator.contains(i.key())&&validator[i.key()]!=i.value().typeName()){
-                    valid = false;
-
-                    error.append(index_number + ": For Key: " + i.key() + " Expecting Type: " + validator[i.key()] + " Received Type: " + i.value().typeName());
-                    target.insert("sync",false);
-
-                    break;
-                }
-
-                if(valid==false){
-                    targets.removeOne(target);
-                    break;
-                }
-                else{
-                    QListIterator<QString> j(mandatory);
-
-                    while(j.hasNext()){
-                        QString value = j.next();
-                        if(!target.contains(value)){
-                            error.append(index_number + ": Expected Key: `" + value + "` but it is not present.");
-                            target.insert("sync",false);
-                            targets.removeOne(target);
-                            complete = false;
-                            break;
-                        }
-                    }
-                    if(complete==false){
-                        break;
-                    }
-
-                }
-            }
-
-            if(target.contains("sync")&&target["sync"]==false){
-                errors.append(error);
-            }
-            else
-            {
-                target.insert("sync",true);
-                sync_targets.append(target);
-            }
-
-        }
-
-
-
-        Q_FOREACH (QStringList err, errors){
-            Q_FOREACH (QString error, err){
-                qDebug()<<error;
-            }
-        }
+        sync_targets=getValidTargets(validator, mandatory);
 
         synchronizeTargets(source, sync_targets);
 
-/* The source replica asks the target replica for the information it has stored about the last time these two replicas were synchronised (if ever).*/
+        beginResetModel();
+        endResetModel();
 
-        //QList<QObject*> local_targets = this->getLocalTargets();
-
-        /*Q_FOREACH (QObject* local_target, local_targets)
-        {
-
-            Database *target = (Database*)local_target;
-            qDebug() << "Synchronizer::onSyncChanged Q_FOREACH (Database* local_target, local_targets) = " << target->getPath();
-
-            //syncWithLocalTarget(Database *source, Database *target, bool resolve_to_source)
-
-        }*/
-
-        //QList<QString> remote_targets = this->getRemoteTargets();
-
-        /*Q_FOREACH (QString remote_target, remote_targets)
-        {
-
-            qDebug() << "Synchronizer::onSyncChanged Q_FOREACH (QObject* remote_target, remote_targets) = " << remote_target;
-
-            //syncWithRemoteTarget(Database *source, QString target_url, bool resolve_to_source)
-
-        }*/
-
-        QMap<QString, QVariant> sync_from_information;
-        //sync_from_information.insert("source_replica_uid",source_replica_uid);
-        sync_from_information.insert("source_replica_generation","");
-        sync_from_information.insert("source_transaction_id","");
-        //sync_from_information.insert("target_replica_uid",target_replica_uid);
-        sync_from_information.insert("target_replica_generation","");
-        sync_from_information.insert("target_replica_transaction_id","");
-
-/*
-
-The application wishing to synchronise sends the following GET request to the server:
-
-GET /thedb/sync-from/my_replica_uid
-
-Where thedb is the name of the database to be synchronised, and my_replica_uid is the replica id of the application’s (i.e. the local, or synchronisation source) database
-
-*/
-
-/*
-
-The target responds with a JSON document that looks like this:
-
-{
-    "target_replica_uid": "other_replica_uid",
-    "target_replica_generation": 12,
-    "target_replica_transaction_id": "T-sdkfj92292j",
-    "source_replica_uid": "my_replica_uid",
-    "source_replica_generation": 23,
-    "source_transaction_id": "T-39299sdsfla8"
-}
-
-With all the information it has stored for the most recent synchronisation between itself and this particular source replica. In this case it tells us that the synchronisation target believes that when it and the source were last synchronised, the target was at generation 12 and the source at generation 23.
-
-*/
-
-
-
-/* The source replica validates that its information regarding the last synchronisation is consistent with the target’s information, and raises an error if not. (This could happen for instance if one of the replicas was lost and restored from backup, or if a user inadvertently tries to synchronise a copied database.) */
-
-
-
-/* The source replica generates a list of changes since the last change the target replica knows of. */
-
-
-
-/* The source replica checks what the last change is it knows about on the target replica. */
-
-
-
-/* If there have been no changes on either replica that the other side has not seen, the synchronisation stops here. */
-
-
-
-/* The source replica sends the changed documents to the target, along with what the latest change is that it knows about on the target replica. */
-
-
-
-/* The target processes the changed documents, and records the source replica’s latest change. */
-
-
-
-/* The target responds with the documents that have changes that the source does not yet know about. */
-
-
-
-/* The source processes the changed documents, and records the target replica’s latest change. */
-
-
-
-/* If the source has seen no changes unrelated to the synchronisation during this whole process, it now sends the target what its latest change is, so that the next synchronisation does not have to consider changes that were the result of this one.*/
+        Q_EMIT errorsChanged(m_errors);
 
         setSync(false);
-
 
     }
     else{
@@ -440,9 +265,80 @@ With all the information it has stored for the most recent synchronisation betwe
     }
 }
 
-void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
+QList<QVariant> Synchronizer::getValidTargets(QMap<QString,QString>validator, QList<QString>mandatory){
 
-    qDebug() << "Synchronizer::synchronizeTargets";
+    QList<QVariant> sync_targets;
+
+    int index = 0;
+
+    QList<QVariant> targets = getTargets().toList();
+
+    Q_FOREACH (QVariant target_variant, targets)
+    {
+        index++;
+        QString index_number = QString::number(index);
+
+        QMap<QString, QVariant> target = target_variant.toMap();
+
+        //QList<QString> error;
+
+        bool valid = true;
+        bool complete = true;
+
+        QMapIterator<QString, QVariant> i(target);
+        while (i.hasNext()) {
+
+            i.next();
+
+            if(validator.contains(i.key())&&validator[i.key()]!=i.value().typeName()){
+                valid = false;
+
+                m_errors.append("<b><font color=\"red\">Database "+index_number+"</font></b>: For Key: `" + i.key() + "` Expecting type `" + validator[i.key()] + "`, but received type `" + i.value().typeName()+"`");
+                target.insert("sync",false);
+
+                break;
+            }
+
+            if(valid==false){
+                targets.removeOne(target);
+                break;
+            }
+            else{
+                QListIterator<QString> j(mandatory);
+
+                while(j.hasNext()){
+                    QString value = j.next();
+                    if(!target.contains(value)){
+                        m_errors.append("<b><font color=\"red\">Database "+index_number+"</font></b>: Expected key `" + value + "`, but it is not present.");
+                        target.insert("sync",false);
+                        targets.removeOne(target);
+                        complete = false;
+                        break;
+                    }
+                }
+                if(complete==false){
+                    break;
+                }
+
+            }
+        }
+
+        if(target.contains("sync")&&target["sync"]==false){
+            m_errors.append("<b><font color=\"red\">Error</font></b>: Database Index "+index_number+" was not synced due to errors. Please check its properties and try again later.");
+        }
+        else
+        {
+            target.insert("sync",true);
+            sync_targets.append(target);
+        }
+
+    }
+
+    return sync_targets;
+
+}
+
+void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
 
     if(targets.typeName()== QStringLiteral("QVariantList")){
 
@@ -459,16 +355,21 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
 
                 if(target_map.contains("remote")&&target_map["remote"]==false){
                     if(target_map.contains("sync")&&target_map["sync"]==true){
+                        QString location = target_map["location"].toString();
+                        m_errors.append("<b><font color=\"green\">Log</font></b>: "+location+" good for local to local sync with source database.");
                         syncLocalToLocal(source, target_map);
                     }
                 }
                 else if(target_map.contains("remote")&&target_map["remote"]==true){
                     if(target_map.contains("sync")&&target_map["sync"]==true){
-                        qDebug() << "Remote database sync is under construction. Try again later.";
+                        QString location = target_map["location"].toString();
+                        m_errors.append("<b><font color=\"red\">Error</font></b>: Remote database sync is under construction. "+location+" was not synced. Try again later.");
+
                     }
                 }
                 else{
-
+                    QString location = target_map["location"].toString();
+                    m_errors.append("<b><font color=\"red\">Undefined Error</font></b>: "+location+" was not synced. Please check its properties and try again later.");
                 }
             }
 
@@ -476,48 +377,226 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
         }
 
     }
-
 
 }
 
 void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> target)
 {
-    qDebug() << "Synchronizer::syncLocalToLocal";
+
+    QString target_db_name = target["location"].toString();
+
+    QMap<QString,QVariant> lastSyncInformation;
+
+    lastSyncInformation.insert("target_replica_uid",getUidFromLocalDb(target_db_name));
+    lastSyncInformation.insert("target_replica_generation","");
+    lastSyncInformation.insert("target_replica_transaction_id",-1);
+    lastSyncInformation.insert("source_replica_uid",getUidFromLocalDb(source->getPath()));
+    lastSyncInformation.insert("source_replica_generation","");
+    lastSyncInformation.insert("source_replica_transaction_id",-1);
+
+    lastSyncInformation = getLastSyncInformation(false, lastSyncInformation, target);
+
+    // Check if target and source have ever been synced before
+
+    if(lastSyncInformation["target_replica_uid"].toString() != "" && lastSyncInformation["target_replica_generation"].toString() != "" && lastSyncInformation["target_replica_transaction_id"].toInt() != -1)
+    {
+        m_errors.append("<b><font color=\"green\">Log</font></b>:"+source->getPath()+" and "+target_db_name+" have previously been synced. Sync procedure will commence.");
+        //Do some syncing
+    }
+    else{
+        m_errors.append("<b><font color=\"Orange\">Warning</font></b>:"+source->getPath()+" and "+target_db_name+" have no details of ever being synced.");
+    }
+
+    /* The source replica asks the target replica for the information it has stored about the last time these two replicas were synchronised (if ever).*/
+
+
+    /*
+
+    The application wishing to synchronise sends the following GET request to the server:
+
+    GET /thedb/sync-from/my_replica_uid
+
+    Where thedb is the name of the database to be synchronised, and my_replica_uid is the replica id of the application’s (i.e. the local, or synchronisation source) database
+
+    */
+
+    /*
+
+    The target responds with a JSON document that looks like this:
+
+    {
+        "target_replica_uid": "other_replica_uid",
+        "target_replica_generation": 12,
+        "target_replica_transaction_id": "T-sdkfj92292j",
+        "source_replica_uid": "my_replica_uid",
+        "source_replica_generation": 23,
+        "source_transaction_id": "T-39299sdsfla8"
+    }
+
+    With all the information it has stored for the most recent synchronisation between itself and this particular source replica. In this case it tells us that the synchronisation target believes that when it and the source were last synchronised, the target was at generation 12 and the source at generation 23.
+
+    */
+
+
+    /* The source replica validates that its information regarding the last synchronisation is consistent with the target’s information, and raises an error if not. (This could happen for instance if one of the replicas was lost and restored from backup, or if a user inadvertently tries to synchronise a copied database.) */
+
+
+
+    /* The source replica generates a list of changes since the last change the target replica knows of. */
+
+
+
+    /* The source replica checks what the last change is it knows about on the target replica. */
+
+
+
+    /* If there have been no changes on either replica that the other side has not seen, the synchronisation stops here. */
+
+
+
+    /* The source replica sends the changed documents to the target, along with what the latest change is that it knows about on the target replica. */
+
+
+
+    /* The target processes the changed documents, and records the source replica’s latest change. */
+
+
+
+    /* The target responds with the documents that have changes that the source does not yet know about. */
+
+
+
+    /* The source processes the changed documents, and records the target replica’s latest change. */
+
+
+
+    /* If the source has seen no changes unrelated to the synchronisation during this whole process, it now sends the target what its latest change is, so that the next synchronisation does not have to consider changes that were the result of this one.*/
+
+
+}
+
+QMap<QString,QVariant> Synchronizer::getLastSyncInformation(bool remote, QMap<QString,QVariant> lastSyncInformation,QMap<QString,QVariant> target){
+
+    /*{
+        "target_replica_uid": "other_replica_uid",
+        "target_replica_generation": 12,
+        "target_replica_transaction_id": "T-sdkfj92292j",
+        "source_replica_uid": "my_replica_uid",
+        "source_replica_generation": 23,
+        "source_transaction_id": "T-39299sdsfla8"
+    }*/
+
+    if(remote == true){
+
+        QString location = target["location"].toString();
+        m_errors.append("<b><font color=\"red\">Error</font></b>: Remote database sync is under construction. "+location+" was not synced. Try again later.");
+
+        return lastSyncInformation;
+
+    }
+    else{
+
+    lastSyncInformation = getSyncLogInfoFromLocalDb(lastSyncInformation, target["location"].toString());
+
+    qDebug() << lastSyncInformation;
+    }
+
+    return lastSyncInformation;
+
+}
+
+QMap<QString,QVariant> Synchronizer::getSyncLogInfoFromLocalDb(QMap<QString,QVariant> lastSyncInformation, QString dbFileName){
+
+    QString searchString = "SELECT known_transaction_id, known_generation FROM sync_log WHERE replica_uid = '"+lastSyncInformation["source_replica_uid"].toString() +"'";
 
     QSqlDatabase db;
 
     db = QSqlDatabase::addDatabase("QSQLITE",QUuid::createUuid().toString());
 
-    QString target_db_name = target["location"].toString();
+    QFile db_file(dbFileName);
 
-    QFile target_db_file(target_db_name);
-
-    if(!target_db_file.exists())
+    if(!db_file.exists())
     {
-        qDebug()<< "Local database " << target_db_name << " does not exist";
+        m_errors.append("<b><font color\"red\">Error</font></b>: Local database " + dbFileName + " does not exist.");
+        return lastSyncInformation;
     }
     else
     {
-        db.setDatabaseName(target_db_name);
+
+        db.setDatabaseName(dbFileName);
         if (!db.open()){
-            qDebug() << db.lastError().text();
+            m_errors.append(db.lastError().text());
         }
         else{
-            QString source_uid;
 
-            QSqlQuery query (db.exec("SELECT value FROM u1db_config WHERE name = 'replica_uid'"));
+            QSqlQuery query (db.exec(searchString));
 
             if(!query.lastError().isValid() && query.next()){
-                source_uid = query.value(0).toString();
+                lastSyncInformation.insert("target_replica_generation", query.value(1).toInt());
+                lastSyncInformation.insert("target_replica_transaction_id",query.value(0).toString());
+                db.close();
+                return lastSyncInformation;
             }
             else{
-                qDebug() << query.lastError().text();
+                m_errors.append(db.lastError().text());
+                db.close();
+                return lastSyncInformation;
             }
         }
 
     }
 
+    return lastSyncInformation;
 }
+
+QString Synchronizer::getUidFromLocalDb(QString dbFileName)
+{
+
+    QString dbUid;
+
+    QSqlDatabase db;
+
+    db = QSqlDatabase::addDatabase("QSQLITE",QUuid::createUuid().toString());
+
+    QFile db_file(dbFileName);
+
+    if(!db_file.exists())
+    {
+        m_errors.append("<b><font color\"red\">Error</font></b>: Local database " + dbFileName + " does not exist.");
+        return dbUid;
+    }
+    else
+    {
+        db.setDatabaseName(dbFileName);
+        if (!db.open()){
+            m_errors.append(db.lastError().text());
+        }
+        else{
+            QSqlQuery query (db.exec("SELECT value FROM u1db_config WHERE name = 'replica_uid'"));
+
+            if(!query.lastError().isValid() && query.next()){
+                dbUid = query.value(0).toString();
+                db.close();
+
+                dbUid = dbUid.replace("{","");
+
+                dbUid = dbUid.replace("}","");
+
+                return dbUid;
+            }
+            else{
+                qDebug() << query.lastError().text();
+                db.close();
+                return dbUid;
+            }
+        }
+
+    }
+
+    return dbUid;
+}
+
+
 
 
 QT_END_NAMESPACE_U1DB
