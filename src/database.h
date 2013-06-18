@@ -77,6 +77,14 @@ private:
     bool initializeIfNeeded(const QString& path=":memory:");
     bool setError(const QString& error);
     QString getDocIdByRow(int row) const;
+
+    int createNewTransaction(QString doc_id);
+    QString generateNewTransactionId();
+    int getCurrentGenerationNumber();
+    int updateCurrentGenerationNumber();
+
+
+
 };
 
 QT_END_NAMESPACE_U1DB

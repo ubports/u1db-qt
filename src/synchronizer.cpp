@@ -394,17 +394,22 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
     lastSyncInformation.insert("source_replica_generation","");
     lastSyncInformation.insert("source_replica_transaction_id",-1);
 
-    lastSyncInformation = getLastSyncInformation(false, lastSyncInformation, target);
+    lastSyncInformation = getLastSyncInformation(source, false, lastSyncInformation, target);
 
     // Check if target and source have ever been synced before
 
-    if(lastSyncInformation["target_replica_uid"].toString() != "" && lastSyncInformation["target_replica_generation"].toString() != "" && lastSyncInformation["target_replica_transaction_id"].toInt() != -1)
+    if(lastSyncInformation["target_replica_uid"].toString() != "" && lastSyncInformation["target_replica_generation"].toString() != "" && lastSyncInformation["target_replica_transaction_id"].toInt() != -1 && lastSyncInformation["source_replica_uid"].toString() != "" && lastSyncInformation["source_replica_generation"].toString() != "" && lastSyncInformation["source_replica_transaction_id"].toInt() != -1)
     {
+
         m_errors.append("<b><font color=\"green\">Log</font></b>:"+source->getPath()+" and "+target_db_name+" have previously been synced. Sync procedure will commence.");
         //Do some syncing
+
     }
     else{
+
         m_errors.append("<b><font color=\"Orange\">Warning</font></b>:"+source->getPath()+" and "+target_db_name+" have no details of ever being synced.");
+
+        //There is a first time for everything, let's sync!
     }
 
     /* The source replica asks the target replica for the information it has stored about the last time these two replicas were synchronised (if ever).*/
@@ -475,7 +480,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 
 }
 
-QMap<QString,QVariant> Synchronizer::getLastSyncInformation(bool remote, QMap<QString,QVariant> lastSyncInformation,QMap<QString,QVariant> target){
+QMap<QString,QVariant> Synchronizer::getLastSyncInformation(Database *source, bool remote, QMap<QString,QVariant> lastSyncInformation,QMap<QString,QVariant> target){
 
     /*{
         "target_replica_uid": "other_replica_uid",
@@ -496,18 +501,23 @@ QMap<QString,QVariant> Synchronizer::getLastSyncInformation(bool remote, QMap<QS
     }
     else{
 
-    lastSyncInformation = getSyncLogInfoFromLocalDb(lastSyncInformation, target["location"].toString());
+        lastSyncInformation["source_replica_uid"].toString();
 
-    qDebug() << lastSyncInformation;
+        lastSyncInformation = getSyncLogInfoFromLocalDb(lastSyncInformation, target["location"].toString(),lastSyncInformation["source_replica_uid"].toString(),"target");
+
+        lastSyncInformation = getSyncLogInfoFromLocalDb(lastSyncInformation, source->getPath(),lastSyncInformation["target_replica_uid"].toString(),"source");
+
+        qDebug() << lastSyncInformation;
+
     }
 
     return lastSyncInformation;
 
 }
 
-QMap<QString,QVariant> Synchronizer::getSyncLogInfoFromLocalDb(QMap<QString,QVariant> lastSyncInformation, QString dbFileName){
+QMap<QString,QVariant> Synchronizer::getSyncLogInfoFromLocalDb(QMap<QString,QVariant> lastSyncInformation, QString dbFileName, QString uid, QString prefix){
 
-    QString searchString = "SELECT known_transaction_id, known_generation FROM sync_log WHERE replica_uid = '"+lastSyncInformation["source_replica_uid"].toString() +"'";
+    QString searchString = "SELECT known_transaction_id, known_generation FROM sync_log WHERE replica_uid = '"+uid +"'";
 
     QSqlDatabase db;
 
@@ -532,8 +542,8 @@ QMap<QString,QVariant> Synchronizer::getSyncLogInfoFromLocalDb(QMap<QString,QVar
             QSqlQuery query (db.exec(searchString));
 
             if(!query.lastError().isValid() && query.next()){
-                lastSyncInformation.insert("target_replica_generation", query.value(1).toInt());
-                lastSyncInformation.insert("target_replica_transaction_id",query.value(0).toString());
+                lastSyncInformation.insert(prefix + "_replica_generation", query.value(1).toInt());
+                lastSyncInformation.insert(prefix + "_replica_transaction_id",query.value(0).toString());
                 db.close();
                 return lastSyncInformation;
             }

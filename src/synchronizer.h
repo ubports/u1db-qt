@@ -49,8 +49,8 @@ public:
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
 
     QList<QVariant> getValidTargets(QMap<QString,QString>validator, QList<QString>mandatory);
-    QMap<QString,QVariant> getLastSyncInformation(bool remote, QMap<QString,QVariant> lastSyncInformation,QMap<QString,QVariant> target);
-    QMap<QString,QVariant> getSyncLogInfoFromLocalDb(QMap<QString,QVariant> lastSyncInformation, QString dbFileName);
+    QMap<QString,QVariant> getLastSyncInformation(Database *source, bool remote, QMap<QString,QVariant> lastSyncInformation,QMap<QString,QVariant> target);
+    QMap<QString,QVariant> getSyncLogInfoFromLocalDb(QMap<QString,QVariant> lastSyncInformation, QString dbFileName, QString uid, QString prefix);
 
     Database* getSource();
     QVariant getTargets();

@@ -341,6 +341,109 @@ QString Database::getCurrentDocRevisionNumber(QString doc_id){
     return QString();
 }
 
+int Database::getCurrentGenerationNumber(){
+
+    int sequence_number = -1;
+
+    QSqlQuery query(m_db.exec());
+
+    qDebug()<<"Select";
+
+    query.prepare("SELECT seq FROM sqlite_sequence WHERE name = 'transaction_log'");
+
+    qDebug()<<"Select";
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            sequence_number = (query.value("seq").toInt());
+
+        }
+
+    }
+
+    return sequence_number;
+
+}
+
+int Database::updateCurrentGenerationNumber(){
+
+    int sequence_number = getCurrentGenerationNumber();
+
+    QSqlQuery query(m_db.exec());
+
+
+    if(sequence_number != -1){
+
+        qDebug()<<"Update";
+
+        query.prepare("UPDATE sqlite_sequence SET seq = :new_seq WHERE name = 'transaction_log'");
+
+        qDebug()<<"Update";
+
+        query.bindValue(":new_seq", (sequence_number+1));
+
+        if (!query.exec())
+            return -1;
+    }
+    else{
+
+        sequence_number = 1;
+
+        qDebug()<<"Insert";
+
+        query.prepare("INSERT INTO sqlite_sequence(name,seq) values('transaction_log',1)");
+
+        qDebug()<<"Insert";
+
+        if (!query.exec())
+            return -1;
+
+    }
+
+    return sequence_number;
+
+}
+
+
+
+QString Database::generateNewTransactionId(){
+
+    QString uid = "T-"+QUuid::createUuid().toString();
+    uid = uid.replace("}","");
+    uid = uid.replace("{","");
+    return uid;
+
+}
+
+int Database::createNewTransaction(QString doc_id){
+
+     //generate new transaction here -- update transaction_log & sqlite_sequence
+
+    int generation = getCurrentGenerationNumber();
+
+    if(generation !=-1){
+
+        QString transaction_id = generateNewTransactionId();
+
+        QSqlQuery query(m_db.exec());
+
+        query.prepare("INSERT INTO transaction_log VALUES(:generation,:doc_id,:transaction_id");
+        query.bindValue(":doc_id", doc_id);
+        query.bindValue(":generation", generation);
+        query.bindValue(":transaction_id", transaction_id);
+
+        if (!query.exec())
+            return -1;
+        else
+            return 0;
+
+    }
+
+    return -1;
+}
+
 /*!
     Updates the existing \a contents of the document identified by \a docId if
     there's no error.
@@ -377,6 +480,9 @@ Database::putDoc(QVariant contents, const QString& docId)
         query.bindValue(":docId", newOrEmptyDocId);
         if (!query.exec())
             return setError(QString("Failed to delete document field %1: %2\n%3").arg(newOrEmptyDocId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
+
+        createNewTransaction(newOrEmptyDocId);
+
     }
     else
     {
@@ -393,6 +499,8 @@ Database::putDoc(QVariant contents, const QString& docId)
         query.bindValue(":docJson", json.isEmpty() ? contents : json.toJson());
         if (!query.exec())
             return setError(QString("Failed to put document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
+
+        createNewTransaction(newOrEmptyDocId);
     }
 
     beginResetModel();
