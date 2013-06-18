@@ -413,6 +413,11 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 {
 
     QString target_db_name = target["location"].toString();
+    Database *targetDb;
+
+    if(target.contains("id")){
+        targetDb = (Database*)target["id"].value<QObject*>();
+    }
 
     QMap<QString,QVariant> lastSyncInformation;
 
@@ -425,6 +430,9 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 
     lastSyncInformation = getLastSyncInformation(source, false, lastSyncInformation, target);
 
+    QList<QString> transactionsFromSource;
+    QList<QString> transactionsFromTarget;
+
     // Check if target and source have ever been synced before
 
     if(lastSyncInformation["target_replica_uid"].toString() != "" && lastSyncInformation["target_replica_generation"].toString() != "" && lastSyncInformation["target_replica_transaction_id"].toInt() != -1 && lastSyncInformation["source_replica_uid"].toString() != "" && lastSyncInformation["source_replica_generation"].toString() != "" && lastSyncInformation["source_replica_transaction_id"].toInt() != -1)
@@ -434,13 +442,10 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 
         //Do some syncing
 
-        QList<QString> transactionsFromSource = listTransactionsSince(lastSyncInformation["source_replica_generation"].toInt(), source->getPath());
+        transactionsFromSource = listTransactionsSince(lastSyncInformation["source_replica_generation"].toInt(), source->getPath());
 
-        QList<QString> transactionsFromTarget = listTransactionsSince(lastSyncInformation["target_replica_generation"].toInt(), target_db_name);
+        transactionsFromTarget = listTransactionsSince(lastSyncInformation["target_replica_generation"].toInt(), target_db_name);
 
-        qDebug() << transactionsFromSource;
-
-        qDebug() << transactionsFromTarget;
 
     }
     else{
@@ -448,7 +453,132 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
         m_errors.append("<b><font color=\"Orange\">Warning</font></b>:"+source->getPath()+" and "+target_db_name+" have no details of ever being synced.");
 
         //There is a first time for everything, let's sync!
+
+        transactionsFromSource = listTransactionsSince(1, source->getPath());
+
+        transactionsFromTarget = listTransactionsSince(1, target_db_name);
     }
+
+    /*!
+     * With two distinct lists present, it is now possible to check what
+     * updates should be made, or new documents created in one or the other
+     * database, depending on conditions.
+     *
+     * However, two additional lists containing transactions IDs are required
+     * because the information is contained within delimited strings (see
+     * below for details).
+     *
+    */
+
+    QList<QString> transactionIdsFromSource;
+    QList<QString> transactionIdsFromTarget;
+
+    Q_FOREACH(QString sourceTransaction, transactionsFromSource){
+
+        /*!
+         * Each sourceTransaction is a pipe delimited string containing
+         * generation number, document ID, and transaction ID details
+         * in that order.
+         *
+         * Splitting the string into its component pieces provides a
+         * document ID (the second key in the list).
+         */
+
+        QStringList transactionDetails = sourceTransaction.split("|");
+
+        /*!
+          * It is only necessary to have unique instances of the
+          * document ID.
+          */
+
+        if(!transactionIdsFromSource.contains(transactionDetails[1]))
+            transactionIdsFromSource.append(transactionDetails[1]);
+
+    }
+
+    Q_FOREACH(QString targetTransaction, transactionsFromTarget){
+
+        /*!
+         * Each targetTransaction is a pipe delimited string containing
+         * generation number, document ID, and transaction ID details
+         * in that order.
+         *
+         * Splitting the string into its component pieces provides a
+         * document ID (the second key in the list).
+         */
+
+        QStringList transactionDetails = targetTransaction.split("|");
+
+        /*!
+          * It is only necessary to have unique instances of the
+          * document ID.
+          */
+
+        if(!transactionIdsFromTarget.contains(transactionDetails[1]))
+            transactionIdsFromTarget.append(transactionDetails[1]);
+
+    }
+
+
+    /*!
+     * The transactions IDs are searched for in the list of changes
+     * from the other database since the last sync (or from the start
+     * if this is the first sync) to determine whether to update an
+     * existing document, or create a new one, depending on conditions.
+     */
+
+    Q_FOREACH(QString sourceTransaction, transactionIdsFromSource){
+
+        if(transactionIdsFromTarget.contains(sourceTransaction)){
+            if(target["resolve_to_source"].toBool()==true)
+
+                //Update a Document from Source to Target
+
+                if(target.contains("id")){
+                    QVariant sourceDocument = source->getDoc(sourceTransaction);
+                    targetDb->putDoc(sourceDocument,sourceTransaction);
+                }
+        }
+        else{
+
+            //New Document from Source to Target
+
+            if(target.contains("id")){
+                QVariant sourceDocument = source->getDoc(sourceTransaction);
+                targetDb->putDoc(sourceDocument,sourceTransaction);
+            }
+
+        }
+
+    }
+
+    Q_FOREACH(QString targetTransaction, transactionIdsFromTarget){
+
+        if(transactionIdsFromSource.contains(targetTransaction)){
+            if(target["resolve_to_source"].toBool()==false){
+
+                //Update a Document from Target to Source
+
+                if(target.contains("id")){
+                    QVariant targetDocument = targetDb->getDoc(targetTransaction);
+                    source->putDoc(targetDocument ,targetTransaction);
+                }
+
+            }
+        }
+        else{
+
+            //New Document from Target to Source
+
+            if(target.contains("id")){
+                QVariant targetDocument = targetDb->getDoc(targetTransaction);
+                source->putDoc(targetDocument ,targetTransaction);
+            }
+        }
+
+    }
+
+
 
     /* The source replica asks the target replica for the information it has stored about the last time these two replicas were synchronised (if ever).*/
 

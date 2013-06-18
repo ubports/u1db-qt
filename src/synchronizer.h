@@ -23,6 +23,7 @@
 #include <QtCore/QObject>
 #include <QSqlDatabase>
 #include <QVariant>
+#include <QMetaType>
 
 #include "database.h"
 
@@ -80,7 +81,7 @@ Q_SIGNALS:
     void errorsChanged(QList<QString> errors);
     void syncCompleted();
 private:
-    Q_DISABLE_COPY(Synchronizer)
+    //Q_DISABLE_COPY(Synchronizer)
     Database* m_source;
     bool m_synchronize;
     bool m_resolve_to_source;
@@ -93,5 +94,8 @@ private:
 
 QT_END_NAMESPACE_U1DB
 
+
+
 #endif // U1DB_SYNCHRONIZER_H
+
 

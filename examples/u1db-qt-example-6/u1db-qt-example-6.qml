@@ -42,7 +42,7 @@ Item {
             database: aDatabase
             docId: 'helloworld'
             create: true
-            contents:{"hello": { "world": { "message":"Hello Worldz", "id": 1 } } }
+            contents:{"hello": { "world": { "message":"Hello World", "id": 1 } } }
 
         }
 
@@ -85,7 +85,7 @@ Item {
            id: aSynchronizer
            source: aDatabase
            targets: [{remote:true},
-               {remote:false,location:"aTargetDatabase6",resolve_to_source:true},
+               {remote:false,id:aTargetDatabase,location:"aTargetDatabase6",resolve_to_source:true},
                {remote:true,location:"http://somewhere/aTargetDatabase6",resolve_to_source:true},
                {remote:"OK"}]
            synchronize: false

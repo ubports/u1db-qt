@@ -67,7 +67,7 @@ Q_SIGNALS:
      */
     void docLoaded(const QString& docId, QVariant content) const;
 private:
-    Q_DISABLE_COPY(Database)
+    //Q_DISABLE_COPY(Database)
     QString m_path;
     QSqlDatabase m_db;
     QString m_error;
