@@ -528,6 +528,7 @@ Database::putDoc(QVariant contents, const QString& docId)
     return newRev;
 }
 
+
 /*!
     Returns a list of all stored documents by their docId.
  */

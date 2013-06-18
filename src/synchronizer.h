@@ -70,6 +70,7 @@ public:
     void syncLocalToLocal(Database *source, QMap<QString,QVariant> target);
     void synchronizeTargets(Database *source, QVariant targets);
     QString getUidFromLocalDb(QString dbFileName);
+    QList<QString> listTransactionsSince(int generation, QString dbPath);
 
 Q_SIGNALS:
     void sourceChanged(Database* source);
@@ -77,6 +78,7 @@ Q_SIGNALS:
     void syncChanged(bool synchronize);
     void resolveToSourceChanged(bool resolve_to_source);
     void errorsChanged(QList<QString> errors);
+    void syncCompleted();
 private:
     Q_DISABLE_COPY(Synchronizer)
     Database* m_source;
