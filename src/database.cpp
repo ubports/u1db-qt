@@ -282,11 +282,20 @@ Database::getDoc(const QString& docId)
     return setError(QString("Failed to get document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? QVariant() : QVariant();
 }
 
+/*!
+    The increaseVectorClockRev(int oldRev) function is deprecated.
+ */
 static int
 increaseVectorClockRev(int oldRev)
 {
     return oldRev;
 }
+
+/*!
+    The getNextDocRevisionNumber(QString doc_id) function
+creates a new revision number. It returns a string for use
+in the document  table's 'doc_rev' field.
+ */
 
 QString Database::getNextDocRevisionNumber(QString doc_id)
 {
@@ -295,13 +304,31 @@ QString Database::getNextDocRevisionNumber(QString doc_id)
 
     QString current_revision_number = getCurrentDocRevisionNumber(doc_id);
 
+    /*!
+        Some revisions contain information from previous
+conflicts/syncs. Revisions are delimited by '|'.
+
+     */
+
     QStringList current_revision_list = current_revision_number.split("|");
 
     Q_FOREACH (QString current_revision, current_revision_list) {
 
+        /*!
+            Each revision contains two pieces of information,
+the uid of the database that made the revsion, and a counter
+for the revsion. This information is delimited by ':'.
+
+         */
+
         QStringList current_revision_number_list = current_revision.split(":");
 
         if(current_revision_number_list[0]==getReplicaUid()) {
+
+            /*!
+                If the current revision uid  is the same as this Database's uid the counter portion is increased by one.
+
+             */
 
             int revision_generation_number = current_revision_number_list[1].toInt()+1;
 
@@ -309,10 +336,20 @@ QString Database::getNextDocRevisionNumber(QString doc_id)
 
         }
         else {
+
+            /*!
+                If the current revision uid  is not the same as this Database's uid then the revision represents a change that originated in another database.
+
+             */
             revision_number+="|"+current_revision;
         }
 
     }
+
+    /*!
+        The Database UID has curly brackets, but they are not required for the revision number and need to be removed.
+
+     */
 
     revision_number = revision_number.replace("{","");
 
@@ -321,6 +358,14 @@ QString Database::getNextDocRevisionNumber(QString doc_id)
     return revision_number;
 
 }
+
+/*!
+
+    The getCurrentDocRevisionNumber(QString doc_id) function
+returns the current string value from the document table's
+doc_rev field.
+
+ */
 
 QString Database::getCurrentDocRevisionNumber(QString doc_id){
     if (!initializeIfNeeded())
@@ -340,6 +385,14 @@ QString Database::getCurrentDocRevisionNumber(QString doc_id){
     }
     return QString();
 }
+
+/*!
+    The getCurrentGenerationNumber() function searches for the
+current generation number from the  sqlite_sequence table.
+The return value can then be used during a synchronization session,
+amongst other things.
+
+ */
 
 int Database::getCurrentGenerationNumber(){
 
@@ -363,6 +416,11 @@ int Database::getCurrentGenerationNumber(){
 
 }
 
+/*!
+    The generateNewTransactionId() function generates a random
+transaction id string, for use when creating new transations.
+
+ */
 
 QString Database::generateNewTransactionId(){
 
@@ -372,6 +430,14 @@ QString Database::generateNewTransactionId(){
     return uid;
 
 }
+
+/*!
+    Each time a document in the Database is created or updated a
+new transaction is performed, and information about it inserted into the
+transation_log table using the createNewTransaction(QString doc_id)
+function.
+
+ */
 
 int Database::createNewTransaction(QString doc_id){
 
