@@ -347,11 +347,7 @@ int Database::getCurrentGenerationNumber(){
 
     QSqlQuery query(m_db.exec());
 
-    qDebug()<<"Select";
-
     query.prepare("SELECT seq FROM sqlite_sequence WHERE name = 'transaction_log'");
-
-    qDebug()<<"Select";
 
     if (query.exec())
     {
@@ -367,46 +363,6 @@ int Database::getCurrentGenerationNumber(){
 
 }
 
-int Database::updateCurrentGenerationNumber(){
-
-    int sequence_number = getCurrentGenerationNumber();
-
-    QSqlQuery query(m_db.exec());
-
-
-    if(sequence_number != -1){
-
-        qDebug()<<"Update";
-
-        query.prepare("UPDATE sqlite_sequence SET seq = :new_seq WHERE name = 'transaction_log'");
-
-        qDebug()<<"Update";
-
-        query.bindValue(":new_seq", (sequence_number+1));
-
-        if (!query.exec())
-            return -1;
-    }
-    else{
-
-        sequence_number = 1;
-
-        qDebug()<<"Insert";
-
-        query.prepare("INSERT INTO sqlite_sequence(name,seq) values('transaction_log',1)");
-
-        qDebug()<<"Insert";
-
-        if (!query.exec())
-            return -1;
-
-    }
-
-    return sequence_number;
-
-}
-
-
 
 QString Database::generateNewTransactionId(){
 
@@ -419,26 +375,17 @@ QString Database::generateNewTransactionId(){
 
 int Database::createNewTransaction(QString doc_id){
 
-     //generate new transaction here -- update transaction_log & sqlite_sequence
+    QString transaction_id = generateNewTransactionId();
 
-    int generation = getCurrentGenerationNumber();
+    QSqlQuery query(m_db.exec());
 
-    if(generation !=-1){
+    QString queryString = "INSERT INTO transaction_log(doc_id, transaction_id) VALUES('"+doc_id+"', '"+transaction_id+"')";
 
-        QString transaction_id = generateNewTransactionId();
-
-        QSqlQuery query(m_db.exec());
-
-        query.prepare("INSERT INTO transaction_log VALUES(:generation,:doc_id,:transaction_id");
-        query.bindValue(":doc_id", doc_id);
-        query.bindValue(":generation", generation);
-        query.bindValue(":transaction_id", transaction_id);
-
-        if (!query.exec())
-            return -1;
-        else
-            return 0;
-
+    if (!query.exec(queryString)){
+        return -1;
+    }
+    else{
+        return 0;
     }
 
     return -1;

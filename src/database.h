@@ -81,9 +81,6 @@ private:
     int createNewTransaction(QString doc_id);
     QString generateNewTransactionId();
     int getCurrentGenerationNumber();
-    int updateCurrentGenerationNumber();
-
-
 
 };
 
