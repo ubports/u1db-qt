@@ -454,9 +454,9 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 
         //There is a first time for everything, let's sync!
 
-        transactionsFromSource = listTransactionsSince(1, source->getPath());
+        transactionsFromSource = listTransactionsSince(0, source->getPath());
 
-        transactionsFromTarget = listTransactionsSince(1, target_db_name);
+        transactionsFromTarget = listTransactionsSince(0, target_db_name);
     }
 
     /*!
