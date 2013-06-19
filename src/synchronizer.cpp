@@ -571,6 +571,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
         }
     }
 
+
     /* The source replica asks the target replica for the information it has stored about the last time these two replicas were synchronised (if ever).*/
 
 
