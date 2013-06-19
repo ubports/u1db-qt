@@ -248,6 +248,7 @@ Database::getDocUnchecked(const QString& docId) const
     return QVariant();
 }
 
+
 /*!
     Returns the contents of a document by \a docId in a form that QML recognizes
     as a Variant object, it's identical to Document::getContents() with the
@@ -341,7 +342,13 @@ for the revsion. This information is delimited by ':'.
                 If the current revision uid  is not the same as this Database's uid then the revision represents a change that originated in another database.
 
              */
-            revision_number+="|"+current_revision;
+            //revision_number+="|"+current_revision;
+
+            /* ##KW## Not sure if the above is necessary,
+             *and did not appear to be working as intended either.
+             *
+             * Commented out, but maybe OK to delete.
+             */
         }
 
     }
@@ -384,6 +391,23 @@ QString Database::getCurrentDocRevisionNumber(QString doc_id){
 
     }
     return QString();
+}
+
+void Database::updateDocRevisionNumber(QString doc_id,QString revision){
+    if (!initializeIfNeeded())
+        return;
+
+    QSqlQuery query(m_db.exec());
+
+    query.prepare("UPDATE document SET doc_rev = :revisionId WHERE doc_id = :docId");
+    query.bindValue(":docId", doc_id);
+    query.bindValue(":revisionId", revision);
+    if (!query.exec())
+    {
+        qDebug() << query.lastError();
+
+    }
+
 }
 
 /*!

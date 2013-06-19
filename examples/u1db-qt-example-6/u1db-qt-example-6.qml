@@ -42,7 +42,7 @@ Item {
             database: aDatabase
             docId: 'helloworld'
             create: true
-            contents:{"hello": { "world": { "message":"Hello World", "id": 1 } } }
+            defaults:{"hello": { "world": { "message":"Hello World", "id": 1 } } }
 
         }
 

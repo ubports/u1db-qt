@@ -54,6 +54,8 @@ public:
 
     QString getNextDocRevisionNumber(QString doc_id);
     QString getCurrentDocRevisionNumber(QString doc_id);
+    void updateDocRevisionNumber(QString doc_id,QString revision);
+
 
 Q_SIGNALS:
     void pathChanged(const QString& path);

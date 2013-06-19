@@ -519,7 +519,6 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 
     }
 
-
     /*!
      * The transactions IDs are searched for in the list of changes
      * from the other database since the last sync (or from the start
@@ -535,8 +534,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
                 //Update a Document from Source to Target
 
                 if(target.contains("id")){
-                    QVariant sourceDocument = source->getDoc(sourceTransaction);
-                    targetDb->putDoc(sourceDocument,sourceTransaction);
+                    syncDocument(source, targetDb, sourceTransaction);
                 }
         }
         else{
@@ -544,8 +542,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
             //New Document from Source to Target
 
             if(target.contains("id")){
-                QVariant sourceDocument = source->getDoc(sourceTransaction);
-                targetDb->putDoc(sourceDocument,sourceTransaction);
+                syncDocument(source, targetDb, sourceTransaction);
             }
 
         }
@@ -560,10 +557,8 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
                 //Update a Document from Target to Source
 
                 if(target.contains("id")){
-                    QVariant targetDocument = targetDb->getDoc(targetTransaction);
-                    source->putDoc(targetDocument ,targetTransaction);
+                    syncDocument(targetDb, source, targetTransaction);
                 }
-
             }
         }
         else{
@@ -571,14 +566,10 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
             //New Document from Target to Source
 
             if(target.contains("id")){
-                QVariant targetDocument = targetDb->getDoc(targetTransaction);
-                source->putDoc(targetDocument ,targetTransaction);
+                syncDocument(targetDb, source, targetTransaction);
             }
         }
-
     }
-
-
 
     /* The source replica asks the target replica for the information it has stored about the last time these two replicas were synchronised (if ever).*/
 
@@ -646,6 +637,14 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
     /* If the source has seen no changes unrelated to the synchronisation during this whole process, it now sends the target what its latest change is, so that the next synchronisation does not have to consider changes that were the result of this one.*/
 
 
+}
+
+void Synchronizer::syncDocument(Database *from, Database *to, QString docId)
+{
+    QVariant document = from->getDoc(docId);
+    to->putDoc(document, docId);
+    QString revision = from->getCurrentDocRevisionNumber(docId);
+    to->updateDocRevisionNumber(docId,revision);
 }
 
 QList<QString> Synchronizer::listTransactionsSince(int generation, QString dbPath){
