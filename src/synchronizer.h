@@ -26,6 +26,8 @@
 #include <QMetaType>
 
 #include "database.h"
+#include "index.h"
+#include "query.h"
 
 QT_BEGIN_NAMESPACE_U1DB
 
@@ -70,7 +72,7 @@ public:
     void syncWithRemoteTarget(Database *source, QString target_url, bool resolve_to_source);
     void syncLocalToLocal(Database *source, QMap<QString,QVariant> target);
     void synchronizeTargets(Database *source, QVariant targets);
-    void syncDocument(Database *from, Database *to, QString docId);
+    QVariant syncDocument(Database *from, Database *to, QString docId);
     QString getUidFromLocalDb(QString dbFileName);
     QList<QString> listTransactionsSince(int generation, QString dbPath);
 

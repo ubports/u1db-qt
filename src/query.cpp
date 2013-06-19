@@ -59,6 +59,7 @@ Query::Query(QObject *parent) :
 QVariant
 Query::data(const QModelIndex & index, int role) const
 {
+
     if (role == 0) // contents
         return m_results.at(index.row());
     if (role == 1) // docId
@@ -150,8 +151,16 @@ void Query::generateQueryResults()
 
     }
 
+    resetModel();
+
     Q_EMIT documentsChanged(m_documents);
     Q_EMIT resultsChanged(m_results);
+
+}
+
+void Query::resetModel(){
+    beginResetModel();
+    endResetModel();
 }
 
 /*!

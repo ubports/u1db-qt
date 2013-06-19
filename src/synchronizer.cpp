@@ -413,10 +413,41 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 {
 
     QString target_db_name = target["location"].toString();
+
     Database *targetDb;
+    Index *targetIndex;
+    Query *targetQuery;
+
+    Database *sourceDb;
+    Index *sourceIndex;
+    Query *sourceQuery;
+
+    /*
+     * ##KW## The two lists below are currently not used for anything
+     * as they were added for functionality that turned out not to be
+     * necessary. They are left here in case they might be convenient
+     * for something else.
+     *
+     * Note: These relate to the function syncDocument's return value.
+     */
+
+    QList<QVariant> source_results;
+    QList<QVariant> target_results;
 
     if(target.contains("id")){
         targetDb = (Database*)target["id"].value<QObject*>();
+    }
+
+    if(target.contains("target_query")){
+        targetQuery = (Query*)target["target_query"].value<QObject*>();
+        targetIndex = targetQuery->getIndex();
+        targetDb = targetIndex->getDatabase();
+    }
+
+    if(target.contains("source_query")){
+        sourceQuery = (Query*)target["source_query"].value<QObject*>();
+        sourceIndex = sourceQuery->getIndex();
+        sourceDb = sourceIndex->getDatabase();
     }
 
     QMap<QString,QVariant> lastSyncInformation;
@@ -534,7 +565,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
                 //Update a Document from Source to Target
 
                 if(target.contains("id")){
-                    syncDocument(source, targetDb, sourceTransaction);
+                    target_results.append(syncDocument(source, targetDb, sourceTransaction));
                 }
         }
         else{
@@ -542,7 +573,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
             //New Document from Source to Target
 
             if(target.contains("id")){
-                syncDocument(source, targetDb, sourceTransaction);
+                target_results.append(syncDocument(source, targetDb, sourceTransaction));
             }
 
         }
@@ -557,7 +588,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
                 //Update a Document from Target to Source
 
                 if(target.contains("id")){
-                    syncDocument(targetDb, source, targetTransaction);
+                    source_results.append(syncDocument(targetDb, source, targetTransaction));
                 }
             }
         }
@@ -566,7 +597,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
             //New Document from Target to Source
 
             if(target.contains("id")){
-                syncDocument(targetDb, source, targetTransaction);
+                source_results.append(syncDocument(targetDb, source, targetTransaction));
             }
         }
     }
@@ -640,12 +671,14 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 
 }
 
-void Synchronizer::syncDocument(Database *from, Database *to, QString docId)
+QVariant Synchronizer::syncDocument(Database *from, Database *to, QString docId)
 {
     QVariant document = from->getDoc(docId);
     to->putDoc(document, docId);
     QString revision = from->getCurrentDocRevisionNumber(docId);
     to->updateDocRevisionNumber(docId,revision);
+
+    return document;
 }
 
 QList<QString> Synchronizer::listTransactionsSince(int generation, QString dbPath){

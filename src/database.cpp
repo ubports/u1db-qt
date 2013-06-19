@@ -498,7 +498,7 @@ Database::putDoc(QVariant contents, const QString& docId)
     QVariant oldDoc = newOrEmptyDocId.isEmpty() ? QVariant() : getDocUnchecked(newOrEmptyDocId);
     /* FIXME: Conflicts */
 
-    //int newRev = increaseVectorClockRev(7/*contents.rev*/);
+    int newRev = increaseVectorClockRev(7/*contents.rev*/);
     // ##KW## maybe this can be removed as it is replaced by revision_number.
 
     QString revision_number = getNextDocRevisionNumber(newOrEmptyDocId);
