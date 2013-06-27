@@ -393,6 +393,44 @@ QString Database::getCurrentDocRevisionNumber(QString doc_id){
     return QString();
 }
 
+/*!
+ * \brief Database::updateSyncLog
+ * \param uid
+ * \param generation
+ * \param transaction_id
+ *
+ * This method is used at the end of a synchronization session,
+ * to update the database with the latest information known about the peer
+ * database that was synced against.
+ */
+void Database::updateSyncLog(bool insert, QString uid, QString generation, QString transaction_id)
+{
+
+    if (!initializeIfNeeded())
+        return;
+
+    QSqlQuery query(m_db.exec());
+
+    if(insert==true){
+        query.prepare("INSERT INTO sync_log(known_generation,known_transation_id,known_transation_id) VALUES(:knownGeneration, :knownTransactionId, :replicaUid)");
+
+    }
+    else{
+        query.prepare("UPDATE sync_log SET known_generation = :knownGeneration, known_transation_id = :knownTransactionId WHERE replica_uid = :replicaUid");
+    }
+
+
+    query.bindValue(":replicaUid", uid);
+    query.bindValue(":knownGeneration", generation);
+    query.bindValue(":knownTransactionId", transaction_id);
+    if (!query.exec())
+    {
+        qDebug() << query.lastError();
+
+    }
+
+}
+
 void Database::updateDocRevisionNumber(QString doc_id,QString revision){
     if (!initializeIfNeeded())
         return;
@@ -723,6 +761,36 @@ Database::getIndexKeys(const QString& indexName)
         list.append(query.value("value").toString());
     return list;
 }
+
+/* Handy functions for synchronization. */
+
+QList<QString> Database::listTransactionsSince(int generation){
+
+    QList<QString> list;
+
+    if (!initializeIfNeeded())
+        return list;
+
+    QSqlQuery query(m_db.exec());
+
+    QString queryStmt = "SELECT generation, doc_id, transaction_id FROM transaction_log where generation > "+QString::number(generation);
+
+    if (query.exec(queryStmt))
+    {
+        while (query.next())
+        {
+            list.append(query.value("generation").toString()+"|"+query.value("doc_id").toString()+"|"+query.value("transaction_id").toString());
+        }
+
+        return list;
+
+    }
+
+    return list;
+
+}
+
+
 
 QT_END_NAMESPACE_U1DB
 

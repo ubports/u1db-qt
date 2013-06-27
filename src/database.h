@@ -36,10 +36,12 @@ class Q_DECL_EXPORT Database : public QAbstractListModel {
 public:
     Database(QObject* parent = 0);
 
+
     // QAbstractListModel
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray>roleNames() const;
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    void resetModel();
 
     QString getPath();
     void setPath(const QString& path);
@@ -52,11 +54,14 @@ public:
     Q_INVOKABLE QStringList getIndexExpressions(const QString& indexName);
     Q_INVOKABLE QStringList getIndexKeys(const QString& indexName);
 
+    /* Functions handy for Synchronization */
     QString getNextDocRevisionNumber(QString doc_id);
     QString getCurrentDocRevisionNumber(QString doc_id);
     void updateDocRevisionNumber(QString doc_id,QString revision);
+    void updateSyncLog(bool insert, QString uid, QString generation, QString transaction_id);
+    QList<QString> listTransactionsSince(int generation);
 
-    void resetModel();
+
 
 
 Q_SIGNALS:

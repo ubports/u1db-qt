@@ -74,7 +74,7 @@ public:
     void synchronizeTargets(Database *source, QVariant targets);
     QVariant syncDocument(Database *from, Database *to, QString docId);
     QString getUidFromLocalDb(QString dbFileName);
-    QList<QString> listTransactionsSince(int generation, QString dbPath);
+
 
 Q_SIGNALS:
     void sourceChanged(Database* source);

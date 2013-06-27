@@ -473,9 +473,9 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 
         //Do some syncing
 
-        transactionsFromSource = listTransactionsSince(lastSyncInformation["source_replica_generation"].toInt(), source->getPath());
+        transactionsFromSource = sourceDb->listTransactionsSince(lastSyncInformation["source_replica_generation"].toInt());
 
-        transactionsFromTarget = listTransactionsSince(lastSyncInformation["target_replica_generation"].toInt(), target_db_name);
+        transactionsFromTarget = targetDb->listTransactionsSince(lastSyncInformation["target_replica_generation"].toInt());
 
 
     }
@@ -485,9 +485,9 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 
         //There is a first time for everything, let's sync!
 
-        transactionsFromSource = listTransactionsSince(0, source->getPath());
+        transactionsFromSource = sourceDb->listTransactionsSince(0);
 
-        transactionsFromTarget = listTransactionsSince(0, target_db_name);
+        transactionsFromTarget = targetDb->listTransactionsSince(0);
     }
 
     /*!
@@ -601,6 +601,17 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
             }
         }
     }
+    
+    
+    if(lastSyncInformation["target_replica_transaction_id"].toInt()==-1&&lastSyncInformation["source_replica_transaction_id"].toInt()==-1){
+        //targetDb->updateSyncLog(true, QString uid, QString generation, QString transaction_id);
+        //sourceDb->updateSyncLog(true, QString uid, QString generation, QString transaction_id);
+    }
+    else{
+        //targetDb->updateSyncLog(false, QString uid, QString generation, QString transaction_id);
+        //sourceDb->updateSyncLog(true, QString uid, QString generation, QString transaction_id);
+    }
+    
 
 
     /* The source replica asks the target replica for the information it has stored about the last time these two replicas were synchronised (if ever).*/
@@ -660,8 +671,6 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
 
     /* The target responds with the documents that have changes that the source does not yet know about. */
 
-
-
     /* The source processes the changed documents, and records the target replica’s latest change. */
 
 
@@ -679,42 +688,6 @@ QVariant Synchronizer::syncDocument(Database *from, Database *to, QString docId)
     to->updateDocRevisionNumber(docId,revision);
 
     return document;
-}
-
-QList<QString> Synchronizer::listTransactionsSince(int generation, QString dbPath){
-
-    QList<QString> list;
-
-    QSqlDatabase db;
-
-    db = QSqlDatabase::addDatabase("QSQLITE",QUuid::createUuid().toString());
-
-    QFile db_file(dbPath);
-
-    db.setDatabaseName(dbPath);
-
-    if (!db.open()){
-        m_errors.append(db.lastError().text());
-    }
-    else{
-
-        QSqlQuery query(db.exec());
-
-        QString queryStmt = "SELECT generation, doc_id, transaction_id FROM transaction_log where generation > "+QString::number(generation);
-
-        if (query.exec(queryStmt))
-        {
-            while (query.next())
-            {
-                list.append(query.value("generation").toString()+"|"+query.value("doc_id").toString()+"|"+query.value("transaction_id").toString());
-            }
-            return list;
-        }
-
-    }
-
-    return list;
-
 }
 
 QMap<QString,QVariant> Synchronizer::getLastSyncInformation(Database *source, bool remote, QMap<QString,QVariant> lastSyncInformation,QMap<QString,QVariant> target){
