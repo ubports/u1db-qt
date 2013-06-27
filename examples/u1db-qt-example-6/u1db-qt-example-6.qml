@@ -84,13 +84,9 @@ Item {
        U1db.Synchronizer{
            id: aSynchronizer
            source: aDatabase
-
            targets: [{remote:true},
                {remote:false,
-                   //source_query: aQuery,
-                   //target_query:aTargetQuery,
                    id:aTargetQuery.index.database,
-                   location:"aTargetDatabase6",
                    resolve_to_source:true},
                {remote:true,
                    location:"http://somewhere/aTargetDatabase6",

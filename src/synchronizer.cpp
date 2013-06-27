@@ -248,7 +248,6 @@ void Synchronizer::onSyncChanged(bool synchronize){
     QList<QString>mandatory;
 
     mandatory.append("remote");
-    mandatory.append("location");
     mandatory.append("resolve_to_source");
 
     if(synchronize == true){
@@ -296,6 +295,13 @@ emitted after the model has been reset.
     }
 }
 
+/*!
+ * \brief Synchronizer::getValidTargets confirms that each sync target definition is valid.
+ * \param validator
+ * \param mandatory
+ * \return
+ */
+
 QList<QVariant> Synchronizer::getValidTargets(QMap<QString,QString>validator, QList<QString>mandatory){
 
     QList<QVariant> sync_targets;
@@ -318,6 +324,8 @@ QList<QVariant> Synchronizer::getValidTargets(QMap<QString,QString>validator, QL
         while (i.hasNext()) {
 
             i.next();
+
+            //qDebug() << i.value().typeName();
 
             if(validator.contains(i.key())&&validator[i.key()]!=i.value().typeName()){
                 valid = false;
@@ -375,7 +383,11 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
 
         QListIterator<QVariant> i(target_list);
 
+        int target_index = -1;
+
         while(i.hasNext()){
+
+            target_index++;
 
             QVariant target = i.next();
 
@@ -384,21 +396,18 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
 
                 if(target_map.contains("remote")&&target_map["remote"]==false){
                     if(target_map.contains("sync")&&target_map["sync"]==true){
-                        QString location = target_map["location"].toString();
-                        m_errors.append("<b><font color=\"green\">Log</font></b>: "+location+" good for local to local sync with source database.");
+                        m_errors.append("<b><font color=\"green\">Log</font></b>: Valid target index "+QString::number(target_index)+" good for local to local sync with source database.");
                         syncLocalToLocal(source, target_map);
                     }
                 }
                 else if(target_map.contains("remote")&&target_map["remote"]==true){
                     if(target_map.contains("sync")&&target_map["sync"]==true){
-                        QString location = target_map["location"].toString();
-                        m_errors.append("<b><font color=\"red\">Error</font></b>: Remote database sync is under construction. "+location+" was not synced. Try again later.");
+                        m_errors.append("<b><font color=\"red\">Error</font></b>: Remote database sync is under construction. Valid target index "+QString::number(target_index)+" was not synced. Try again later.");
 
                     }
                 }
                 else{
-                    QString location = target_map["location"].toString();
-                    m_errors.append("<b><font color=\"red\">Undefined Error</font></b>: "+location+" was not synced. Please check its properties and try again later.");
+                    m_errors.append("<b><font color=\"red\">Undefined Error</font></b>: Valid target index "+QString::number(target_index)+" was not synced. Please check its properties and try again later.");
                 }
             }
 
@@ -409,7 +418,7 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
 
 }
 
-void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> target)
+void Synchronizer::syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> target)
 {
 
     QString target_db_name = target["location"].toString();
@@ -418,7 +427,6 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
     Index *targetIndex;
     Query *targetQuery;
 
-    Database *sourceDb;
     Index *sourceIndex;
     Query *sourceQuery;
 
@@ -450,12 +458,17 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
         sourceDb = sourceIndex->getDatabase();
     }
 
+    if(sourceDb == NULL || targetDb == NULL){
+        m_errors.append("<b><font color=\"Red\">Error</font></b>: Either the source or target database does not exist or is not active.");
+        return;
+    }
+
     QMap<QString,QVariant> lastSyncInformation;
 
     lastSyncInformation.insert("target_replica_uid",getUidFromLocalDb(target_db_name));
     lastSyncInformation.insert("target_replica_generation","");
     lastSyncInformation.insert("target_replica_transaction_id",-1);
-    lastSyncInformation.insert("source_replica_uid",getUidFromLocalDb(source->getPath()));
+    lastSyncInformation.insert("source_replica_uid",getUidFromLocalDb(sourceDb->getPath()));
     lastSyncInformation.insert("source_replica_generation","");
     lastSyncInformation.insert("source_replica_transaction_id",-1);
 
@@ -469,7 +482,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
     if(lastSyncInformation["target_replica_uid"].toString() != "" && lastSyncInformation["target_replica_generation"].toString() != "" && lastSyncInformation["target_replica_transaction_id"].toInt() != -1 && lastSyncInformation["source_replica_uid"].toString() != "" && lastSyncInformation["source_replica_generation"].toString() != "" && lastSyncInformation["source_replica_transaction_id"].toInt() != -1)
     {
 
-        m_errors.append("<b><font color=\"green\">Log</font></b>:"+source->getPath()+" and "+target_db_name+" have previously been synced. Sync procedure will commence.");
+        m_errors.append("<b><font color=\"green\">Log</font></b>:"+sourceDb->getPath()+" and "+target_db_name+" have previously been synced. Sync procedure will commence.");
 
         //Do some syncing
 
@@ -481,7 +494,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
     }
     else{
 
-        m_errors.append("<b><font color=\"Orange\">Warning</font></b>:"+source->getPath()+" and "+target_db_name+" have no details of ever being synced.");
+        m_errors.append("<b><font color=\"Orange\">Warning</font></b>:"+sourceDb->getPath()+" and "+target_db_name+" have no details of ever being synced.");
 
         //There is a first time for everything, let's sync!
 
@@ -565,7 +578,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
                 //Update a Document from Source to Target
 
                 if(target.contains("id")){
-                    target_results.append(syncDocument(source, targetDb, sourceTransaction));
+                    target_results.append(syncDocument(sourceDb, targetDb, sourceTransaction));
                 }
         }
         else{
@@ -573,7 +586,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
             //New Document from Source to Target
 
             if(target.contains("id")){
-                target_results.append(syncDocument(source, targetDb, sourceTransaction));
+                target_results.append(syncDocument(sourceDb, targetDb, sourceTransaction));
             }
 
         }
@@ -588,7 +601,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
                 //Update a Document from Target to Source
 
                 if(target.contains("id")){
-                    source_results.append(syncDocument(targetDb, source, targetTransaction));
+                    source_results.append(syncDocument(targetDb, sourceDb, targetTransaction));
                 }
             }
         }
@@ -597,7 +610,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
             //New Document from Target to Source
 
             if(target.contains("id")){
-                source_results.append(syncDocument(targetDb, source, targetTransaction));
+                source_results.append(syncDocument(targetDb, sourceDb, targetTransaction));
             }
         }
     }

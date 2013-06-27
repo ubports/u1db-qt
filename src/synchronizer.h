@@ -70,7 +70,7 @@ public:
 
     void syncWithLocalTarget(Database *source, Database *target, bool resolve_to_source);
     void syncWithRemoteTarget(Database *source, QString target_url, bool resolve_to_source);
-    void syncLocalToLocal(Database *source, QMap<QString,QVariant> target);
+    void syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> target);
     void synchronizeTargets(Database *source, QVariant targets);
     QVariant syncDocument(Database *from, Database *to, QString docId);
     QString getUidFromLocalDb(QString dbFileName);
