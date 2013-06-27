@@ -60,6 +60,7 @@ public:
     void updateDocRevisionNumber(QString doc_id,QString revision);
     void updateSyncLog(bool insert, QString uid, QString generation, QString transaction_id);
     QList<QString> listTransactionsSince(int generation);
+    QMap<QString,QVariant> getSyncLogInfo(QMap<QString,QVariant> lastSyncInformation, QString uid, QString prefix);
 
 
 

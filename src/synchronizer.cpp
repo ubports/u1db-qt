@@ -459,7 +459,7 @@ void Synchronizer::syncLocalToLocal(Database *source, QMap<QString,QVariant> tar
     lastSyncInformation.insert("source_replica_generation","");
     lastSyncInformation.insert("source_replica_transaction_id",-1);
 
-    lastSyncInformation = getLastSyncInformation(source, false, lastSyncInformation, target);
+    lastSyncInformation = getLastSyncInformation(sourceDb, targetDb, false, lastSyncInformation);
 
     QList<QString> transactionsFromSource;
     QList<QString> transactionsFromTarget;
@@ -690,12 +690,11 @@ QVariant Synchronizer::syncDocument(Database *from, Database *to, QString docId)
     return document;
 }
 
-QMap<QString,QVariant> Synchronizer::getLastSyncInformation(Database *source, bool remote, QMap<QString,QVariant> lastSyncInformation,QMap<QString,QVariant> target){
+QMap<QString,QVariant> Synchronizer::getLastSyncInformation(Database *sourceDb, Database *targetDb, bool remote, QMap<QString,QVariant> lastSyncInformation){
 
     if(remote == true){
 
-        QString location = target["location"].toString();
-        m_errors.append("<b><font color=\"red\">Error</font></b>: Remote database sync is under construction. "+location+" was not synced. Try again later.");
+        m_errors.append("<b><font color=\"red\">Error</font></b>: Remote database sync is under construction. Nothing was synced. Try again later.");
 
         return lastSyncInformation;
 
@@ -704,9 +703,9 @@ QMap<QString,QVariant> Synchronizer::getLastSyncInformation(Database *source, bo
 
         lastSyncInformation["source_replica_uid"].toString();
 
-        lastSyncInformation = getSyncLogInfoFromLocalDb(lastSyncInformation, target["location"].toString(),lastSyncInformation["source_replica_uid"].toString(),"target");
+        lastSyncInformation = targetDb->getSyncLogInfo(lastSyncInformation, lastSyncInformation["source_replica_uid"].toString(),"target");
 
-        lastSyncInformation = getSyncLogInfoFromLocalDb(lastSyncInformation, source->getPath(),lastSyncInformation["target_replica_uid"].toString(),"source");
+        lastSyncInformation = sourceDb->getSyncLogInfo(lastSyncInformation, lastSyncInformation["target_replica_uid"].toString(),"source");
 
     }
 
@@ -714,49 +713,6 @@ QMap<QString,QVariant> Synchronizer::getLastSyncInformation(Database *source, bo
 
 }
 
-QMap<QString,QVariant> Synchronizer::getSyncLogInfoFromLocalDb(QMap<QString,QVariant> lastSyncInformation, QString dbFileName, QString uid, QString prefix){
-
-    QString searchString = "SELECT known_transaction_id, known_generation FROM sync_log WHERE replica_uid = '"+uid +"'";
-
-    QSqlDatabase db;
-
-    db = QSqlDatabase::addDatabase("QSQLITE",QUuid::createUuid().toString());
-
-    QFile db_file(dbFileName);
-
-    if(!db_file.exists())
-    {
-        m_errors.append("<b><font color\"red\">Error</font></b>: Local database " + dbFileName + " does not exist.");
-        return lastSyncInformation;
-    }
-    else
-    {
-
-        db.setDatabaseName(dbFileName);
-        if (!db.open()){
-            m_errors.append(db.lastError().text());
-        }
-        else{
-
-            QSqlQuery query (db.exec(searchString));
-
-            if(!query.lastError().isValid() && query.next()){
-                lastSyncInformation.insert(prefix + "_replica_generation", query.value(1).toInt());
-                lastSyncInformation.insert(prefix + "_replica_transaction_id",query.value(0).toString());
-                db.close();
-                return lastSyncInformation;
-            }
-            else{
-                m_errors.append(db.lastError().text());
-                db.close();
-                return lastSyncInformation;
-            }
-        }
-
-    }
-
-    return lastSyncInformation;
-}
 
 QString Synchronizer::getUidFromLocalDb(QString dbFileName)
 {

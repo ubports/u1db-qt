@@ -790,6 +790,41 @@ QList<QString> Database::listTransactionsSince(int generation){
 
 }
 
+QMap<QString,QVariant> Database::getSyncLogInfo(QMap<QString,QVariant> lastSyncInformation, QString uid, QString prefix){
+
+    if (!initializeIfNeeded())
+        return lastSyncInformation;
+
+    QString queryStmt = "SELECT known_transaction_id, known_generation FROM sync_log WHERE replica_uid = '"+uid +"'";
+
+    QSqlQuery query(m_db.exec());
+
+    if (query.exec(queryStmt))
+    {
+        while (query.next())
+        {
+            lastSyncInformation.insert(prefix + "_replica_generation", query.value(1).toInt());
+            lastSyncInformation.insert(prefix + "_replica_transaction_id",query.value(0).toString());
+            return lastSyncInformation;
+        }
+
+    }
+
+    /* Below does not work from the Database class.
+     * This is leftover from the migration of this function
+     * from the Synchronizer class.
+     *
+     * Why is it left here? As a reminder to do something to
+     * resolve the issue of not being able to update Sychnronizer's
+     * m_errors from the Database class.
+     */
+
+    //m_errors.append(m_db.lastError().text());
+
+
+    return lastSyncInformation;
+}
+
 
 
 QT_END_NAMESPACE_U1DB
