@@ -15,7 +15,8 @@ Build-Depends: debhelper (>= 9),
                ubuntu-ui-toolkit-doc,
                qtdeclarative5-dev-tools
 Standards-Version: 3.9.3
-Vcs-Bzr: https://launchpad.net/u1db-qt/trunk
+Homepage: https://launchpad.net/u1db-qt
+Vcs-Bzr: https://code.launchpad.net/u1db-qt/trunk
 
 Package: libu1db-qt5-1
 Architecture: any

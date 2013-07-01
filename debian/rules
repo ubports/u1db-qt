@@ -10,9 +10,7 @@ export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 	dh $@ --parallel
 
 override_dh_auto_configure:
-	PATH=/opt/qt5/bin:$(PATH) \
-	dh_auto_configure -- -DCMAKE_MODULE_PATH=/opt/qt5/lib/cmake \
-	-DLD_LIBRARY_PATH=/opt/qt5/lib:$(LD_LIBRARY_PATH) -DBUILD_DOCS=ON
+	dh_auto_configure -- -DBUILD_DOCS=ON
 
 override_dh_auto_build:
 	dh_auto_build

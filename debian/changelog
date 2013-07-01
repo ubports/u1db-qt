@@ -1,3 +1,9 @@
+u1db-qt (0.1.5ubuntu1) UNRELEASED; urgency=low
+
+  * Debian packaging tweaks according to https://wiki.ubuntu.com/DailyRelease/InlinePackaging
+
+ -- Christian Dywan <christian.dywan@canonical.com>  Mon, 01 Jul 2013 14:37:36 +0200
+
 u1db-qt (0.1.5) quantal; urgency=low
   * Add .index file for cross-linking to -doc package and set URL
 
