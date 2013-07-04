@@ -99,6 +99,7 @@ private:
 
     void onSyncChanged(bool synchronize);
     void remoteGetSyncInfoFinished(QNetworkReply* reply);
+    void remotePostSyncInfoFinished(QNetworkReply* reply);
 
 };
 

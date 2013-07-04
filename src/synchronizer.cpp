@@ -295,50 +295,74 @@ emitted after the model has been reset.
     }
 }
 
-void Synchronizer::remoteGetSyncInfoFinished(QNetworkReply* reply)
+
+void Synchronizer::remotePostSyncInfoFinished(QNetworkReply* reply)
 {
 
-    //qDebug() << reply->error;
-
-    qDebug() << reply->errorString();
-
-    qDebug() << reply->isReadable();
-
-    qDebug() << reply->isOpen();
-
-    qDebug() << reply->rawHeaderList();
+    QUrl postUrl = reply->request().url();
 
     QByteArray data = reply->readAll();
 
-    qDebug() << data;
+    QString replyData = QString(data);
+
+    qDebug() << replyData;
+
+    reply->close();
+
+}
+
+void Synchronizer::remoteGetSyncInfoFinished(QNetworkReply* reply)
+{
+
+    QUrl postUrl = reply->request().url();
+
+    QByteArray data = reply->readAll();
 
     QString replyData = QString(data);
 
     reply->close();
 
-    //POST /thedb/sync-from/my_replica_uid
+    QVariantMap replyMap;
 
-    /* Below is commented out until all required information becomes available
-    QString source_uid = need-to-get-this-info;
-    QString post_string = need-to-get-this-info+"/sync-from/"+source_uid;
-    QString url_string = "http://127.0.0.1";
-// Above should not be hard coded, but need a work around to get this information
-    QString full_get_request = url_string+"/"+get_string;
+    QJsonDocument replyJson = QJsonDocument::fromJson(replyData.toUtf8());
+    qDebug() << replyJson;
+
+    QVariant replyVariant = replyJson.toVariant();
+
+    replyMap = replyVariant.toMap();
+
+    double source_replica_generation = replyMap["source_replica_generation"].toDouble();
+    QString source_replica_uid = replyMap["source_replica_uid"].toString();
+    QString source_transaction_id = replyMap["source_transaction_id"].toString();
+    double target_replica_generation = replyMap["target_replica_generation"].toDouble();
+    QString target_replica_transaction_id = replyMap["target_replica_transaction_id"].toString();
+    QString target_replica_uid = replyMap["target_replica_uid"].toString();
+
+    qDebug() << source_replica_generation;
+    qDebug() << source_replica_uid;
+    qDebug() << source_transaction_id;
+    qDebug() << target_replica_generation;
+    qDebug() << target_replica_transaction_id;
+    qDebug() << target_replica_uid;
+
+    QNetworkRequest request(postUrl);
+
+    request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-u1db-sync-stream");
 
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
 
-
-    QUrl url(full_get_request);
-    url.setPort(7777);
-
-
-    QNetworkRequest request(url);
-
     connect(manager, &QNetworkAccessManager::finished, this, &Synchronizer::remotePostSyncInfoFinished);
 
-    QNetworkReply *reply = manager->get(QNetworkRequest(request));
+    QString postData;
 
-    */
+    postData = "[\r\n";
+    postData += "{json_object},\r\n";
+    postData += "{\"last_known_generation\": 0, \"last_known_trans_id\": \"\"},\r\n";
+    postData += "]";
+
+    QNetworkReply *nextReply = manager->post(QNetworkRequest(request),postData.toUtf8());
+
+    qDebug()<<nextReply->errorString() << " " << postData.toUtf8();
 
 
 }
@@ -471,9 +495,6 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
                         QNetworkRequest request(url);
 
                         connect(manager, &QNetworkAccessManager::finished,                                this, &Synchronizer::remoteGetSyncInfoFinished);
-
-                        //QObject::connect(this, &Synchronizer::syncChanged, this, &Synchronizer::onSyncChanged);
-
 
                         QNetworkReply *reply = manager->get(QNetworkRequest(request));
 
