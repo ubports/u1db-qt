@@ -295,6 +295,54 @@ emitted after the model has been reset.
     }
 }
 
+void Synchronizer::remoteGetSyncInfoFinished(QNetworkReply* reply)
+{
+
+    //qDebug() << reply->error;
+
+    qDebug() << reply->errorString();
+
+    qDebug() << reply->isReadable();
+
+    qDebug() << reply->isOpen();
+
+    qDebug() << reply->rawHeaderList();
+
+    QByteArray data = reply->readAll();
+
+    qDebug() << data;
+
+    QString replyData = QString(data);
+
+    reply->close();
+
+    //POST /thedb/sync-from/my_replica_uid
+
+    /* Below is commented out until all required information becomes available
+    QString source_uid = need-to-get-this-info;
+    QString post_string = need-to-get-this-info+"/sync-from/"+source_uid;
+    QString url_string = "http://127.0.0.1";
+// Above should not be hard coded, but need a work around to get this information
+    QString full_get_request = url_string+"/"+get_string;
+
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+
+
+    QUrl url(full_get_request);
+    url.setPort(7777);
+
+
+    QNetworkRequest request(url);
+
+    connect(manager, &QNetworkAccessManager::finished, this, &Synchronizer::remotePostSyncInfoFinished);
+
+    QNetworkReply *reply = manager->get(QNetworkRequest(request));
+
+    */
+
+
+}
+
 /*!
  * \brief Synchronizer::getValidTargets confirms that each sync target definition is valid.
  * \param validator
@@ -403,6 +451,33 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
                 else if(target_map.contains("remote")&&target_map["remote"]==true){
                     if(target_map.contains("sync")&&target_map["sync"]==true){
                         m_errors.append("<b><font color=\"red\">Error</font></b>: Remote database sync is under construction. Valid target index "+QString::number(target_index)+" was not synced. Try again later.");
+                        //ip
+                        //port
+                        //name
+                        //GET /thedb/sync-from/my_replica_uid
+
+                        QString source_uid = getUidFromLocalDb(source->getPath());
+                        QString get_string = target_map["name"].toString()+"/sync-from/"+source_uid;
+                        QString url_string = "http://"+target_map["ip"].toString();
+                        QString full_get_request = url_string+"/"+get_string;
+
+                        QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+
+
+                        QUrl url(full_get_request);
+                        url.setPort(7777);
+
+
+                        QNetworkRequest request(url);
+
+                        connect(manager, &QNetworkAccessManager::finished,                                this, &Synchronizer::remoteGetSyncInfoFinished);
+
+                        //QObject::connect(this, &Synchronizer::syncChanged, this, &Synchronizer::onSyncChanged);
+
+
+                        QNetworkReply *reply = manager->get(QNetworkRequest(request));
+
+                        qDebug() << "Reply: " << reply->errorString();
 
                     }
                 }

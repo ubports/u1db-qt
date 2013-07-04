@@ -89,7 +89,9 @@ Item {
                    id:aTargetQuery.index.database,
                    resolve_to_source:true},
                {remote:true,
-                   location:"http://somewhere/aTargetDatabase6",
+                   ip:"127.0.0.1",
+                   port:":7777",
+                   name:"example1.u1db",
                    resolve_to_source:true},
                {remote:"OK"}]
            synchronize: false

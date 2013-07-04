@@ -29,6 +29,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${Qt5Core_INCLUDE_DIRS}
+    ${Qt5Network_INCLUDE_DIRS}
     ${Qt5Sql_INCLUDE_DIRS}
     ${U1DB_INCLUDE_DIRS}
     )
@@ -37,6 +38,7 @@ add_library(${U1DB_QT_LIBNAME} SHARED ${U1DB_QT_SRCS} ${U1DB_QT_RCC})
 target_link_libraries(${U1DB_QT_LIBNAME}
     ${Qt5Core_LIBRARIES}
     ${Qt5Sql_LIBRARIES}
+    ${Qt5Network_LIBRARIES}
     ${U1DB_LDFLAGS}
     )
 

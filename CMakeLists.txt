@@ -7,11 +7,12 @@ set(CMAKE_AUTOMOC ON)
 # Dependencies
 include(FindPkgConfig)
 find_package(Qt5Core REQUIRED)
+find_package(Qt5Network REQUIRED)
 find_package(Qt5Sql REQUIRED)
 add_definitions(-DWITHQT5=1)
 
 set(U1DB_QT_LIBNAME u1db-qt5)
-set(QT_PKGCONFIG_DEPENDENCIES "Qt5Core Qt5Quick Qt5Sql")
+set(QT_PKGCONFIG_DEPENDENCIES "Qt5Core Qt5Network Qt5Quick Qt5Sql")
 set(QT_U1DB_PKGCONFIG_FILE lib${U1DB_QT_LIBNAME}.pc)
 
 # Build flags

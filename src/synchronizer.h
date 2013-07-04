@@ -24,6 +24,9 @@
 #include <QSqlDatabase>
 #include <QVariant>
 #include <QMetaType>
+#include <QtNetwork>
+#include <QNetworkAccessManager>
+
 
 #include "database.h"
 #include "index.h"
@@ -72,8 +75,11 @@ public:
     void syncWithRemoteTarget(Database *source, QString target_url, bool resolve_to_source);
     void syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> target);
     void synchronizeTargets(Database *source, QVariant targets);
-    QVariant syncDocument(Database *from, Database *to, QString docId);
+
+    QVariant syncDocument(Database *from, Database *to, QString docId); 
     QString getUidFromLocalDb(QString dbFileName);
+
+
 
 
 Q_SIGNALS:
@@ -92,6 +98,7 @@ private:
     QList<QString> m_errors;
 
     void onSyncChanged(bool synchronize);
+    void remoteGetSyncInfoFinished(QNetworkReply* reply);
 
 };
 
