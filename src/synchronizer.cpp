@@ -325,7 +325,6 @@ void Synchronizer::remoteGetSyncInfoFinished(QNetworkReply* reply)
     QVariantMap replyMap;
 
     QJsonDocument replyJson = QJsonDocument::fromJson(replyData.toUtf8());
-    qDebug() << replyJson;
 
     QVariant replyVariant = replyJson.toVariant();
 
@@ -338,13 +337,6 @@ void Synchronizer::remoteGetSyncInfoFinished(QNetworkReply* reply)
     QString target_replica_transaction_id = replyMap["target_replica_transaction_id"].toString();
     QString target_replica_uid = replyMap["target_replica_uid"].toString();
 
-    qDebug() << source_replica_generation;
-    qDebug() << source_replica_uid;
-    qDebug() << source_transaction_id;
-    qDebug() << target_replica_generation;
-    qDebug() << target_replica_transaction_id;
-    qDebug() << target_replica_uid;
-
     QNetworkRequest request(postUrl);
 
     request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-u1db-sync-stream");
@@ -356,8 +348,16 @@ void Synchronizer::remoteGetSyncInfoFinished(QNetworkReply* reply)
     QString postData;
 
     postData = "[\r\n";
-    postData += "{json_object},\r\n";
     postData += "{\"last_known_generation\": 0, \"last_known_trans_id\": \"\"},\r\n";
+
+    QList<QString> transactions = m_source->listTransactionsSince(source_replica_generation);
+
+    Q_FOREACH(QString transaction,transactions){
+        QStringList transactionData = transaction.split("|");
+        postData +=  "{\"id\": \""+transactionData[1]+"\", \"rev\": \""+m_source->getCurrentDocRevisionNumber(transactionData[1])+"\", \"content\": \"{}\", \"generation\": "+transactionData[0]+", \"trans_id\": \""+transactionData[2]+"\"},\r\n";
+    }
+
+
     postData += "]";
 
     QNetworkReply *nextReply = manager->post(QNetworkRequest(request),postData.toUtf8());
