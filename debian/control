@@ -14,12 +14,13 @@ Build-Depends: debhelper (>= 9),
                qttools5-dev-tools,
                ubuntu-ui-toolkit-doc,
                qtdeclarative5-dev-tools
-Standards-Version: 3.9.3
+Standards-Version: 3.9.4
 Homepage: https://launchpad.net/u1db-qt
 Vcs-Bzr: https://code.launchpad.net/u1db-qt/trunk
 
-Package: libu1db-qt5-1
+Package: libu1db-qt5-3
 Architecture: any
+Pre-Depends: dpkg (>= 1.15.6~), ${misc:Pre-Depends}
 Depends: ${shlibs:Depends},
          ${misc:Depends},
          qtdeclarative5-qtquick2-plugin,
@@ -31,7 +32,7 @@ Package: libu1db-qt5-dev
 Section: libdevel
 Architecture: any
 Depends: ${misc:Depends},
-         libu1db-qt5-1 (= ${binary:Version}),
+         libu1db-qt5-3 (= ${binary:Version}),
          qtdeclarative5-dev,
          qtbase5-dev
 Description: Qt5 binding and QtQuick2 plugin for U1DB - development files
@@ -43,17 +44,17 @@ Package: libu1db-qt5-examples
 Section: doc
 Architecture: all
 Depends: ${misc:Depends},
-         libu1db-qt5-1 (= ${binary:Version})
+         libu1db-qt5-3 (>= ${source:Version})
 Description: Qt5 binding and QtQuick2 plugin for U1DB - examples
  Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
  .
- This package contains the examples demonstrating the use of the Qt binding for U1DB
+ This package contains examples showcasing the use of the Qt binding for U1DB
 
 Package: libu1db-qt5-doc
 Section: doc
 Architecture: all
 Depends: ${misc:Depends},
-         libu1db-qt5-1 (= ${binary:Version}),
+         libu1db-qt5-3 (>= ${source:Version}),
          qttools5-dev-tools
 Description: Qt5 binding and QtQuick2 plugin for U1DB - offline documentation
  Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
