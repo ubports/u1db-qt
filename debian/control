@@ -3,6 +3,7 @@ Section: libs
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Build-Depends: debhelper (>= 9),
+               devscripts,
                cmake (>= 2.8.6),
                qtdeclarative5-dev,
                qtbase5-dev,

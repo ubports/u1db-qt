@@ -46,3 +46,5 @@ if (BUILD_PYTHON)
     endif ()
 endif ()
 
+add_test(NAME licensetest COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/checklicense.sh" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+
