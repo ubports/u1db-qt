@@ -1,4 +1,4 @@
-u1db-qt (0.1.5ubuntu1) UNRELEASED; urgency=low
+u1db-qt (0.1.5-0ubuntu1) UNRELEASED; urgency=low
 
   * Debian packaging tweaks according to
     https://wiki.ubuntu.com/DailyRelease/InlinePackaging
