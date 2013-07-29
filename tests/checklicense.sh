@@ -16,7 +16,7 @@
 #
 ################################################################################
 PATTERN='\.(c(c|pp|xx)?|h(h|pp|xx)?|p(l|m)|php|py(|x)|java|js|css|vala|qml|sh)$'
-SKIP='(_build|Canonical|GENERATED FILE|Yahoo! Inc. All rights reserved)'
+SKIP='(_build|CMakeFiles|Canonical|GENERATED FILE|Yahoo! Inc. All rights reserved)'
 COMMAND="licensecheck --noconf -r * --copyright -c $PATTERN"
 echo Executing $COMMAND
 RESULTS=$($COMMAND)
