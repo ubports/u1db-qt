@@ -2,7 +2,7 @@ add_custom_target(check COMMAND "env" "CTEST_OUTPUT_ON_FAILURE=1" "${CMAKE_CTEST
 
 find_package(Qt5Test REQUIRED)
 
-add_test(NAME plugintest COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/strict-qmltestrunner" "-platform" "minimal" "-import" "../modules" "-xunitxml" "-o" "plugintest-xunit.xml" "-input" "${CMAKE_CURRENT_SOURCE_DIR}")
+add_test(NAME plugintest COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/strict-qmltestrunner.sh" "-platform" "minimal" "-import" "../modules" "-xunitxml" "-o" "plugintest-xunit.xml" "-input" "${CMAKE_CURRENT_SOURCE_DIR}")
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -45,4 +45,6 @@ if (BUILD_PYTHON)
         add_custom_command(TARGET u1dbqt POST_BUILD COMMAND ${CMAKE_COMMAND} -E create_symlink libu1dbqt.so u1dbqt.so)
     endif ()
 endif ()
+
+add_test(NAME licensetest COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/checklicense.sh" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
