@@ -7,12 +7,11 @@ Copyright: (C) 2011-2013 Canonical Ltd.
 License: LGPL-3
 
 License: LGPL-3
- This library is free software: you can redistribute it and/or modify
- it under the terms of the GNU Lesser General Public License as published
- by the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published by
+ the Free Software Foundation; version 3.
  .
- This package is distributed in the hope that it will be useful,
+ This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
@@ -22,10 +21,6 @@ License: LGPL-3
  .
  On Debian systems, the complete text of the GNU Lesser General
  Public License can be found in "/usr/share/common-licenses/LGPL-3".
-
-Files: debian/*
-Copyright: 2013 Canonical Ltd.
-License: LGPL-3
 
 Files: documentation/style/reset.css
 Copyright: 2010, Yahoo! Inc.
