@@ -21,6 +21,7 @@ Vcs-Bzr: https://code.launchpad.net/u1db-qt/trunk
 
 Package: libu1db-qt5-3
 Architecture: any
+Multi-Arch: same
 Pre-Depends: dpkg (>= 1.15.6~),
              ${misc:Pre-Depends},
 Depends: libqt5sql5-sqlite,
@@ -29,6 +30,22 @@ Depends: libqt5sql5-sqlite,
          ${shlibs:Depends},
 Description: Qt5 binding and QtQuick2 plugin for U1DB - shared library
  Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
+ .
+ This package contains the shared library.
+
+Package: qtdeclarative5-u1db-plugin
+Architecture: any
+Multi-Arch: same
+Pre-Depends: dpkg (>= 1.15.6~),
+             ${misc:Pre-Depends},
+Depends: libqt5sql5-sqlite,
+         qtdeclarative5-qtquick2-plugin,
+         ${misc:Depends},
+         ${shlibs:Depends},
+Description: Qt5 binding and QtQuick2 plugin for U1DB - QML plugin
+ Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
+ .
+ This package contains the QML plugin.
 
 Package: libu1db-qt5-dev
 Section: libdevel

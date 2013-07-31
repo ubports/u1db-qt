@@ -47,7 +47,7 @@ set_target_properties(${U1DB_QT_LIBNAME} PROPERTIES
 set(INCLUDE_INSTALL_DIR include/lib${U1DB_QT_LIBNAME})
 
 install(TARGETS ${U1DB_QT_LIBNAME}
-    LIBRARY DESTINATION lib${LIB_SUFFIX}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 
 install(FILES global.h database.h document.h index.h query.h

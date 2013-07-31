@@ -6,6 +6,7 @@ set(CMAKE_AUTOMOC ON)
 
 # Dependencies
 include(FindPkgConfig)
+include(GNUInstallDirs)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Sql REQUIRED)
 add_definitions(-DWITHQT5=1)
@@ -32,11 +33,13 @@ add_subdirectory(qtcreator)
 # PkgConfig file
 set (PREFIX "${CMAKE_INSTALL_PREFIX}")
 set (EXEC_PREFIX "${CMAKE_INSTALL_PREFIX}")
+set(libdir "${CMAKE_INSTALL_FULL_LIBDIR}")
+set(includedir "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
 
 configure_file (libu1db-qt.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/${QT_U1DB_PKGCONFIG_FILE} @ONLY)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${QT_U1DB_PKGCONFIG_FILE}
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
     )
 

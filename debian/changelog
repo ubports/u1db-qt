@@ -5,7 +5,7 @@ u1db-qt (0.1.5-0ubuntu1) UNRELEASED; urgency=low
     https://wiki.ubuntu.com/DailyRelease/InlinePackaging
 
   [ Timo Jyrinki ]
-  * Automatic snapshot from revision 94 (bootstrap)
+  * Automatic snapshot from revision 96 (bootstrap)
 
  -- Christian Dywan <christian.dywan@canonical.com>  Mon, 01 Jul 2013 14:37:36 +0200
 
