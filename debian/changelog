@@ -10,26 +10,31 @@ u1db-qt (0.1.5-0ubuntu1) UNRELEASED; urgency=low
  -- Christian Dywan <christian.dywan@canonical.com>  Mon, 01 Jul 2013 14:37:36 +0200
 
 u1db-qt (0.1.5) quantal; urgency=low
+
   * Add .index file for cross-linking to -doc package and set URL
 
  -- Christian Dywan <christian.dywan@canonical.com>  Mon, 13 May 2013 10:58:01  +0200
 
 u1db-qt (0.1.4) quantal; urgency=low
+
   * Add qch file for QtCreator to -dev package
  
  -- Christian Dywan <christian.dywan@canonical.com>  Wed, 02 May 2013 14:21:33  -0700
 
 u1db-qt (0.1.3) quantal; urgency=low
+
   * Add QtCreator Application templates and plugins.qmltypes to -dev package
  
  -- Christian Dywan <christian.dywan@canonical.com>  Wed, 01 May 2013 10:40:08  -0700
 
 u1db-qt (0.1.2) quantal; urgency=low
+
   * Documentation packages -doc and -examples
  
  -- Christian Dywan <christian.dywan@canonical.com>  Tue, 23 Apr 2013 12:58:11  +0100
 
 u1db-qt (0.1.1-0ubuntu1) quantal; urgency=low
+
   * Added .install files
   * Corrected dependencies
   * Drop obsolete -DWITHQT5=1 flag
