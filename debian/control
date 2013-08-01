@@ -28,12 +28,12 @@ Depends: libqt5sql5-sqlite,
          qtdeclarative5-qtquick2-plugin,
          ${misc:Depends},
          ${shlibs:Depends},
-Description: Qt5 binding and QtQuick2 plugin for U1DB - shared library
+Description: Qt5 binding for U1DB - shared library
  Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
  .
  This package contains the shared library.
 
-Package: qtdeclarative5-u1db-plugin
+Package: qtdeclarative5-u1db1.0
 Architecture: any
 Multi-Arch: same
 Pre-Depends: dpkg (>= 1.15.6~),
@@ -42,7 +42,7 @@ Depends: libqt5sql5-sqlite,
          qtdeclarative5-qtquick2-plugin,
          ${misc:Depends},
          ${shlibs:Depends},
-Description: Qt5 binding and QtQuick2 plugin for U1DB - QML plugin
+Description: Qt5 binding for U1DB - QtQuick2 QML plugin
  Simple Qt5 binding and QtQuick2 plugin for U1DB (https://launchpad.net/u1db).
  .
  This package contains the QML plugin.
