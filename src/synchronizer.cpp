@@ -935,22 +935,11 @@ void Synchronizer::postDataFromClientToRemoteServer(Database *source, QUrl postU
     Q_FOREACH(QString transaction,transactions){
         QStringList transactionData = transaction.split("|");
 
-        /*
-         * NOTE: 'content' is hard coded at the moment.
-         * This is incorrect and needs to be changed ASAP.
-         *
-         */
-
         QString content = source->getDocumentContents(transactionData[1]);
         content = content.replace("\r\n","");
         content = content.replace("\r","");
         content = content.replace("\n","");
         content = content.replace("\"","\\\"");
-
-        //qDebug() << "content: " << content;
-
-        //content = "{\\\"hello\\\":\\\"world\\\"}";
-
 
         postString.append(",\r\n{\"content\": \""+content+"\",\"rev\": \""+m_source->getCurrentDocRevisionNumber(transactionData[1])+"\", \"id\": \""+transactionData[1]+"\",\"trans_id\": \""+transactionData[2]+"\",\"gen\": "+transactionData[0]+"}");
 
