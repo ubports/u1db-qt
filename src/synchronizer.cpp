@@ -509,18 +509,6 @@ void Synchronizer::syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> t
     Index *sourceIndex;
     Query *sourceQuery;
 
-    /*
-     * ##KW## The two lists below are currently not used for anything
-     * as they were added for functionality that turned out not to be
-     * necessary. They are left here in case they might be convenient
-     * for something else.
-     *
-     * Note: These relate to the function syncDocument's return value.
-     */
-
-    QList<QVariant> source_results;
-    QList<QVariant> target_results;
-
     if(target.contains("id")){
         targetDb = (Database*)target["id"].value<QObject*>();
     }
@@ -640,70 +628,7 @@ void Synchronizer::syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> t
         if(!transactionIdsFromTarget.contains(transactionDetails[1]))
             transactionIdsFromTarget.append(transactionDetails[1]);
 
-    }
-
-    /*!
-     * The transactions IDs are searched for in the list of changes
-     * from the other database since the last sync (or from the start
-     * if this is the first sync) to determine whether to update an
-     * existing document, or create a new one, depending on conditions.
-     */
-
-    Q_FOREACH(QString sourceTransaction, transactionIdsFromSource){
-
-        if(transactionIdsFromTarget.contains(sourceTransaction)){
-            if(target["resolve_to_source"].toBool()==true)
-
-                //Update a Document from Source to Target
-
-                if(target.contains("id")){
-                    target_results.append(syncDocument(sourceDb, targetDb, sourceTransaction));
-                }
-        }
-        else{
-
-            //New Document from Source to Target
-
-            if(target.contains("id")){
-                target_results.append(syncDocument(sourceDb, targetDb, sourceTransaction));
-            }
-
-        }
-
-    }
-
-    Q_FOREACH(QString targetTransaction, transactionIdsFromTarget){
-
-        if(transactionIdsFromSource.contains(targetTransaction)){
-            if(target["resolve_to_source"].toBool()==false){
-
-                //Update a Document from Target to Source
-
-                if(target.contains("id")){
-                    source_results.append(syncDocument(targetDb, sourceDb, targetTransaction));
-                }
-            }
-        }
-        else{
-
-            //New Document from Target to Source
-
-            if(target.contains("id")){
-                source_results.append(syncDocument(targetDb, sourceDb, targetTransaction));
-            }
-        }
-    }
-    
-    
-    if(lastSyncInformation["target_replica_transaction_id"].toInt()==-1&&lastSyncInformation["source_replica_transaction_id"].toInt()==-1){
-        //targetDb->updateSyncLog(true, QString uid, QString generation, QString transaction_id);
-        //sourceDb->updateSyncLog(true, QString uid, QString generation, QString transaction_id);
-    }
-    else{
-        //targetDb->updateSyncLog(false, QString uid, QString generation, QString transaction_id);
-        //sourceDb->updateSyncLog(true, QString uid, QString generation, QString transaction_id);
-    }
-    
+    }   
 
 
     /* The source replica asks the target replica for the information it has stored about the last time these two replicas were synchronised (if ever).*/
