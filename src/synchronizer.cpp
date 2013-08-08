@@ -1022,12 +1022,10 @@ void Synchronizer::processDataFromRemoteServer(Database *source, QString replyDa
             if(index == 0)
             {
                 // Meta data
-                //qDebug() << "Meta Data: " << map;
             }
             else
             {
                 // Document to update
-                //qDebug() << "Document: " << map;
 
                 QString id("");
                 QVariant content("");
