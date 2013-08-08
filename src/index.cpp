@@ -147,17 +147,6 @@ Index::setExpression(QStringList expression)
         return;
 
     m_expression = expression;
-<<<<<<< TREE
-
-    if (m_database)
-    {
-        m_database->putIndex(m_name, expression);
-        Q_EMIT dataInvalidated();
-    }
-
-
-=======
->>>>>>> MERGE-SOURCE
 
     if (m_database)
     {

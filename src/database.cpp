@@ -106,11 +106,8 @@ Database::initializeIfNeeded(const QString& path)
     /* A unique ID is used for the connection name to ensure that we aren't
        re-using or replacing other opend databases. */
     if (!m_db.isValid())
-<<<<<<< TREE
         m_db = QSqlDatabase::addDatabase("QSQLITE",QUuid::createUuid().toString());
-=======
-        m_db = QSqlDatabase::addDatabase("QSQLITE", QUuid::createUuid().toString());
->>>>>>> MERGE-SOURCE
+
     if (!m_db.isValid())
         return setError("QSqlDatabase error");
     m_db.setDatabaseName(path);
