@@ -87,7 +87,17 @@ QT_BEGIN_NAMESPACE_U1DB
     Example use with u1db-serve:
 
     1. In a terminal cd into a directory where u1db has been downloaded/branched.
-    2. Create a database called 'example1.u1db' using u1db (see here: http://pythonhosted.org/u1db/quickstart.html).
+    2. Using Python create a database called 'example1.u1db' using u1db, and a document 'helloworld':
+
+        # python
+
+            >>> import u1db
+            >>> db = u1db.open("example1.u1db",create=True)
+            >>> content = {"hello": { "world": { "message":"Hello World Updated" } } }
+            >>> db.create_doc(content, doc_id="helloworld")
+
+        ctrl+d
+
     3. From the u1db directory above type './u1db-serve --port=7777' and hit enter.
     4. Open another terminal tab.
     5. Change into a directory containing u1db-qt (assuming this class is included in that directory and the installed version on the host computer).
