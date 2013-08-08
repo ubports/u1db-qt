@@ -86,7 +86,7 @@ QT_BEGIN_NAMESPACE_U1DB
 
     Example use with u1db-serve:
 
-    1. In a terminal cd into a directory where u1db has been downloaded/branched.
+    1. In a terminal cd into a directory where the u1db Python reference implemented has been downloaded from lp:u1db.
     2. Using Python create a database called 'example1.u1db' using u1db, and a document 'helloworld':
 
         # python
