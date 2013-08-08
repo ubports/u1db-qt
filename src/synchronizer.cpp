@@ -875,8 +875,8 @@ void Synchronizer::postDataFromClientToRemoteServer(Database *source, QUrl postU
     QByteArray postDataSize = QByteArray::number(postString.size());
 
     QNetworkRequest request(postUrl);
-    request.setRawHeader("User-Agent", "My app name v0.1");
-    request.setRawHeader("X-Custom-User-Agent", "My app name v0.1");
+    request.setRawHeader("User-Agent", "U1Db-Qt v1.0");
+    request.setRawHeader("X-Custom-User-Agent", "U1Db-Qt v1.0");
     request.setRawHeader("Content-Type", "application/x-u1db-sync-stream");
     request.setRawHeader("Content-Length", postDataSize);
 
