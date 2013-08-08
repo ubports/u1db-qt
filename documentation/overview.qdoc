@@ -25,7 +25,7 @@
      \part General Topics
      \list
      \li \l {Tutorial} gives a quick start guide from storing a document
-     to querying a database and displaying it in Ubuntu Components.
+     to querying a database and displaying it in \l {Ubuntu User Interface Toolkit}{Ubuntu Components}.
      \li \l {Design Concepts} provides an overview of the design and
      terminology.
      \endlist

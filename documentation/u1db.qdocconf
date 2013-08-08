@@ -1,5 +1,7 @@
 project = U1Db-Qt
 description = U1Db-Qt plugin documentation
+url = http://developer.ubuntu.com/api/ubuntu-12.10/qml/u1db/
+indexes = /usr/share/ubuntu-ui-toolkit/doc/html/ubuntuuserinterfacetoolkit.index
 
 sourcedirs = ../src \
              ../documentation
@@ -62,4 +64,19 @@ qhp.projects             = U1DbQt
 qhp.U1DbQt.file          = u1dbqt.qhp
 qhp.U1DbQt.namespace     = net.launchpad.u1db-qt
 qhp.U1DbQt.virtualFolder = u1dbqt
+qhp.U1DbQt.indexTitle    = U1DbQt Reference Documentation
+qhp.U1DbQt.indexRoot     = 
+
+qhp.U1DbQt.subprojects = overview tutorial concepts
+qhp.U1DbQt.subprojects.overview.title = U1DbQt Overview
+qhp.U1DbQt.subprojects.overview.indexTitle = All Modules
+qhp.U1DbQt.subprojects.overview.selectors = class
+
+qhp.U1DbQt.subprojects.tutorial.title = U1DbQt Tutorial
+qhp.U1DbQt.subprojects.tutorial.indexTitle = Tutorial
+qhp.U1DbQt.subprojects.tutorial.selectors = fake:page,group,module
+
+qhp.U1DbQt.subprojects.concepts.title = U1DbQt Design Concepts
+qhp.U1DbQt.subprojects.concepts.indexTitle = Design Concepts
+qhp.U1DbQt.subprojects.concepts.selectors = fake:example
 

@@ -59,8 +59,6 @@ MainView {
         anchors.fill: parent
 
         Tab {
-            objectName: "Tab1"
-
             title: i18n.tr("Hello U1Db!")
 
             page: Page {

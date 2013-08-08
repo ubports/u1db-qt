@@ -1,3 +1,6 @@
-usr/lib/lib*.so
 usr/include/lib*/*.h
-usr/lib/pkgconfig/lib*.pc
+usr/lib/*/qt5/qml/*/plugins.qmltypes
+usr/lib/*/lib*.so
+usr/lib/*/pkgconfig/lib*.pc
+usr/share/qt5/doc/qch/*
+usr/share/qtcreator/templates/qml/*

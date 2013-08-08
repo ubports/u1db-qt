@@ -173,10 +173,17 @@ bool Query::queryField(QString field, QVariant value){
 
     QString value_string = value.toString();
     QVariant query = getQuery();
+    // * is the default if query is empty
+    if (!query.isValid())
+        query = QVariant(QString("*"));
     QString typeName = query.typeName();
 
-
     if(typeName == "QString")
+    {
+        QString query_string = query.toString();
+        match = queryString(query_string, value_string);
+    }
+    else if(typeName == "int")
     {
         QString query_string = query.toString();
         match = queryString(query_string, value_string);
@@ -184,6 +191,11 @@ bool Query::queryField(QString field, QVariant value){
     else if(typeName == "QVariantList")
     {
         match = iterateQueryList(query, field, value_string);
+    }
+    else
+    {
+        m_query = "";
+        qWarning("u1db: Unexpected type %s for query", qPrintable(typeName));
     }
 
     return match;
@@ -225,6 +237,11 @@ bool Query::iterateQueryList(QVariant query, QString field, QString value)
                 break;
             }
 
+        }
+        else
+        {
+            m_query = "";
+            qWarning("u1db: Unexpected type %s for query", qPrintable(typeName));
         }
 
     }

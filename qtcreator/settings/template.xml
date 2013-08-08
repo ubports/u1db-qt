@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template openeditor="main.qml" priority="2"
+    featuresRequired="QtSupport.Wizards.FeatureQtQuickProject, QtSupport.Wizards.FeatureQtQuick, QtSupport.Wizards.FeatureQtQuick.2"
+    id="QB.U1DbSettingsWithQtQuick2.0">
+    <displayname>Storing app settings in U1Db</displayname>
+    <description>A straightforward example of storing data in a U1Db document.&lt;br/&gt;The data can be displayed using standard QML items.&lt;br/&gt;&lt;br/&gt;Requires &lt;b&gt;Qt 5.0&lt;/b&gt; or newer.</description>
+</template>
