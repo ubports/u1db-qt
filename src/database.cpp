@@ -248,6 +248,32 @@ Database::getDocUnchecked(const QString& docId) const
     return QVariant();
 }
 
+QString
+Database::getDocumentContents(const QString& docId)
+{
+    if (!initializeIfNeeded())
+        return QString();
+
+    QSqlQuery query(m_db.exec());
+    query.prepare("SELECT document.doc_rev, document.content, "
+        "count(conflicts.doc_rev) AS conflicts FROM document LEFT OUTER JOIN "
+        "conflicts ON conflicts.doc_id = document.doc_id WHERE "
+        "document.doc_id = :docId GROUP BY document.doc_id, "
+        "document.doc_rev, document.content");
+    query.bindValue(":docId", docId);
+    if (query.exec())
+    {
+        if (query.next())
+        {
+            if (query.value("conflicts").toInt() > 0)
+                setError(QString("Conflicts in %1").arg(docId));
+            return query.value("content").toString();
+        }
+        return setError(QString("Failed to get document %1: No document").arg(docId)) ? QString() : QString();
+    }
+    return setError(QString("Failed to get document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? QString() : QString();
+}
+
 
 /*!
     Returns the contents of a document by \a docId in a form that QML recognizes

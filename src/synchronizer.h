@@ -79,7 +79,8 @@ public:
     QVariant syncDocument(Database *from, Database *to, QString docId); 
     QString getUidFromLocalDb(QString dbFileName);
 
-
+    void postDataFromClientToRemoteServer(Database *source, QUrl postUrl, QString replyData);
+    void processDataFromRemoteServer(Database *source, QString replyData);
 
 
 Q_SIGNALS:

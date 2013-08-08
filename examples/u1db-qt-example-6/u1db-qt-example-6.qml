@@ -90,7 +90,7 @@ Item {
                    resolve_to_source:true},
                {remote:true,
                    ip:"127.0.0.1",
-                   port:":7777",
+                   port: 7777,
                    name:"example1.u1db",
                    resolve_to_source:true},
                {remote:"OK"}]

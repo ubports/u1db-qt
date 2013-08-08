@@ -41,14 +41,60 @@ QT_BEGIN_NAMESPACE_U1DB
 
 /*
 
- Below this line are methods that are standards in declarative API design. They include the element instantiation, default settings for properties and get/set methods for properties.
+ Below this line are general methods for this class, such as setting/getting values for various properties.
 
 */
 
 /*!
-    Instantiate a new Synchronizer with an optional \a parent, usually by declaring it as a QML item.
+    Create a new Synchronizer element, with an optional \a parent, usually by declaring it as a QML item.
 
     Synchronizer elements sync two databases together, a 'source' database and a remote or local 'target' database.
+
+    Example use in a QML application:
+
+    U1db.Synchronizer{
+        id: aSynchronizer
+        synchronize: false
+        source: aDatabase
+        targets: [{remote:true,
+        ip:"127.0.0.1",
+        port: 7777,
+        name:"example1.u1db",
+        resolve_to_source:true}]
+
+    }
+
+    Short description of properties:
+
+    id: The element's identification.
+
+    bool synchronize: Is the element actively synching or not. Should be set to false.
+
+    U1DB::Database source: The id of a local database that will be used for synchronization.
+
+    QVariant targets: One or more target databases that will be synched with the local database.
+
+    bool targets.remote: Is the target database a remote or local database.
+
+    QString targets.ip: The ip address of a remote database (if applicable).
+
+    int targets.port: Port number of the remote server.
+
+    QString targets.name: The name of the database.
+
+    bool targets.resolve_to_source: In case of conflict should the sync resolve to the source's data (if true).
+
+    Example use with u1db-serve:
+
+    1. In a terminal cd into a directory where u1db has been downloaded/branched.
+    2. Create a database called 'example1.u1db' using u1db (see here: http://pythonhosted.org/u1db/quickstart.html).
+    3. From the u1db directory above type './u1db-serve --port=7777' and hit enter.
+    4. Open another terminal tab.
+    5. Change into a directory containing u1db-qt (assuming this class is included in that directory and the installed version on the host computer).
+    6. Change into the directory where u1db-qt-example-6.qml is located.
+    7. Type 'qmlscene u1db-qt-example-6.qml' and hit enter.
+    8. Click the button labelled 'Sync'.
+    9. Check the terminal windows for output from either the client or server.
 
  */
 
@@ -74,6 +120,7 @@ Synchronizer::data(const QModelIndex & index, int role) const
 /*!
     \internal
     Used to implement QAbstractListModel
+
     The number of rows: the number of documents given by the query.
  */
 int
@@ -85,8 +132,7 @@ Synchronizer::rowCount(const QModelIndex & parent) const
 /*!
     \internal
     Used to implement QAbstractListModel
-    Defines \b{errors} as the variable exposed to the Delegate in a model
-    \b{index} is supported out of the box.
+
  */
 QHash<int, QByteArray>
 Synchronizer::roleNames() const
@@ -207,11 +253,11 @@ QList<QString> Synchronizer::getErrors(){
     return m_errors;
 }
 
-
-
 /*
 
- Below this line represents the unique API methods that are not part of standard declarative API design.
+ Below this line represents the class' more unique functionality.
+ In other words, methods that do more than simply modify/retrieve
+ an element's property values.
 
 */
 
@@ -296,76 +342,6 @@ emitted after the model has been reset.
 }
 
 
-void Synchronizer::remotePostSyncInfoFinished(QNetworkReply* reply)
-{
-
-    QUrl postUrl = reply->request().url();
-
-    QByteArray data = reply->readAll();
-
-    QString replyData = QString(data);
-
-    qDebug() << replyData;
-
-    reply->close();
-
-}
-
-void Synchronizer::remoteGetSyncInfoFinished(QNetworkReply* reply)
-{
-
-    QUrl postUrl = reply->request().url();
-
-    QByteArray data = reply->readAll();
-
-    QString replyData = QString(data);
-
-    reply->close();
-
-    QVariantMap replyMap;
-
-    QJsonDocument replyJson = QJsonDocument::fromJson(replyData.toUtf8());
-
-    QVariant replyVariant = replyJson.toVariant();
-
-    replyMap = replyVariant.toMap();
-
-    double source_replica_generation = replyMap["source_replica_generation"].toDouble();
-    QString source_replica_uid = replyMap["source_replica_uid"].toString();
-    QString source_transaction_id = replyMap["source_transaction_id"].toString();
-    double target_replica_generation = replyMap["target_replica_generation"].toDouble();
-    QString target_replica_transaction_id = replyMap["target_replica_transaction_id"].toString();
-    QString target_replica_uid = replyMap["target_replica_uid"].toString();
-
-    QNetworkRequest request(postUrl);
-
-    request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-u1db-sync-stream");
-
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-
-    connect(manager, &QNetworkAccessManager::finished, this, &Synchronizer::remotePostSyncInfoFinished);
-
-    QString postData;
-
-    postData = "[\r\n";
-    postData += "{\"last_known_generation\": 0, \"last_known_trans_id\": \"\"},\r\n";
-
-    QList<QString> transactions = m_source->listTransactionsSince(source_replica_generation);
-
-    Q_FOREACH(QString transaction,transactions){
-        QStringList transactionData = transaction.split("|");
-        postData +=  "{\"id\": \""+transactionData[1]+"\", \"rev\": \""+m_source->getCurrentDocRevisionNumber(transactionData[1])+"\", \"content\": \"{}\", \"generation\": "+transactionData[0]+", \"trans_id\": \""+transactionData[2]+"\"},\r\n";
-    }
-
-
-    postData += "]";
-
-    QNetworkReply *nextReply = manager->post(QNetworkRequest(request),postData.toUtf8());
-
-    qDebug()<<nextReply->errorString() << " " << postData.toUtf8();
-
-
-}
 
 /*!
  * \brief Synchronizer::getValidTargets confirms that each sync target definition is valid.
@@ -396,8 +372,6 @@ QList<QVariant> Synchronizer::getValidTargets(QMap<QString,QString>validator, QL
         while (i.hasNext()) {
 
             i.next();
-
-            //qDebug() << i.value().typeName();
 
             if(validator.contains(i.key())&&validator[i.key()]!=i.value().typeName()){
                 valid = false;
@@ -484,12 +458,13 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
                         QString get_string = target_map["name"].toString()+"/sync-from/"+source_uid;
                         QString url_string = "http://"+target_map["ip"].toString();
                         QString full_get_request = url_string+"/"+get_string;
+                        int port_number = target_map["port"].toInt();
 
-                        QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+                        QNetworkAccessManager *manager = new QNetworkAccessManager(source);
 
 
                         QUrl url(full_get_request);
-                        url.setPort(7777);
+                        url.setPort(port_number);
 
 
                         QNetworkRequest request(url);
@@ -870,8 +845,242 @@ QString Synchronizer::getUidFromLocalDb(QString dbFileName)
     return dbUid;
 }
 
+/*!
+ * \brief Synchronizer::remoteGetSyncInfoFinished
+ * \param reply
+ *
+ * Once the initial exchange between the client application
+ * and the remote server is complete, this method retrieves
+ * necessary information from the reply that came from the
+ * server, and is required for posting data from the client
+ * in the steps that will follow.
+ *
+ * After the data is saved to a string and the network reply
+ * is closed, the appropriate method for posting
+ * (postDataFromClientToRemoteServer) is then called.
+ *
+ */
+
+void Synchronizer::remoteGetSyncInfoFinished(QNetworkReply* reply)
+{
+
+    QNetworkAccessManager *manager = reply->manager();
+
+    Database *source = qobject_cast<Database *>(manager->parent());
+
+    QUrl postUrl = reply->request().url();
+
+    QByteArray data = reply->readAll();
+
+    QString replyData = QString(data);
+
+    reply->close();
+
+    postDataFromClientToRemoteServer(source, postUrl, replyData);
+}
+
+/*!
+ * \brief Synchronizer::postDataFromClientToRemoteServer
+ * \param postUrl
+ * \param replyData
+ *
+ * This method builds a string for posting from the client
+ * application to the remote server, using information previously
+ * gathered from the source and target databases,
+ * and then initiates the post.
+ *
+ */
+
+void Synchronizer::postDataFromClientToRemoteServer(Database *source, QUrl postUrl, QString replyData)
+{
+
+    QVariantMap replyMap;
+
+    QJsonDocument replyJson = QJsonDocument::fromJson(replyData.toUtf8());
+
+    QVariant replyVariant = replyJson.toVariant();
+
+    replyMap = replyVariant.toMap();
+
+    double source_replica_generation = replyMap["source_replica_generation"].toDouble();
+    QString source_replica_uid = replyMap["source_replica_uid"].toString();
+    QString source_replica_transaction_id = replyMap["source_transaction_id"].toString();
+    double target_replica_generation = replyMap["target_replica_generation"].toDouble();
+    QString target_replica_transaction_id = replyMap["target_replica_transaction_id"].toString();
+    QString target_replica_uid = replyMap["target_replica_uid"].toString();
+
+    QNetworkAccessManager *manager = new QNetworkAccessManager(source);
+
+    connect(manager, &QNetworkAccessManager::finished, this, &Synchronizer::remotePostSyncInfoFinished);
+
+    QByteArray postString;
+
+    postString = "[\r\n";
+    postString.append("{\"last_known_generation\": ");
+    postString.append(QByteArray::number(source_replica_generation));
+    postString.append(", \"last_known_trans_id\": \"");
+    postString.append(source_replica_transaction_id);
+    postString.append("\"}");
+
+    QList<QString> transactions = m_source->listTransactionsSince(source_replica_generation);
+
+    Q_FOREACH(QString transaction,transactions){
+        QStringList transactionData = transaction.split("|");
+
+        /*
+         * NOTE: 'content' is hard coded at the moment.
+         * This is incorrect and needs to be changed ASAP.
+         *
+         */
+
+        QString content = source->getDocumentContents(transactionData[1]);
+        content = content.replace("\r\n","");
+        content = content.replace("\r","");
+        content = content.replace("\n","");
+        content = content.replace("\"","\\\"");
+
+        //qDebug() << "content: " << content;
+
+        //content = "{\\\"hello\\\":\\\"world\\\"}";
 
 
+        postString.append(",\r\n{\"content\": \""+content+"\",\"rev\": \""+m_source->getCurrentDocRevisionNumber(transactionData[1])+"\", \"id\": \""+transactionData[1]+"\",\"trans_id\": \""+transactionData[2]+"\",\"gen\": "+transactionData[0]+"}");
+
+    }
+
+    postString.append("\r\n]");
+
+    qDebug()<< "remotePostSyncInfoFinished postString: " << postString;
+
+    QByteArray postDataSize = QByteArray::number(postString.size());
+
+    QNetworkRequest request(postUrl);
+    request.setRawHeader("User-Agent", "My app name v0.1");
+    request.setRawHeader("X-Custom-User-Agent", "My app name v0.1");
+    request.setRawHeader("Content-Type", "application/x-u1db-sync-stream");
+    request.setRawHeader("Content-Length", postDataSize);
+
+    manager->post(QNetworkRequest(request),postString);
+
+}
+
+/*!
+ * \brief Synchronizer::remotePostSyncInfoFinished
+ * \param reply
+ *
+ * This method is a slot, which is called once the data
+ * from the client application has been posted to the remote
+ * server.
+ *
+ * This is where any new data from the
+ * remote server is gathered, and then the further steps
+ * for processing on the client side are begun.
+ *
+ */
+
+
+void Synchronizer::remotePostSyncInfoFinished(QNetworkReply* reply)
+{
+
+    QNetworkAccessManager *manager = reply->manager();
+
+    Database *source = qobject_cast<Database *>(manager->parent());
+
+    QByteArray data = reply->readAll();
+
+    QString replyData = QString(data);
+
+    reply->close();
+
+    processDataFromRemoteServer(source, replyData);
+
+}
+
+void Synchronizer::processDataFromRemoteServer(Database *source, QString replyData)
+{
+
+    replyData = replyData.replace("\r\n","");
+
+    QJsonDocument replyJson = QJsonDocument::fromJson(replyData.toUtf8());
+
+    QVariant replyVariant = replyJson.toVariant();
+
+    QVariantList replyList = replyVariant.toList();
+
+    QListIterator<QVariant> i(replyList);
+
+    int index = -1;
+
+    while(i.hasNext()){
+
+        index++;
+
+        QVariant current = i.next();
+
+        QString type_name = QString::fromUtf8(current.typeName());
+
+        qDebug() << "Type: " << type_name;
+
+        if(type_name == "QVariantMap")
+        {
+
+            QVariantMap map = current.toMap();
+
+            if(index == 0)
+            {
+                // Meta data
+                qDebug() << "Meta Data: " << map;
+            }
+            else
+            {
+                // Document to update
+                qDebug() << "Document: " << map;
+
+                //
+                //to->putDoc(document, docId);
+                //QString revision = from->getCurrentDocRevisionNumber(docId);
+                //to->updateDocRevisionNumber(docId,revision);
+
+                QString id("");
+                QVariant content("");
+                QString rev("");
+
+                QMapIterator<QString, QVariant> i(map);
+
+                while (i.hasNext()) {
+
+                    i.next();
+
+                    if(i.key()=="content")
+                    {
+                        content = i.value();
+                    }
+                    else if(i.key()=="id")
+                    {
+                        id = i.value().toString();
+                    }
+                    else if(i.key()=="rev")
+                    {
+                        rev = i.value().toString();
+                    }
+
+                }
+
+                if(content!=""&&id!=""&&rev!="")
+                {
+                    source->putDoc(content,id);
+                    source->updateDocRevisionNumber(id,rev);
+
+                    qDebug() << "updated: " << id;
+                }
+
+            }
+
+        }
+
+    }
+
+}
 
 QT_END_NAMESPACE_U1DB
 
