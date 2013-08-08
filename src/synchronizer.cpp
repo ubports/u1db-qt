@@ -483,8 +483,6 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
 
                         QNetworkReply *reply = manager->get(QNetworkRequest(request));
 
-                        qDebug() << "Reply: " << reply->errorString();
-
                     }
                 }
                 else{
@@ -960,8 +958,6 @@ void Synchronizer::postDataFromClientToRemoteServer(Database *source, QUrl postU
 
     postString.append("\r\n]");
 
-    qDebug()<< "remotePostSyncInfoFinished postString: " << postString;
-
     QByteArray postDataSize = QByteArray::number(postString.size());
 
     QNetworkRequest request(postUrl);
@@ -1029,8 +1025,6 @@ void Synchronizer::processDataFromRemoteServer(Database *source, QString replyDa
 
         QString type_name = QString::fromUtf8(current.typeName());
 
-        qDebug() << "Type: " << type_name;
-
         if(type_name == "QVariantMap")
         {
 
@@ -1039,17 +1033,12 @@ void Synchronizer::processDataFromRemoteServer(Database *source, QString replyDa
             if(index == 0)
             {
                 // Meta data
-                qDebug() << "Meta Data: " << map;
+                //qDebug() << "Meta Data: " << map;
             }
             else
             {
                 // Document to update
-                qDebug() << "Document: " << map;
-
-                //
-                //to->putDoc(document, docId);
-                //QString revision = from->getCurrentDocRevisionNumber(docId);
-                //to->updateDocRevisionNumber(docId,revision);
+                //qDebug() << "Document: " << map;
 
                 QString id("");
                 QVariant content("");
@@ -1080,8 +1069,6 @@ void Synchronizer::processDataFromRemoteServer(Database *source, QString replyDa
                 {
                     source->putDoc(content,id);
                     source->updateDocRevisionNumber(id,rev);
-
-                    qDebug() << "updated: " << id;
                 }
 
             }
