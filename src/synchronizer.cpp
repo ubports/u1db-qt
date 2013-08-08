@@ -109,7 +109,7 @@ QT_BEGIN_NAMESPACE_U1DB
  */
 
 Synchronizer::Synchronizer(QObject *parent) :
-    QAbstractListModel(parent), m_synchronize(false)
+    QAbstractListModel(parent), m_synchronize(false), m_source(NULL)
 {
     QObject::connect(this, &Synchronizer::syncChanged, this, &Synchronizer::onSyncChanged);
 }
@@ -479,9 +479,9 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
 
                         QNetworkRequest request(url);
 
-                        connect(manager, &QNetworkAccessManager::finished,                                this, &Synchronizer::remoteGetSyncInfoFinished);
+                        connect(manager, &QNetworkAccessManager::finished, this, &Synchronizer::remoteGetSyncInfoFinished);
 
-                        QNetworkReply *reply = manager->get(QNetworkRequest(request));
+                        manager->get(QNetworkRequest(request));
 
                     }
                 }
@@ -913,7 +913,7 @@ void Synchronizer::postDataFromClientToRemoteServer(Database *source, QUrl postU
     double source_replica_generation = replyMap["source_replica_generation"].toDouble();
     QString source_replica_uid = replyMap["source_replica_uid"].toString();
     QString source_replica_transaction_id = replyMap["source_transaction_id"].toString();
-    double target_replica_generation = replyMap["target_replica_generation"].toDouble();
+    //double target_replica_generation = replyMap["target_replica_generation"].toDouble();
     QString target_replica_transaction_id = replyMap["target_replica_transaction_id"].toString();
     QString target_replica_uid = replyMap["target_replica_uid"].toString();
 
