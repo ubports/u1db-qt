@@ -373,7 +373,7 @@ for the revsion. This information is delimited by ':'.
              */
             //revision_number+="|"+current_revision;
 
-            /* ##KW## Not sure if the above is necessary,
+            /* Not sure if the above is necessary,
              *and did not appear to be working as intended either.
              *
              * Commented out, but maybe OK to delete.
@@ -411,6 +411,7 @@ QString Database::getCurrentDocRevisionNumber(QString doc_id){
 
     query.prepare("SELECT doc_rev from document WHERE doc_id = :docId");
     query.bindValue(":docId", doc_id);
+
     if (query.exec())
     {
         while (query.next())
@@ -418,6 +419,9 @@ QString Database::getCurrentDocRevisionNumber(QString doc_id){
             return query.value("doc_rev").toString();
         }
 
+    }
+    else{
+        qDebug() << query.lastError().text();
     }
     return QString();
 }
@@ -508,6 +512,9 @@ int Database::getCurrentGenerationNumber(){
 
         }
 
+    }
+    else{
+        qDebug() << query.lastError().text();
     }
 
     return sequence_number;
@@ -659,6 +666,9 @@ Database::listDocs()
             list.append(query.value("doc_id").toString());
         }
         return list;
+    }
+    else{
+        qDebug() << query.lastError().text();
     }
     return setError(QString("Failed to list documents: %1\n%2").arg(query.lastError().text()).arg(query.lastQuery())) ? list : list;
 }
