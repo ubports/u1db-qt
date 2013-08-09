@@ -421,7 +421,7 @@ QString Database::getCurrentDocRevisionNumber(QString doc_id){
 
     }
     else{
-        qDebug() << query.lastError().text();
+        return setError(query.lastError().text()) ? QString() : QString();
     }
     return QString();
 }
@@ -455,7 +455,7 @@ void Database::updateSyncLog(bool insert, QString uid, QString generation, QStri
     query.bindValue(":knownTransactionId", transaction_id);
     if (!query.exec())
     {
-        qDebug() << query.lastError();
+        setError(query.lastError().text());
 
     }
 
@@ -482,7 +482,7 @@ void Database::updateDocRevisionNumber(QString doc_id,QString revision){
     query.bindValue(":revisionId", revision);
     if (!query.exec())
     {
-        qDebug() << query.lastError();
+        setError(query.lastError().text());
 
     }
 
@@ -514,7 +514,7 @@ int Database::getCurrentGenerationNumber(){
 
     }
     else{
-        qDebug() << query.lastError().text();
+        setError(query.lastError().text());
     }
 
     return sequence_number;
@@ -668,7 +668,7 @@ Database::listDocs()
         return list;
     }
     else{
-        qDebug() << query.lastError().text();
+        return setError(query.lastError().text());
     }
     return setError(QString("Failed to list documents: %1\n%2").arg(query.lastError().text()).arg(query.lastQuery())) ? list : list;
 }
@@ -862,6 +862,9 @@ QMap<QString,QVariant> Database::getSyncLogInfo(QMap<QString,QVariant> lastSyncI
             return lastSyncInformation;
         }
 
+    }
+    else{
+        setError(query.lastError().text());
     }
 
     return lastSyncInformation;
