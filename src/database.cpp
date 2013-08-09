@@ -668,7 +668,7 @@ Database::listDocs()
         return list;
     }
     else{
-        return setError(query.lastError().text());
+        return setError(query.lastError().text()) ? list : list;
     }
     return setError(QString("Failed to list documents: %1\n%2").arg(query.lastError().text()).arg(query.lastQuery())) ? list : list;
 }
