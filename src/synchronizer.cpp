@@ -32,7 +32,7 @@ QT_BEGIN_NAMESPACE_U1DB
 
 /*!
     \class Synchronizer
-    \inmodule U1db
+    \inmodule U1Db
     \ingroup modules
 
     \brief The Synchronizer class handles synchronizing between two databases.
@@ -355,9 +355,6 @@ emitted after the model has been reset.
 
 /*!
  * \brief Synchronizer::getValidTargets confirms that each sync target definition is valid.
- * \param validator
- * \param mandatory
- * \return
  */
 
 QList<QVariant> Synchronizer::getValidTargets(QMap<QString,QString>validator, QList<QString>mandatory){
@@ -891,7 +888,6 @@ QString Synchronizer::getUidFromLocalDb(QString dbFileName)
 
 /*!
  * \brief Synchronizer::remoteGetSyncInfoFinished
- * \param reply
  *
  * Once the initial exchange between the client application
  * and the remote server is complete, this method retrieves
@@ -925,8 +921,6 @@ void Synchronizer::remoteGetSyncInfoFinished(QNetworkReply* reply)
 
 /*!
  * \brief Synchronizer::postDataFromClientToRemoteServer
- * \param postUrl
- * \param replyData
  *
  * This method builds a string for posting from the client
  * application to the remote server, using information previously
@@ -997,7 +991,6 @@ void Synchronizer::postDataFromClientToRemoteServer(Database *source, QUrl postU
 
 /*!
  * \brief Synchronizer::remotePostSyncInfoFinished
- * \param reply
  *
  * This method is a slot, which is called once the data
  * from the client application has been posted to the remote

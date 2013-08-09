@@ -322,9 +322,9 @@ increaseVectorClockRev(int oldRev)
 }
 
 /*!
-    The getNextDocRevisionNumber(QString doc_id) function
-creates a new revision number. It returns a string for use
-in the document  table's 'doc_rev' field.
+  This function creates a new revision number.
+
+  It returns a string for use in the document table's 'doc_rev' field.
  */
 
 QString Database::getNextDocRevisionNumber(QString doc_id)
@@ -424,9 +424,6 @@ QString Database::getCurrentDocRevisionNumber(QString doc_id){
 
 /*!
  * \brief Database::updateSyncLog
- * \param uid
- * \param generation
- * \param transaction_id
  *
  * This method is used at the end of a synchronization session,
  * to update the database with the latest information known about the peer
@@ -459,6 +456,16 @@ void Database::updateSyncLog(bool insert, QString uid, QString generation, QStri
     }
 
 }
+
+/*!
+ * \brief Database::updateDocRevisionNumber
+ *
+ * Whenever a document as added or modified it needs a new revision number.
+ *
+ * The revision number contains information about revisions made at the source,
+ * but also revisions to the document by target databases (and then synced with the source).
+ *
+ */
 
 void Database::updateDocRevisionNumber(QString doc_id,QString revision){
     if (!initializeIfNeeded())
@@ -616,6 +623,12 @@ Database::putDoc(QVariant contents, const QString& docId)
     return revision_number;
 }
 
+/*!
+ * \brief Database::resetModel
+ *
+ * Resets the Database model.
+ */
+
 void Database::resetModel(){
 
     beginResetModel();
@@ -671,6 +684,12 @@ Database::setPath(const QString& path)
     Q_EMIT pathChanged(path);
 }
 
+/*!
+ * \brief Database::getPath
+ *
+ * Simply returns the path of the database.
+ *
+ */
 QString
 Database::getPath()
 {
@@ -835,22 +854,8 @@ QMap<QString,QVariant> Database::getSyncLogInfo(QMap<QString,QVariant> lastSyncI
 
     }
 
-    /* Below does not work from the Database class.
-     * This is leftover from the migration of this function
-     * from the Synchronizer class.
-     *
-     * Why is it left here? As a reminder to do something to
-     * resolve the issue of not being able to update Sychnronizer's
-     * m_errors from the Database class.
-     */
-
-    //m_errors.append(m_db.lastError().text());
-
-
     return lastSyncInformation;
 }
-
-
 
 QT_END_NAMESPACE_U1DB
 

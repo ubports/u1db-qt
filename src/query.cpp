@@ -158,6 +158,13 @@ void Query::generateQueryResults()
 
 }
 
+/*!
+ * \brief Query::resetModel
+ *
+ * Resets the model of the Query
+ *
+ */
+
 void Query::resetModel(){
     beginResetModel();
     endResetModel();
