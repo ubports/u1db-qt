@@ -144,7 +144,7 @@ Item {
                                 anchors.right: parent.right
                                 wrapMode: Text.WordWrap
                                 text: {
-                                    text: errors
+                                    text: sync_output
                                 }
                             }
                         }

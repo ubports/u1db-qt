@@ -44,7 +44,7 @@ class Q_DECL_EXPORT Synchronizer : public QAbstractListModel {
     Q_PROPERTY(bool synchronize READ getSync WRITE setSync NOTIFY syncChanged)
     Q_PROPERTY(bool resolve_to_source READ getResolveToSource WRITE setResolveToSource NOTIFY resolveToSourceChanged)
     Q_PROPERTY(QVariant targets READ getTargets WRITE setTargets NOTIFY targetsChanged)
-    Q_PROPERTY(QList<QString> errors READ getErrors WRITE setErrors NOTIFY errorsChanged)
+    Q_PROPERTY(QList<QVariant> sync_output READ getSyncOutput NOTIFY syncOutputChanged)
 
 public:
     Synchronizer(QObject* parent = 0);
@@ -62,13 +62,13 @@ public:
     QVariant getTargets();
     bool getSync();
     bool getResolveToSource();
-    QList<QString> getErrors();
+    QList<QVariant> getSyncOutput();
 
     void setSource(Database* source);
     void setTargets(QVariant targets);
     void setSync(bool synchronize);
     void setResolveToSource(bool resolve_to_source);
-    void setErrors(QList<QString> errors);
+    void setSyncOutput(QList<QVariant> sync_output);
 
 
     void syncWithLocalTarget(Database *source, Database *target, bool resolve_to_source);
@@ -88,7 +88,7 @@ Q_SIGNALS:
     void targetsChanged(QVariant targets);
     void syncChanged(bool synchronize);
     void resolveToSourceChanged(bool resolve_to_source);
-    void errorsChanged(QList<QString> errors);
+    void syncOutputChanged(QList<QVariant> sync_output);
     void syncCompleted();
 private:
     //Q_DISABLE_COPY(Synchronizer)
@@ -96,7 +96,7 @@ private:
     bool m_synchronize;
     bool m_resolve_to_source;
     QVariant m_targets;
-    QList<QString> m_errors;
+    QList<QVariant> m_sync_output;
 
     void onSyncChanged(bool synchronize);
     void remoteGetSyncInfoFinished(QNetworkReply* reply);

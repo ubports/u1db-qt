@@ -122,8 +122,8 @@ Synchronizer::Synchronizer(QObject *parent) :
 QVariant
 Synchronizer::data(const QModelIndex & index, int role) const
 {
-    if (role == 0) // errors
-        return m_errors.at(index.row());
+    if (role == 0)
+        return m_sync_output.at(index.row());
     return QVariant();
 }
 
@@ -136,7 +136,7 @@ Synchronizer::data(const QModelIndex & index, int role) const
 int
 Synchronizer::rowCount(const QModelIndex & parent) const
 {
-    return m_errors.count();
+    return m_sync_output.count();
 }
 
 /*!
@@ -148,7 +148,7 @@ QHash<int, QByteArray>
 Synchronizer::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles.insert(0, "errors");
+    roles.insert(0, "sync_output");
     return roles;
 }
 
@@ -200,7 +200,7 @@ void Synchronizer::setSync(bool synchronize)
 }
 
 /*!
-    \property Synchronizer::errors
+    \property Synchronizer::resolve_to_source
  */
 void Synchronizer::setResolveToSource(bool resolve_to_source)
 {
@@ -212,15 +212,15 @@ void Synchronizer::setResolveToSource(bool resolve_to_source)
 }
 
 /*!
-    \property Synchronizer::errors
+    \property Synchronizer::sync_output
  */
-void Synchronizer::setErrors(QList<QString> errors)
+void Synchronizer::setSyncOutput(QList<QVariant> sync_output)
 {
-     if (m_errors == errors)
+     if (m_sync_output == sync_output)
         return;
 
-    m_errors = errors;
-    Q_EMIT errorsChanged(errors);
+    m_sync_output = sync_output;
+    Q_EMIT syncOutputChanged(sync_output);
 }
 
 /*!
@@ -259,8 +259,8 @@ bool Synchronizer::getResolveToSource(){
 /*!
 
  */
-QList<QString> Synchronizer::getErrors(){
-    return m_errors;
+QList<QVariant> Synchronizer::getSyncOutput(){
+    return m_sync_output;
 }
 
 /*
@@ -293,7 +293,7 @@ void Synchronizer::onSyncChanged(bool synchronize){
     validator.insert("remote","bool");
     validator.insert("location","QString");
     validator.insert("resolve_to_source","bool");
-    validator.insert("errors", "QStringList");
+
 
     /*!
      * The mandatory map contains the keys that are used to confirm
@@ -331,11 +331,11 @@ void Synchronizer::onSyncChanged(bool synchronize){
         endResetModel();
 
         /*!
-          The convenience signals errorsChanged and syncCompleted are
+          The convenience signals syncOutputChanged and syncCompleted are
 emitted after the model has been reset.
           */
 
-        Q_EMIT errorsChanged(m_errors);
+        Q_EMIT syncOutputChanged(m_sync_output);
         Q_EMIT syncCompleted();
 
         /*!
@@ -386,7 +386,15 @@ QList<QVariant> Synchronizer::getValidTargets(QMap<QString,QString>validator, QL
             if(validator.contains(i.key())&&validator[i.key()]!=i.value().typeName()){
                 valid = false;
 
-                m_errors.append("<b><font color=\"red\">Database "+index_number+"</font></b>: For Key: `" + i.key() + "` Expecting type `" + validator[i.key()] + "`, but received type `" + i.value().typeName()+"`");
+                QString message_value = "For property `" + i.key() + "` Expecting type `" + validator[i.key()] + "`, but received type `" + i.value().typeName()+"`";
+                
+                QVariantMap output_map;
+                output_map.insert("concerning_property","targets");
+                output_map.insert("concerning_index",index_number);
+                output_map.insert("message_type","error");
+                output_map.insert("message_value",message_value);
+                m_sync_output.append(output_map);
+                
                 target.insert("sync",false);
 
                 break;
@@ -402,7 +410,16 @@ QList<QVariant> Synchronizer::getValidTargets(QMap<QString,QString>validator, QL
                 while(j.hasNext()){
                     QString value = j.next();
                     if(!target.contains(value)){
-                        m_errors.append("<b><font color=\"red\">Database "+index_number+"</font></b>: Expected key `" + value + "`, but it is not present.");
+
+                        QString message_value = "Expected property `" + value + "`, but it is not present.";
+
+                        QVariantMap output_map;
+                        output_map.insert("concerning_property","targets");
+                        output_map.insert("concerning_index",index_number);
+                        output_map.insert("message_type","error");
+                        output_map.insert("message_value",message_value);
+                        m_sync_output.append(output_map);
+
                         target.insert("sync",false);
                         targets.removeOne(target);
                         complete = false;
@@ -417,12 +434,31 @@ QList<QVariant> Synchronizer::getValidTargets(QMap<QString,QString>validator, QL
         }
 
         if(target.contains("sync")&&target["sync"]==false){
-            m_errors.append("<b><font color=\"red\">Error</font></b>: Database Index "+index_number+" was not synced due to errors. Please check its properties and try again later.");
+
+            QString message_value = "Not synced due to errors with properties.";
+
+            QVariantMap output_map;
+            output_map.insert("concerning_property","targets");
+            output_map.insert("concerning_index",index_number);
+            output_map.insert("message_type","error");
+            output_map.insert("message_value",message_value);
+            m_sync_output.append(output_map);
+
         }
         else
         {
             target.insert("sync",true);
             sync_targets.append(target);
+
+            QString message_value = "Mandatory properties were included and their values are valid.";
+
+            QVariantMap output_map;
+            output_map.insert("concerning_property","targets");
+            output_map.insert("concerning_index",index_number);
+            output_map.insert("message_type","no-errors");
+            output_map.insert("message_value",message_value);
+            m_sync_output.append(output_map);
+
         }
 
     }
@@ -452,13 +488,22 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
 
                 if(target_map.contains("remote")&&target_map["remote"]==false){
                     if(target_map.contains("sync")&&target_map["sync"]==true){
-                        m_errors.append("<b><font color=\"green\">Log</font></b>: Valid target index "+QString::number(target_index)+" good for local to local sync with source database.");
+
+                        QString message_value = "Valid local target.";
+
+                        QVariantMap output_map;
+                        output_map.insert("concerning_property","targets");
+                        output_map.insert("concerning_index",target_index);
+                        output_map.insert("message_type","no-errors");
+                        output_map.insert("message_value",message_value);
+                        m_sync_output.append(output_map);
+
                         syncLocalToLocal(source, target_map);
                     }
                 }
                 else if(target_map.contains("remote")&&target_map["remote"]==true){
                     if(target_map.contains("sync")&&target_map["sync"]==true){
-                        m_errors.append("<b><font color=\"red\">Error</font></b>: Remote database sync is under construction. Valid target index "+QString::number(target_index)+" was not synced. Try again later.");
+
                         //ip
                         //port
                         //name
@@ -472,24 +517,40 @@ void Synchronizer::synchronizeTargets(Database *source, QVariant targets){
 
                         QNetworkAccessManager *manager = new QNetworkAccessManager(source);
 
-
                         QUrl url(full_get_request);
                         url.setPort(port_number);
-
 
                         QNetworkRequest request(url);
 
                         connect(manager, &QNetworkAccessManager::finished, this, &Synchronizer::remoteGetSyncInfoFinished);
+
+                        QString message_value = "Valid remote target.";
+
+                        QVariantMap output_map;
+                        output_map.insert("concerning_property","targets");
+                        output_map.insert("concerning_index",target_index);
+                        output_map.insert("message_type","no-errors");
+                        output_map.insert("message_value",message_value);
+                        m_sync_output.append(output_map);
 
                         manager->get(QNetworkRequest(request));
 
                     }
                 }
                 else{
-                    m_errors.append("<b><font color=\"red\">Undefined Error</font></b>: Valid target index "+QString::number(target_index)+" was not synced. Please check its properties and try again later.");
-                }
-            }
 
+                    QString message_value = "Unknown error. Please check properties";
+
+                    QVariantMap output_map;
+                    output_map.insert("concerning_property","targets");
+                    output_map.insert("concerning_index",target_index);
+                    output_map.insert("message_type","error");
+                    output_map.insert("message_value",message_value);
+                    m_sync_output.append(output_map);
+
+                }
+
+            }
 
         }
 
@@ -526,7 +587,16 @@ void Synchronizer::syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> t
     }
 
     if(sourceDb == NULL || targetDb == NULL){
-        m_errors.append("<b><font color=\"Red\">Error</font></b>: Either the source or target database does not exist or is not active.");
+
+        QString message_value = "Either source or target does not exist or is not active.";
+
+        QVariantMap output_map;
+        output_map.insert("concerning_property","source|targets");
+        //output_map.insert("concerning_index",index_number); // no access to targets index?
+        output_map.insert("message_type","error");
+        output_map.insert("message_value",message_value);
+        m_sync_output.append(output_map);
+
         return;
     }
 
@@ -549,7 +619,15 @@ void Synchronizer::syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> t
     if(lastSyncInformation["target_replica_uid"].toString() != "" && lastSyncInformation["target_replica_generation"].toString() != "" && lastSyncInformation["target_replica_transaction_id"].toInt() != -1 && lastSyncInformation["source_replica_uid"].toString() != "" && lastSyncInformation["source_replica_generation"].toString() != "" && lastSyncInformation["source_replica_transaction_id"].toInt() != -1)
     {
 
-        m_errors.append("<b><font color=\"green\">Log</font></b>:"+sourceDb->getPath()+" and "+target_db_name+" have previously been synced. Sync procedure will commence.");
+        QString message_value = "Source and local database have previously synced.";
+
+        QVariantMap output_map;
+        output_map.insert("concerning_property","source|targets");
+        output_map.insert("concerning_source",sourceDb->getPath());
+        output_map.insert("concerning_target",target_db_name);
+        output_map.insert("message_type","no-errors");
+        output_map.insert("message_value",message_value);
+        m_sync_output.append(output_map);
 
         //Do some syncing
 
@@ -561,7 +639,15 @@ void Synchronizer::syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> t
     }
     else{
 
-        m_errors.append("<b><font color=\"Orange\">Warning</font></b>:"+sourceDb->getPath()+" and "+target_db_name+" have no details of ever being synced.");
+        QString message_value = "Source and local database have not previously synced.";
+
+        QVariantMap output_map;
+        output_map.insert("concerning_property","source|targets");
+        output_map.insert("concerning_source",sourceDb->getPath());
+        output_map.insert("concerning_target",target_db_name);
+        output_map.insert("message_type","no-errors");
+        output_map.insert("message_value",message_value);
+        m_sync_output.append(output_map);
 
         //There is a first time for everything, let's sync!
 
@@ -711,7 +797,14 @@ QMap<QString,QVariant> Synchronizer::getLastSyncInformation(Database *sourceDb, 
 
     if(remote == true){
 
-        m_errors.append("<b><font color=\"red\">Error</font></b>: Remote database sync is under construction. Nothing was synced. Try again later.");
+        QString message_value = "Sync information from remote target not available at this time.";
+
+        QVariantMap output_map;
+        output_map.insert("concerning_property","source|targets");
+        output_map.insert("concerning_source",sourceDb->getPath());
+        output_map.insert("message_type","warning");
+        output_map.insert("message_value",message_value);
+        m_sync_output.append(output_map);
 
         return lastSyncInformation;
 
@@ -744,14 +837,32 @@ QString Synchronizer::getUidFromLocalDb(QString dbFileName)
 
     if(!db_file.exists())
     {
-        m_errors.append("<b><font color\"red\">Error</font></b>: Local database " + dbFileName + " does not exist.");
+
+        QString message_value = "Database does not exist.";
+
+        QVariantMap output_map;
+        output_map.insert("concerning_property","source|targets");
+        output_map.insert("concerning_database",dbFileName);
+        output_map.insert("message_type","error");
+        output_map.insert("message_value",message_value);
+        m_sync_output.append(output_map);
+
         return dbUid;
     }
     else
     {
         db.setDatabaseName(dbFileName);
         if (!db.open()){
-            m_errors.append(db.lastError().text());
+
+            QString message_value = db.lastError().text();
+
+            QVariantMap output_map;
+            output_map.insert("concerning_property","source|targets");
+            output_map.insert("concerning_database",dbFileName);
+            output_map.insert("message_type","error");
+            output_map.insert("message_value",message_value);
+            m_sync_output.append(output_map);
+
         }
         else{
             QSqlQuery query (db.exec("SELECT value FROM u1db_config WHERE name = 'replica_uid'"));
