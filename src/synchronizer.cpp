@@ -31,7 +31,7 @@
 QT_BEGIN_NAMESPACE_U1DB
 
 /*!
-    \class Synchronizer
+    \qmlclass Synchronizer
     \inmodule U1Db
     \ingroup modules
 
