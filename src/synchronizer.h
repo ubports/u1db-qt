@@ -70,9 +70,6 @@ public:
     void setResolveToSource(bool resolve_to_source);
     void setSyncOutput(QList<QVariant> sync_output);
 
-
-    void syncWithLocalTarget(Database *source, Database *target, bool resolve_to_source);
-    void syncWithRemoteTarget(Database *source, QString target_url, bool resolve_to_source);
     void syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> target);
     void synchronizeTargets(Database *source, QVariant targets);
 
@@ -84,12 +81,48 @@ public:
 
 
 Q_SIGNALS:
+
+    /*!
+     * \brief sourceChanged
+     * \param source
+     */
+
     void sourceChanged(Database* source);
+
+    /*!
+     * \brief targetsChanged
+     * \param targets
+     */
+
     void targetsChanged(QVariant targets);
+
+    /*!
+     * \brief syncChanged
+     * \param synchronize
+     */
+
     void syncChanged(bool synchronize);
+
+    /*!
+     * \brief resolveToSourceChanged
+     * \param resolve_to_source
+     */
+
     void resolveToSourceChanged(bool resolve_to_source);
+
+    /*!
+     * \brief syncOutputChanged
+     * \param sync_output
+     */
+
     void syncOutputChanged(QList<QVariant> sync_output);
+
+    /*!
+     * \brief syncCompleted
+     */
+
     void syncCompleted();
+
 private:
     //Q_DISABLE_COPY(Synchronizer)
     Database* m_source;

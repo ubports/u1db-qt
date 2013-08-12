@@ -251,6 +251,15 @@ Database::getDocUnchecked(const QString& docId) const
     return QVariant();
 }
 
+/*!
+ * \internal
+ * \brief Database::getDocumentContents
+ *
+ * Returns the string representation of a document that has
+ * been selected from the database using a document id.
+ *
+ */
+
 QString
 Database::getDocumentContents(const QString& docId)
 {
@@ -322,6 +331,7 @@ increaseVectorClockRev(int oldRev)
 }
 
 /*!
+ * \internal
   This function creates a new revision number.
 
   It returns a string for use in the document table's 'doc_rev' field.
@@ -396,12 +406,13 @@ for the revsion. This information is delimited by ':'.
 }
 
 /*!
-
+ * \internal
     The getCurrentDocRevisionNumber(QString doc_id) function
 returns the current string value from the document table's
 doc_rev field.
 
  */
+
 
 QString Database::getCurrentDocRevisionNumber(QString doc_id){
     if (!initializeIfNeeded())
@@ -427,6 +438,7 @@ QString Database::getCurrentDocRevisionNumber(QString doc_id){
 }
 
 /*!
+ * \internal
  * \brief Database::updateSyncLog
  *
  * This method is used at the end of a synchronization session,
@@ -462,6 +474,7 @@ void Database::updateSyncLog(bool insert, QString uid, QString generation, QStri
 }
 
 /*!
+ * \internal
  * \brief Database::updateDocRevisionNumber
  *
  * Whenever a document as added or modified it needs a new revision number.
@@ -816,6 +829,14 @@ Database::getIndexKeys(const QString& indexName)
 
 /* Handy functions for synchronization. */
 
+/*!
+ * \internal
+ * \brief Database::listTransactionsSince
+ *
+ * This lists transactions for the database since a particular generation number.
+ *
+ */
+
 QList<QString> Database::listTransactionsSince(int generation){
 
     QList<QString> list;
@@ -841,6 +862,14 @@ QList<QString> Database::listTransactionsSince(int generation){
     return list;
 
 }
+
+/*!
+ * \internal
+ * \brief Database::getSyncLogInfo
+ *
+ * Provides the information about previous synchronizations between the database and another (if any).
+ *
+ */
 
 QMap<QString,QVariant> Database::getSyncLogInfo(QMap<QString,QVariant> lastSyncInformation, QString uid, QString prefix){
 
