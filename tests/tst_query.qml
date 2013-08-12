@@ -117,6 +117,7 @@ Item {
     U1db.Query {
         id: wrongQuery
         index: byNamePhone
+        query: { 'name': 'Ivanka', 'phone': '*' }
     }
 
     SignalSpy {

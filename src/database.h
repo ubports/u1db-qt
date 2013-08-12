@@ -63,9 +63,6 @@ public:
     QList<QString> listTransactionsSince(int generation);
     QMap<QString,QVariant> getSyncLogInfo(QMap<QString,QVariant> lastSyncInformation, QString uid, QString prefix);
 
-
-
-
 Q_SIGNALS:
     void pathChanged(const QString& path);
     void errorChanged(const QString& error);
