@@ -72,15 +72,15 @@ TestCase {
 
     function test_1_databasePopulated () {
         spyListCompleted.wait()
-        compare(myDatabase.putDoc({"animals": ["cat", "dog", "hamster"]}) > -1, true)
+        compare(myDatabase.putDoc({"animals": ["cat", "dog", "hamster"]}) == '', false)
 
         var myPath = "aDatabaseA"
         myDatabase.path = myPath
         spyPathChanged.wait()
         compare(myDatabase.path, myPath)
-        compare(myDatabase.putDoc({"spam": "eggs"}) > -1, true)
+        compare(myDatabase.putDoc({"spam": "eggs"}) == '', false)
         var json = {"foo": "bar"}
-        compare(myDatabase.putDoc(json, "hijklmn") > -1, true)
+        compare(myDatabase.putDoc(json, "hijklmn") == '', false)
         compare(myDatabase.getDoc("hijklmn"), json)
         compare(myDatabase.getDoc("hijklmn"), json)
     }

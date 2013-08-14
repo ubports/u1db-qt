@@ -36,21 +36,33 @@ class Q_DECL_EXPORT Database : public QAbstractListModel {
 public:
     Database(QObject* parent = 0);
 
+
     // QAbstractListModel
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QHash<int, QByteArray>roleNames() const;
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    void resetModel();
 
     QString getPath();
     void setPath(const QString& path);
     Q_INVOKABLE QVariant getDoc(const QString& docId);
+    QString getDocumentContents(const QString& docId);
     QVariant getDocUnchecked(const QString& docId) const;
-    Q_INVOKABLE int putDoc(QVariant newDoc, const QString& docID=QString());
+    Q_INVOKABLE QString putDoc(QVariant newDoc, const QString& docID=QString());
     Q_INVOKABLE QList<QString> listDocs();
     Q_INVOKABLE QString lastError();
     Q_INVOKABLE QString putIndex(const QString& index_name, QStringList expressions);
     Q_INVOKABLE QStringList getIndexExpressions(const QString& indexName);
     Q_INVOKABLE QStringList getIndexKeys(const QString& indexName);
+
+    /* Functions handy for Synchronization */
+    QString getNextDocRevisionNumber(QString doc_id);
+    QString getCurrentDocRevisionNumber(QString doc_id);
+    void updateDocRevisionNumber(QString doc_id,QString revision);
+    void updateSyncLog(bool insert, QString uid, QString generation, QString transaction_id);
+    QList<QString> listTransactionsSince(int generation);
+    QMap<QString,QVariant> getSyncLogInfo(QMap<QString,QVariant> lastSyncInformation, QString uid, QString prefix);
+
 Q_SIGNALS:
     void pathChanged(const QString& path);
     void errorChanged(const QString& error);
@@ -63,7 +75,7 @@ Q_SIGNALS:
      */
     void docLoaded(const QString& docId, QVariant content) const;
 private:
-    Q_DISABLE_COPY(Database)
+    //Q_DISABLE_COPY(Database)
     QString m_path;
     QSqlDatabase m_db;
     QString m_error;
@@ -73,6 +85,11 @@ private:
     bool initializeIfNeeded(const QString& path=":memory:");
     bool setError(const QString& error);
     QString getDocIdByRow(int row) const;
+
+    int createNewTransaction(QString doc_id);
+    QString generateNewTransactionId();
+    int getCurrentGenerationNumber();
+
 };
 
 QT_END_NAMESPACE_U1DB

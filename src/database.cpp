@@ -106,7 +106,8 @@ Database::initializeIfNeeded(const QString& path)
     /* A unique ID is used for the connection name to ensure that we aren't
        re-using or replacing other opend databases. */
     if (!m_db.isValid())
-        m_db = QSqlDatabase::addDatabase("QSQLITE", QUuid::createUuid().toString());
+        m_db = QSqlDatabase::addDatabase("QSQLITE",QUuid::createUuid().toString());
+
     if (!m_db.isValid())
         return setError("QSqlDatabase error");
     m_db.setDatabaseName(path);
@@ -251,6 +252,42 @@ Database::getDocUnchecked(const QString& docId) const
 }
 
 /*!
+ * \internal
+ * \brief Database::getDocumentContents
+ *
+ * Returns the string representation of a document that has
+ * been selected from the database using a document id.
+ *
+ */
+
+QString
+Database::getDocumentContents(const QString& docId)
+{
+    if (!initializeIfNeeded())
+        return QString();
+
+    QSqlQuery query(m_db.exec());
+    query.prepare("SELECT document.doc_rev, document.content, "
+        "count(conflicts.doc_rev) AS conflicts FROM document LEFT OUTER JOIN "
+        "conflicts ON conflicts.doc_id = document.doc_id WHERE "
+        "document.doc_id = :docId GROUP BY document.doc_id, "
+        "document.doc_rev, document.content");
+    query.bindValue(":docId", docId);
+    if (query.exec())
+    {
+        if (query.next())
+        {
+            if (query.value("conflicts").toInt() > 0)
+                setError(QString("Conflicts in %1").arg(docId));
+            return query.value("content").toString();
+        }
+        return setError(QString("Failed to get document %1: No document").arg(docId)) ? QString() : QString();
+    }
+    return setError(QString("Failed to get document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? QString() : QString();
+}
+
+
+/*!
     Returns the contents of a document by \a docId in a form that QML recognizes
     as a Variant object, it's identical to Document::getContents() with the
     same \a docId.
@@ -284,10 +321,258 @@ Database::getDoc(const QString& docId)
     return setError(QString("Failed to get document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? QVariant() : QVariant();
 }
 
+/*!
+    The increaseVectorClockRev(int oldRev) function is deprecated.
+ */
 static int
 increaseVectorClockRev(int oldRev)
 {
     return oldRev;
+}
+
+/*!
+ * \internal
+  This function creates a new revision number.
+
+  It returns a string for use in the document table's 'doc_rev' field.
+ */
+
+QString Database::getNextDocRevisionNumber(QString doc_id)
+{
+
+    QString revision_number = getReplicaUid()+":1";
+
+    QString current_revision_number = getCurrentDocRevisionNumber(doc_id);
+
+    /*!
+        Some revisions contain information from previous
+conflicts/syncs. Revisions are delimited by '|'.
+
+     */
+
+    QStringList current_revision_list = current_revision_number.split("|");
+
+    Q_FOREACH (QString current_revision, current_revision_list) {
+
+        /*!
+            Each revision contains two pieces of information,
+the uid of the database that made the revsion, and a counter
+for the revsion. This information is delimited by ':'.
+
+         */
+
+        QStringList current_revision_number_list = current_revision.split(":");
+
+        if(current_revision_number_list[0]==getReplicaUid()) {
+
+            /*!
+                If the current revision uid  is the same as this Database's uid the counter portion is increased by one.
+
+             */
+
+            int revision_generation_number = current_revision_number_list[1].toInt()+1;
+
+            revision_number = getReplicaUid()+":"+QString::number(revision_generation_number);
+
+        }
+        else {
+
+            /*!
+                If the current revision uid  is not the same as this Database's uid then the revision represents a change that originated in another database.
+
+             */
+            //revision_number+="|"+current_revision;
+
+            /* Not sure if the above is necessary,
+             *and did not appear to be working as intended either.
+             *
+             * Commented out, but maybe OK to delete.
+             */
+        }
+
+    }
+
+    /*!
+        The Database UID has curly brackets, but they are not required for the revision number and need to be removed.
+
+     */
+
+    revision_number = revision_number.replace("{","");
+
+    revision_number = revision_number.replace("}","");
+
+    return revision_number;
+
+}
+
+/*!
+ * \internal
+    The getCurrentDocRevisionNumber(QString doc_id) function
+returns the current string value from the document table's
+doc_rev field.
+
+ */
+
+
+QString Database::getCurrentDocRevisionNumber(QString doc_id){
+    if (!initializeIfNeeded())
+        return QString();
+
+    QSqlQuery query(m_db.exec());
+
+    query.prepare("SELECT doc_rev from document WHERE doc_id = :docId");
+    query.bindValue(":docId", doc_id);
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            return query.value("doc_rev").toString();
+        }
+
+    }
+    else{
+        return setError(query.lastError().text()) ? QString() : QString();
+    }
+    return QString();
+}
+
+/*!
+ * \internal
+ * \brief Database::updateSyncLog
+ *
+ * This method is used at the end of a synchronization session,
+ * to update the database with the latest information known about the peer
+ * database that was synced against.
+ */
+void Database::updateSyncLog(bool insert, QString uid, QString generation, QString transaction_id)
+{
+
+    if (!initializeIfNeeded())
+        return;
+
+    QSqlQuery query(m_db.exec());
+
+    if(insert==true){
+        query.prepare("INSERT INTO sync_log(known_generation,known_transation_id,known_transation_id) VALUES(:knownGeneration, :knownTransactionId, :replicaUid)");
+
+    }
+    else{
+        query.prepare("UPDATE sync_log SET known_generation = :knownGeneration, known_transation_id = :knownTransactionId WHERE replica_uid = :replicaUid");
+    }
+
+
+    query.bindValue(":replicaUid", uid);
+    query.bindValue(":knownGeneration", generation);
+    query.bindValue(":knownTransactionId", transaction_id);
+    if (!query.exec())
+    {
+        setError(query.lastError().text());
+
+    }
+
+}
+
+/*!
+ * \internal
+ * \brief Database::updateDocRevisionNumber
+ *
+ * Whenever a document as added or modified it needs a new revision number.
+ *
+ * The revision number contains information about revisions made at the source,
+ * but also revisions to the document by target databases (and then synced with the source).
+ *
+ */
+
+void Database::updateDocRevisionNumber(QString doc_id,QString revision){
+    if (!initializeIfNeeded())
+        return;
+
+    QSqlQuery query(m_db.exec());
+
+    query.prepare("UPDATE document SET doc_rev = :revisionId WHERE doc_id = :docId");
+    query.bindValue(":docId", doc_id);
+    query.bindValue(":revisionId", revision);
+    if (!query.exec())
+    {
+        setError(query.lastError().text());
+
+    }
+
+}
+
+/*!
+    The getCurrentGenerationNumber() function searches for the
+current generation number from the  sqlite_sequence table.
+The return value can then be used during a synchronization session,
+amongst other things.
+
+ */
+
+int Database::getCurrentGenerationNumber(){
+
+    int sequence_number = -1;
+
+    QSqlQuery query(m_db.exec());
+
+    query.prepare("SELECT seq FROM sqlite_sequence WHERE name = 'transaction_log'");
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            sequence_number = (query.value("seq").toInt());
+
+        }
+
+    }
+    else{
+        setError(query.lastError().text());
+    }
+
+    return sequence_number;
+
+}
+
+/*!
+    The generateNewTransactionId() function generates a random
+transaction id string, for use when creating new transations.
+
+ */
+
+QString Database::generateNewTransactionId(){
+
+    QString uid = "T-"+QUuid::createUuid().toString();
+    uid = uid.replace("}","");
+    uid = uid.replace("{","");
+    return uid;
+
+}
+
+/*!
+    Each time a document in the Database is created or updated a
+new transaction is performed, and information about it inserted into the
+transation_log table using the createNewTransaction(QString doc_id)
+function.
+
+ */
+
+int Database::createNewTransaction(QString doc_id){
+
+    QString transaction_id = generateNewTransactionId();
+
+    QSqlQuery query(m_db.exec());
+
+    QString queryString = "INSERT INTO transaction_log(doc_id, transaction_id) VALUES('"+doc_id+"', '"+transaction_id+"')";
+
+    if (!query.exec(queryString)){
+        return -1;
+    }
+    else{
+        return 0;
+    }
+
+    return -1;
 }
 
 /*!
@@ -297,48 +582,53 @@ increaseVectorClockRev(int oldRev)
     stored under an autogenerated name.
     Returns the new revision of the document, or -1 on failure.
  */
-int
+QString
 Database::putDoc(QVariant contents, const QString& docId)
 {
     if (!initializeIfNeeded())
-        return -1;
+        return "";
 
     QString newOrEmptyDocId(docId);
     QVariant oldDoc = newOrEmptyDocId.isEmpty() ? QVariant() : getDocUnchecked(newOrEmptyDocId);
-    /* FIXME: Conflicts */
 
-    int newRev = increaseVectorClockRev(7/*contents.rev*/);
+    QString revision_number = getNextDocRevisionNumber(newOrEmptyDocId);
+
     QSqlQuery query(m_db.exec());
     if (oldDoc.isValid())
     {
         query.prepare("UPDATE document SET doc_rev=:docRev, content=:docJson WHERE doc_id = :docId");
         query.bindValue(":docId", newOrEmptyDocId);
-        query.bindValue(":docRev", newRev);
+        query.bindValue(":docRev", revision_number);
         // Parse Variant from QML as JsonDocument, fallback to string
         QString json(QJsonDocument::fromVariant(contents).toJson());
         query.bindValue(":docJson", json.isEmpty() ? contents : json);
         if (!query.exec())
-            return setError(QString("Failed to put/ update document %1: %2\n%3").arg(newOrEmptyDocId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
+            return setError(QString("Failed to put/ update document %1: %2\n%3").arg(newOrEmptyDocId).arg(query.lastError().text()).arg(query.lastQuery())) ? "" : "";
         query.prepare("DELETE FROM document_fields WHERE doc_id = :docId");
         query.bindValue(":docId", newOrEmptyDocId);
         if (!query.exec())
-            return setError(QString("Failed to delete document field %1: %2\n%3").arg(newOrEmptyDocId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
+            return setError(QString("Failed to delete document field %1: %2\n%3").arg(newOrEmptyDocId).arg(query.lastError().text()).arg(query.lastQuery())) ? "" : "";
+
+        createNewTransaction(newOrEmptyDocId);
+
     }
     else
     {
         if (newOrEmptyDocId.isEmpty())
             newOrEmptyDocId = QString("D-%1").arg(QUuid::createUuid().toString().mid(1).replace("}",""));
         if (!QRegExp("^[a-zA-Z0-9.%_-]+$").exactMatch(newOrEmptyDocId))
-            return setError(QString("Invalid docID %1").arg(newOrEmptyDocId)) ? -1 : -1;
+            return setError(QString("Invalid docID %1").arg(newOrEmptyDocId)) ? "" : "";
 
         query.prepare("INSERT INTO document (doc_id, doc_rev, content) VALUES (:docId, :docRev, :docJson)");
         query.bindValue(":docId", newOrEmptyDocId);
-        query.bindValue(":docRev", newRev);
+        query.bindValue(":docRev", revision_number);
         // Parse Variant from QML as JsonDocument, fallback to string
         QJsonDocument json(QJsonDocument::fromVariant(contents));
         query.bindValue(":docJson", json.isEmpty() ? contents : json.toJson());
         if (!query.exec())
-            return setError(QString("Failed to put document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? -1 : -1;
+            return setError(QString("Failed to put document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? "" : "";
+
+        createNewTransaction(newOrEmptyDocId);
     }
 
     beginResetModel();
@@ -350,8 +640,22 @@ Database::putDoc(QVariant contents, const QString& docId)
 
     Q_EMIT docChanged(newOrEmptyDocId, contents);
 
-    return newRev;
+    return revision_number;
 }
+
+/*!
+ * \brief Database::resetModel
+ *
+ * Resets the Database model.
+ */
+
+void Database::resetModel(){
+
+    beginResetModel();
+    endResetModel();
+
+}
+
 
 /*!
     Returns a list of all stored documents by their docId.
@@ -376,6 +680,7 @@ Database::listDocs()
         }
         return list;
     }
+
     return setError(QString("Failed to list documents: %1\n%2").arg(query.lastError().text()).arg(query.lastQuery())) ? list : list;
 }
 
@@ -400,6 +705,12 @@ Database::setPath(const QString& path)
     Q_EMIT pathChanged(path);
 }
 
+/*!
+ * \brief Database::getPath
+ *
+ * Simply returns the path of the database.
+ *
+ */
 QString
 Database::getPath()
 {
@@ -514,6 +825,76 @@ Database::getIndexKeys(const QString& indexName)
     while (query.next())
         list.append(query.value("value").toString());
     return list;
+}
+
+/* Handy functions for synchronization. */
+
+/*!
+ * \internal
+ * \brief Database::listTransactionsSince
+ *
+ * This lists transactions for the database since a particular generation number.
+ *
+ */
+
+QList<QString> Database::listTransactionsSince(int generation){
+
+    QList<QString> list;
+
+    if (!initializeIfNeeded())
+        return list;
+
+    QSqlQuery query(m_db.exec());
+
+    QString queryStmt = "SELECT generation, doc_id, transaction_id FROM transaction_log where generation > "+QString::number(generation);
+
+    if (query.exec(queryStmt))
+    {
+        while (query.next())
+        {
+            list.append(query.value("generation").toString()+"|"+query.value("doc_id").toString()+"|"+query.value("transaction_id").toString());
+        }
+
+        return list;
+
+    }
+
+    return list;
+
+}
+
+/*!
+ * \internal
+ * \brief Database::getSyncLogInfo
+ *
+ * Provides the information about previous synchronizations between the database and another (if any).
+ *
+ */
+
+QMap<QString,QVariant> Database::getSyncLogInfo(QMap<QString,QVariant> lastSyncInformation, QString uid, QString prefix){
+
+    if (!initializeIfNeeded())
+        return lastSyncInformation;
+
+    QString queryStmt = "SELECT known_transaction_id, known_generation FROM sync_log WHERE replica_uid = '"+uid +"'";
+
+    QSqlQuery query(m_db.exec());
+
+    if (query.exec(queryStmt))
+    {
+        while (query.next())
+        {
+            lastSyncInformation.insert(prefix + "_replica_generation", query.value(1).toInt());
+            lastSyncInformation.insert(prefix + "_replica_transaction_id",query.value(0).toString());
+            return lastSyncInformation;
+        }
+
+    }
+    else{
+        setError(query.lastError().text());
+    }
+
+    return lastSyncInformation;
 }
 
 QT_END_NAMESPACE_U1DB

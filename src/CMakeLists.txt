@@ -6,6 +6,7 @@ set(U1DB_QT_SRCS
     document.cpp
     index.cpp
     query.cpp
+    synchronizer.cpp
     )
 
 # Generated files
@@ -14,6 +15,7 @@ set(U1DB_QT_GENERATED
     moc_document.cpp
     moc_index.cpp
     moc_query.cpp
+    moc_synchronizer.cpp
     )
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${U1DB_QT_GENERATED}")
 
@@ -27,6 +29,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${Qt5Core_INCLUDE_DIRS}
+    ${Qt5Network_INCLUDE_DIRS}
     ${Qt5Sql_INCLUDE_DIRS}
     ${U1DB_INCLUDE_DIRS}
     )
@@ -35,6 +38,7 @@ add_library(${U1DB_QT_LIBNAME} SHARED ${U1DB_QT_SRCS} ${U1DB_QT_RCC})
 target_link_libraries(${U1DB_QT_LIBNAME}
     ${Qt5Core_LIBRARIES}
     ${Qt5Sql_LIBRARIES}
+    ${Qt5Network_LIBRARIES}
     ${U1DB_LDFLAGS}
     )
 
@@ -50,7 +54,7 @@ install(TARGETS ${U1DB_QT_LIBNAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 
-install(FILES global.h database.h document.h index.h query.h
+install(FILES global.h database.h document.h index.h query.h synchronizer.h
     DESTINATION ${INCLUDE_INSTALL_DIR}
     )
 

@@ -9,6 +9,7 @@ headers = ../src/database.h \
           ../src/document.h \
           ../src/index.h \
           ../src/query.h \
+          ../src/synchronizer.h \
           ../src/global.h
 Cpp.ignoretokens = Q_DECL_EXPORT \
                    Q_PROPERTY \
@@ -25,7 +26,8 @@ exampledirs = ../examples/u1db-qt-example-1 \
 ../examples/u1db-qt-example-2b \
 ../examples/u1db-qt-example-3 \
 ../examples/u1db-qt-example-4 \
-../examples/u1db-qt-example-5
+../examples/u1db-qt-example-5 \
+../examples/u1db-qt-example-6
 
 imagedirs = images 
 

@@ -52,6 +52,8 @@ public:
     QStringList getDocuments();
     QList<QVariant> getResults();
 
+    void resetModel();
+
 Q_SIGNALS:
     void indexChanged(Index* index);
     void queryChanged(QVariant query);

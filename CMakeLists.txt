@@ -8,11 +8,12 @@ set(CMAKE_AUTOMOC ON)
 include(FindPkgConfig)
 include(GNUInstallDirs)
 find_package(Qt5Core REQUIRED)
+find_package(Qt5Network REQUIRED)
 find_package(Qt5Sql REQUIRED)
 add_definitions(-DWITHQT5=1)
 
 set(U1DB_QT_LIBNAME u1db-qt5)
-set(QT_PKGCONFIG_DEPENDENCIES "Qt5Core Qt5Quick Qt5Sql")
+set(QT_PKGCONFIG_DEPENDENCIES "Qt5Core Qt5Network Qt5Quick Qt5Sql")
 set(QT_U1DB_PKGCONFIG_FILE lib${U1DB_QT_LIBNAME}.pc)
 
 # Build flags
@@ -42,4 +43,3 @@ configure_file (libu1db-qt.pc.in
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${QT_U1DB_PKGCONFIG_FILE}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
     )
-
