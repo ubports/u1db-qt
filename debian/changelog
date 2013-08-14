@@ -1,3 +1,14 @@
+u1db-qt (0.1.5+13.10.20130814.1-0ubuntu1) saucy; urgency=low
+
+  [ Kevin Wright ]
+  * This branch merges the latest trunk with the code for
+    synchronization of databases. (LP: #1184628)
+
+  [ Ubuntu daily release ]
+  * Automatic snapshot from revision 100
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 14 Aug 2013 14:30:45 +0000
+
 u1db-qt (0.1.5+13.10.20130807-0ubuntu1) saucy; urgency=low
 
   [ Christian Dywan ]
