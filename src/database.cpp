@@ -20,6 +20,9 @@
 #include <QDebug>
 #include <QSqlQuery>
 #include <QFile>
+#include <QFileInfo>
+#include <QStandardPaths>
+#include <QDir>
 #include <QSqlError>
 #include <QUuid>
 #include <QStringList>
@@ -110,7 +113,18 @@ Database::initializeIfNeeded(const QString& path)
 
     if (!m_db.isValid())
         return setError("QSqlDatabase error");
+
+    if (path != ":memory:" && QDir::isRelativePath(path)) {
+        QString dataPath(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+        QString absolutePath(QDir(dataPath).absoluteFilePath(path));
+        QString parent(QFileInfo(absolutePath).dir().path());
+        if (!QDir().mkpath(parent))
+            qWarning() << "Failed to make data folder" << parent;
+        m_db.setDatabaseName(absolutePath);
+    }
+    else
     m_db.setDatabaseName(path);
+
     if (!m_db.open())
         return setError(QString("Failed to open %1: %2").arg(path).arg(m_db.lastError().text()));
     if (!isInitialized())
@@ -686,8 +700,10 @@ Database::listDocs()
 
 /*!
     \property Database::path
-    A relative filename or absolute path to store documents
-    and indexes persistently on disk. By default documents are stored in memory.
+    A relative filename can be given to store the database in an app-specific
+    writable folder. This is recommended as it ensures to work with confinement.
+    If more control is needed absolute paths can be used.
+    By default everything is stored in memory.
  */
 void
 Database::setPath(const QString& path)
@@ -697,7 +713,6 @@ Database::setPath(const QString& path)
 
     beginResetModel();
     m_db.close();
-    // TODO: relative path
     initializeIfNeeded(path);
     endResetModel();
 
