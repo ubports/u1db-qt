@@ -148,7 +148,8 @@ TestCase {
         // We should get all documents
         workaroundQueryAndWait(defaultPhone)
         compare(defaultPhone.documents, ['1', '_', 'a'], 'uno')
-        compare(defaultPhone.results.length, 5, 'dos')
+        compare(defaultPhone.results.length, 3, 'dos')
+        compare(defaultPhone.results.length, defaultPhone.documents.length, 'puntos')
         // FIXME: compare(defaultPhone.results, [], 'dos')
         // These queries are functionally equivalent
         compare(defaultPhone.documents, allPhone.documents, 'tres')
@@ -176,6 +177,13 @@ TestCase {
         workaroundQueryAndWait(ivankaAllNamePhoneKeywords)
         workaroundQueryAndWait(ivankaAllNamePhone)
         // FIXME: compare(ivankaAllNamePhone.documents, ivankaAllNamePhoneKeywords.documents, 'tres')
+    }
+
+    function test_4_delete () {
+        compare(defaultPhone.documents, ['1', '_', 'a'], 'uno')
+        // Deleted aka empty documents should not be returned
+        gents.putDoc('', '_')
+        compare(defaultPhone.documents, ['1', 'a'], 'dos')
     }
 
 } }
