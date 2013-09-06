@@ -1,6 +1,6 @@
 project = U1Db-Qt
 description = U1Db-Qt plugin documentation
-url = http://developer.ubuntu.com/api/ubuntu-13.10/qml/u1db-qt5/
+url = http://developer.ubuntu.com/api/devel/ubuntu-13.10/qml/u1db-qt5/
 indexes = /usr/share/ubuntu-ui-toolkit/doc/html/ubuntuuserinterfacetoolkit.index
 
 sourcedirs = ../src \
