@@ -182,7 +182,7 @@ TestCase {
     function test_4_delete () {
         compare(defaultPhone.documents, ['1', '_', 'a'], 'uno')
         // Deleted aka empty documents should not be returned
-        gents.putDoc('', '_')
+        gents.removeDoc('_')
         compare(defaultPhone.documents, ['1', 'a'], 'dos')
     }
 
