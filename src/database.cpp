@@ -336,15 +336,6 @@ Database::getDoc(const QString& docId)
 }
 
 /*!
-    The increaseVectorClockRev(int oldRev) function is deprecated.
- */
-static int
-increaseVectorClockRev(int oldRev)
-{
-    return oldRev;
-}
-
-/*!
  * \internal
   This function creates a new revision number.
 
