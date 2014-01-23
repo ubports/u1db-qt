@@ -12,3 +12,6 @@ export DPKG_GENSYMBOLS_CHECK_LEVEL=4
 override_dh_auto_configure:
 	dh_auto_configure -- -DBUILD_DOCS=ON
 
+override_dh_auto_test:
+	sh tests/xvfb.sh dh_auto_test || exit $?
+
