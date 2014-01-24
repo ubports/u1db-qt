@@ -658,10 +658,10 @@ Database::putDoc(QVariant contents, const QString& docId)
 }
 
 /*!
-    Removes the document identified by \a docId.
+    Deletes the document identified by \a docId.
  */
 void
-Database::removeDoc(const QString& docId)
+Database::deleteDoc(const QString& docId)
 {
     putDoc(QString(), docId);
 }
