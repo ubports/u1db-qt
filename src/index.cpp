@@ -216,7 +216,7 @@ QStringList Index::appendResultsFromMap(QString docId, QStringList fieldsList, Q
 
         i.next();
 
-        if(fieldsList.count()>0){
+        if(!original_field.isEmpty()){
             current_field = original_field + "." + i.key();
         }
         else{
