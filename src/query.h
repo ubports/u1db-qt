@@ -69,8 +69,8 @@ private:
     void onDataInvalidated();
 
     void generateQueryResults();
-    bool iterateQueryList(QVariant query, QString field, QString value);
-    bool queryString(QString query, QString value);
+    bool iterateQueryList(QVariant query, QString field, QVariant value);
+    bool queryString(QString query, QVariant value);
     bool queryMap(QVariantMap map, QString value, QString field);
     bool queryField(QString field, QVariant value);
 };
