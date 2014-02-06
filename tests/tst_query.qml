@@ -130,6 +130,30 @@ TestCase {
     name: "U1dbDatabase"
     when: windowShown
 
+    function prettyJson(j) {
+        var A = JSON.stringify(j)
+        if (A['0'] && A != '{}') {
+            var A = '['
+            for(var i in j)
+                A += JSON.stringify(j[i]) + ','
+            A = A.substring(0, A.lastIndexOf(',')) + ']'
+        }
+        return A
+    }
+
+    function compare (a, b) {
+        /* Override built-in compare to:
+           Match different JSON for identical values (number hash versus list)
+           Produce readable output for all JSON values
+         */
+        if (a == b)
+            return
+        var A = prettyJson(a), B = prettyJson(b)
+        if (A != B) {
+            fail('%1 != %2 (%3 != %4)'.arg(A).arg(B).arg(JSON.stringify(a)).arg(JSON.stringify(b)))
+        }
+    }
+
     function workaroundQueryAndWait (buggyQuery) {
         var realQuery = buggyQuery.query;
         spyDocumentsChanged.target = buggyQuery
