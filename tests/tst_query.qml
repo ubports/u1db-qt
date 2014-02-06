@@ -44,7 +44,7 @@ Item {
     U1db.Document {
         database: gents
         docId: '_'
-        contents: { 'gents': [ { 'name': 'Ivanka', 'phone': 00321 }, ] }
+        contents: { 'misc': { 'software': 'linux', 'sports': [ 'basketball', 'hockey' ] }, 'date': '2014-01-01' , 'gents': [ { 'name': 'Ivanka', 'phone': 00321 }, ] }
     }
 
     U1db.Index {
@@ -59,6 +59,13 @@ Item {
         database: gents
         name: 'by-name-phone'
         expression: ['gents.name', 'gents.phone']
+    }
+
+    U1db.Index {
+        id: byDate
+        database: gents
+        name: 'by-date'
+        expression: ['date', 'sports', 'software']
     }
 
     U1db.Query {
@@ -118,6 +125,12 @@ Item {
         id: wrongQuery
         index: byNamePhone
         query: [{ 'name': 'Ivanka', 'phone': '*' }]
+    }
+
+    U1db.Query {
+        id: toplevelQuery
+        index: byDate
+        query: [{ 'date': '2014*', 'sports': 'basketball', 'software': 'linux' }]
     }
 
     SignalSpy {
@@ -201,6 +214,7 @@ TestCase {
         workaroundQueryAndWait(ivankaAllNamePhoneKeywords)
         workaroundQueryAndWait(ivankaAllNamePhone)
         // FIXME: compare(ivankaAllNamePhone.documents, ivankaAllNamePhoneKeywords.documents, 'tres')
+        compare(toplevelQuery.documents, ['_'])
     }
 
     function test_4_delete () {
