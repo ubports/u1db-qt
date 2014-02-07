@@ -1,6 +1,6 @@
 *** Building and installing ***
 
-cmake .; make
+cmake -DBUILD_DOCS=ON .; make
 sudo make install
 
 *** Test from the build folder ***
