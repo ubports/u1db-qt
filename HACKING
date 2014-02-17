@@ -4,7 +4,7 @@ Get the source:
     bzr branch lp:u1db-qt
 
 Build dependencies to have:
-    ubuntu-sdk-libs-dev, dbus-test-runner
+    ubuntu-sdk-libs-dev, dbus-test-runner, qtdeclarative5-test-plugin
 
 Build it:
     mkdir _build; cd _build; cmake .. -DBUILD_DOCS=ON
