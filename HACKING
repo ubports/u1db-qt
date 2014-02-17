@@ -1,7 +1,16 @@
 *** Building and installing ***
 
-cmake -DBUILD_DOCS=ON .; make
-sudo make install
+Get the source:
+    bzr branch lp:u1db-qt
+
+Build dependencies to have:
+    ubuntu-sdk-libs-dev, dbus-test-runner
+
+Build it:
+    cmake -DBUILD_DOCS=ON .; make
+    sudo make install
+
+Note: docs are optional but recommended as they must build when merging changes.
 
 *** Test from the build folder ***
 
