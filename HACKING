@@ -7,7 +7,8 @@ Build dependencies to have:
     ubuntu-sdk-libs-dev, dbus-test-runner
 
 Build it:
-    cmake -DBUILD_DOCS=ON .; make
+    mkdir _build; cd _build; cmake .. -DBUILD_DOCS=ON
+    make
     sudo make install
 
 Note: docs are optional but recommended as they must build when merging changes.
