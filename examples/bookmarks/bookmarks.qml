@@ -96,7 +96,7 @@ MainView {
                     text: i18n.tr('Delete')
                     onClicked: {
                         PopupUtils.close(detailsPop)
-                        db.putDoc('', bookmarksList.detailsDocId)
+                        db.deleteDoc(bookmarksList.detailsDocId)
                     }
                 }
             }
