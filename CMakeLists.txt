@@ -17,7 +17,7 @@ set(QT_PKGCONFIG_DEPENDENCIES "Qt5Core Qt5Network Qt5Quick Qt5Sql")
 set(QT_U1DB_PKGCONFIG_FILE lib${U1DB_QT_LIBNAME}.pc)
 
 # Build flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wundef -std=c++0x")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wundef -Werror -std=c++0x")
 add_definitions(-DQT_NO_KEYWORDS)
 # Disable building during install to avoid file permission chaos
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY 1)
