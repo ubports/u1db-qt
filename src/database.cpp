@@ -649,6 +649,15 @@ Database::putDoc(QVariant contents, const QString& docId)
 }
 
 /*!
+    Deletes the document identified by \a docId.
+ */
+void
+Database::deleteDoc(const QString& docId)
+{
+    putDoc(QString(), docId);
+}
+
+/*!
  * \brief Database::resetModel
  *
  * Resets the Database model.
