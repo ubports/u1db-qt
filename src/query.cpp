@@ -181,7 +181,6 @@ bool Query::queryField(QString field, QVariant value){
 
     bool match = false;
 
-    QString value_string = value.toString();
     QVariant query = getQuery();
     // * is the default if query is empty
     if (!query.isValid())
@@ -191,16 +190,16 @@ bool Query::queryField(QString field, QVariant value){
     if(typeName == "QString")
     {
         QString query_string = query.toString();
-        match = queryString(query_string, value_string);
+        match = queryString(query_string, value);
     }
     else if(typeName == "int")
     {
         QString query_string = query.toString();
-        match = queryString(query_string, value_string);
+        match = queryString(query_string, value);
     }
     else if(typeName == "QVariantList")
     {
-        match = iterateQueryList(query, field, value_string);
+        match = iterateQueryList(query, field, value);
     }
     else
     {
@@ -216,7 +215,7 @@ bool Query::queryField(QString field, QVariant value){
     \internal
     Loop through the query assuming it's a list.
  */
-bool Query::iterateQueryList(QVariant query, QString field, QString value)
+bool Query::iterateQueryList(QVariant query, QString field, QVariant value)
 {
 
     bool match = false;
@@ -232,7 +231,7 @@ bool Query::iterateQueryList(QVariant query, QString field, QString value)
 
         if(typeName == "QVariantMap")
         {
-            match = queryMap(j_value.toMap(), value, field);
+            match = queryMap(j_value.toMap(), value.toString(), field);
 
             if(match == true){
                 break;
@@ -263,8 +262,17 @@ bool Query::iterateQueryList(QVariant query, QString field, QString value)
     \internal
     Handle different types of string values including wildcards.
  */
-bool Query::queryString(QString query, QString value)
+bool Query::queryString(QString query, QVariant value)
 {
+
+    QString typeName = value.typeName();
+    if (typeName == "QVariantList") {
+        Q_FOREACH (QVariant value_string, value.toList()) {
+            if (queryString(query, value_string.toString()))
+                return true;
+        }
+        return false;
+    }
 
     bool match = false;
 
@@ -277,7 +285,7 @@ bool Query::queryString(QString query, QString value)
         else if(query.contains("*")){
             QStringList k_string_list = query.split("*");
             QString k_string = k_string_list[0];
-            match = value.startsWith(k_string,Qt::CaseSensitive);
+            match = value.toString().startsWith(k_string,Qt::CaseSensitive);
 
             return match;
 
