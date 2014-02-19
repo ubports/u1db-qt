@@ -336,15 +336,6 @@ Database::getDoc(const QString& docId)
 }
 
 /*!
-    The increaseVectorClockRev(int oldRev) function is deprecated.
- */
-static int
-increaseVectorClockRev(int oldRev)
-{
-    return oldRev;
-}
-
-/*!
  * \internal
   This function creates a new revision number.
 
@@ -655,6 +646,15 @@ Database::putDoc(QVariant contents, const QString& docId)
     Q_EMIT docChanged(newOrEmptyDocId, contents);
 
     return revision_number;
+}
+
+/*!
+    Deletes the document identified by \a docId.
+ */
+void
+Database::deleteDoc(const QString& docId)
+{
+    putDoc(QString(), docId);
 }
 
 /*!

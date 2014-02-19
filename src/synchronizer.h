@@ -125,8 +125,8 @@ Q_SIGNALS:
 
 private:
     //Q_DISABLE_COPY(Synchronizer)
-    Database* m_source;
     bool m_synchronize;
+    Database* m_source;
     bool m_resolve_to_source;
     QVariant m_targets;
     QList<QVariant> m_sync_output;

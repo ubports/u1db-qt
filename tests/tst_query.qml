@@ -44,7 +44,7 @@ Item {
     U1db.Document {
         database: gents
         docId: '_'
-        contents: { 'gents': [ { 'name': 'Ivanka', 'phone': 00321 }, ] }
+        contents: { 'misc': { 'software': 'linux', 'sports': [ 'basketball', 'hockey' ] }, 'date': '2014-01-01' , 'gents': [ { 'name': 'Ivanka', 'phone': 00321 }, ] }
     }
 
     U1db.Index {
@@ -59,6 +59,13 @@ Item {
         database: gents
         name: 'by-name-phone'
         expression: ['gents.name', 'gents.phone']
+    }
+
+    U1db.Index {
+        id: byDate
+        database: gents
+        name: 'by-date'
+        expression: ['date', 'sports', 'software']
     }
 
     U1db.Query {
@@ -120,6 +127,12 @@ Item {
         query: [{ 'name': 'Ivanka', 'phone': '*' }]
     }
 
+    U1db.Query {
+        id: toplevelQuery
+        index: byDate
+        query: [{ 'date': '2014*', 'sports': 'basketball', 'software': 'linux' }]
+    }
+
     SignalSpy {
         id: spyDocumentsChanged
         target: defaultPhone
@@ -129,6 +142,30 @@ Item {
 TestCase {
     name: "U1dbDatabase"
     when: windowShown
+
+    function prettyJson(j) {
+        var A = JSON.stringify(j)
+        if (A['0'] && A != '{}') {
+            var A = '['
+            for(var i in j)
+                A += JSON.stringify(j[i]) + ','
+            A = A.substring(0, A.lastIndexOf(',')) + ']'
+        }
+        return A
+    }
+
+    function compare (a, b) {
+        /* Override built-in compare to:
+           Match different JSON for identical values (number hash versus list)
+           Produce readable output for all JSON values
+         */
+        if (a == b)
+            return
+        var A = prettyJson(a), B = prettyJson(b)
+        if (A != B) {
+            fail('%1 != %2 (%3 != %4)'.arg(A).arg(B).arg(JSON.stringify(a)).arg(JSON.stringify(b)))
+        }
+    }
 
     function workaroundQueryAndWait (buggyQuery) {
         var realQuery = buggyQuery.query;
@@ -179,12 +216,13 @@ TestCase {
         workaroundQueryAndWait(ivankaAllNamePhoneKeywords)
         workaroundQueryAndWait(ivankaAllNamePhone)
         // FIXME: compare(ivankaAllNamePhone.documents, ivankaAllNamePhoneKeywords.documents, 'tres')
+        compare(toplevelQuery.documents, ['_'])
     }
 
     function test_4_delete () {
         compare(defaultPhone.documents, ['1', '_', 'a'], 'uno')
         // Deleted aka empty documents should not be returned
-        gents.putDoc('', '_')
+        gents.deleteDoc('_')
         compare(defaultPhone.documents, ['1', 'a'], 'dos')
     }
 
