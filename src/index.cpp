@@ -216,7 +216,7 @@ QStringList Index::appendResultsFromMap(QString docId, QStringList fieldsList, Q
 
         i.next();
 
-        if(fieldsList.count()>0){
+        if(!original_field.isEmpty()){
             current_field = original_field + "." + i.key();
         }
         else{
@@ -235,7 +235,7 @@ QStringList Index::appendResultsFromMap(QString docId, QStringList fieldsList, Q
         {
             fieldsList = getFieldsFromList(docId, fieldsList, value.toList(),current_field);
         }
-        else
+
         {
             if(m_expression.contains(current_field)==true){
                 results_map.insert(i.key(),value);
@@ -277,6 +277,10 @@ QStringList Index::getFieldsFromList(QString docId, QStringList fieldsList, QVar
         else if(value.userType()==9) // QVariantList
         {
             fieldsList = getFieldsFromList(docId, fieldsList, value.toList(),current_field);
+        }
+        else if(value.userType()==10) // QString
+        {
+            fieldsList.append(current_field);
         }
         else
         {

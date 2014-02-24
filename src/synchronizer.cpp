@@ -682,13 +682,12 @@ void Synchronizer::syncLocalToLocal(Database *sourceDb, QMap<QString,QVariant> t
 
     if(target.contains("id")){
         targetDb = (Database*)target["id"].value<QObject*>();
-    }
-
-    if(target.contains("target_query")){
+    } else if(target.contains("target_query")){
         targetQuery = (Query*)target["target_query"].value<QObject*>();
         targetIndex = targetQuery->getIndex();
         targetDb = targetIndex->getDatabase();
-    }
+    } else
+        targetDb = NULL;
 
     if(target.contains("source_query")){
         sourceQuery = (Query*)target["source_query"].value<QObject*>();

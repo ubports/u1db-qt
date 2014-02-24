@@ -49,6 +49,7 @@ public:
     QString getDocumentContents(const QString& docId);
     QVariant getDocUnchecked(const QString& docId) const;
     Q_INVOKABLE QString putDoc(QVariant newDoc, const QString& docID=QString());
+    Q_INVOKABLE void deleteDoc(const QString& docID);
     Q_INVOKABLE QList<QString> listDocs();
     Q_INVOKABLE QString lastError();
     Q_INVOKABLE QString putIndex(const QString& index_name, QStringList expressions);
