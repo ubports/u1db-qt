@@ -47,6 +47,12 @@ Item {
         contents: { 'misc': { 'software': 'linux', 'sports': [ 'basketball', 'hockey' ] }, 'date': '2014-01-01' , 'gents': [ { 'name': 'Ivanka', 'phone': 00321 }, ] }
     }
 
+    U1db.Document {
+        database: gents
+        docId: 'F'
+        contents: { 'details': { 'name': 'spy', 'type': 'hide', 'colour': 'blue' } }
+    }
+
     U1db.Index {
         id: byPhone
         database: gents
@@ -133,6 +139,24 @@ Item {
         query: [{ 'date': '2014*', 'sports': 'basketball', 'software': 'linux' }]
     }
 
+    U1db.Query {
+        id: queryOne
+        index: U1db.Index {
+            database: gents
+            expression: [ 'details.type' ]
+        }
+        query: [ 'show' ]
+    }
+
+    U1db.Query {
+        id: queryBoth
+        index: U1db.Index {
+            database: gents
+            expression: [ 'details.type', 'details.colour' ]
+        }
+        query: [ 'show', '*' ]
+    }
+
     SignalSpy {
         id: spyDocumentsChanged
         target: defaultPhone
@@ -154,7 +178,7 @@ TestCase {
         return A
     }
 
-    function compare (a, b) {
+    function compare (a, b, msg) {
         /* Override built-in compare to:
            Match different JSON for identical values (number hash versus list)
            Produce readable output for all JSON values
@@ -163,7 +187,7 @@ TestCase {
             return
         var A = prettyJson(a), B = prettyJson(b)
         if (A != B) {
-            fail('%1 != %2 (%3 != %4)'.arg(A).arg(B).arg(JSON.stringify(a)).arg(JSON.stringify(b)))
+            fail('%5%1 != %2 (%3 != %4)'.arg(A).arg(B).arg(JSON.stringify(a)).arg(JSON.stringify(b)).arg(msg ? msg + ': ' : ''))
         }
     }
 
@@ -224,5 +248,9 @@ TestCase {
         compare(defaultPhone.documents, ['1', 'a'], 'dos')
     }
 
+    function test_5_fields () {
+        compare(queryOne.documents, {}, 'one field')
+        compare(queryBoth.documents, {}, 'two fields')
+    }
 } }
 
