@@ -5,12 +5,7 @@ indexes = /usr/share/ubuntu-ui-toolkit/doc/html/ubuntuuserinterfacetoolkit.index
 
 sourcedirs = ../src \
              ../documentation
-headers = ../src/database.h \
-          ../src/document.h \
-          ../src/index.h \
-          ../src/query.h \
-          ../src/synchronizer.h \
-          ../src/global.h
+headerdirs = ../src/
 Cpp.ignoretokens = Q_DECL_EXPORT \
                    Q_PROPERTY \
                    QT_BEGIN_NAMESPACE_U1DB \

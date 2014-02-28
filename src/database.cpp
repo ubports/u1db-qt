@@ -37,13 +37,38 @@ QT_BEGIN_NAMESPACE_U1DB
 /*!
     \class Database
     \inmodule U1Db
-    \ingroup modules
+    \ingroup cpp
 
-    \brief The Database class implements the on-disk storage of an individual
-    U1DB database.
+    \brief The Database class implements on-disk storage for documents and indexes.
 
     Database can be used as a QAbstractListModel, delegates will then have access to \a docId and \a contents
     analogous to the properties of Document.
+*/
+
+/*!
+    \qmltype Database
+    \instantiates Database
+    \inqmlmodule U1Db 1.0
+    \ingroup modules
+
+    \brief Database implements on-disk storage for documents and indexes.
+
+    In a ListView the Database can be used as a model which includes all documents
+    in the database. For listing only a subset of documents Query can be used.
+
+    \qml
+    ListView {
+        model: Database {
+            id: myDatabase
+        }
+        delegate: ListItem.Subtitled {
+            text: docId
+            subText: contents.color
+        }
+    }
+    \endqml
+
+    \sa Query
 */
 
 /*!
@@ -84,7 +109,7 @@ Database::setError(const QString& error)
 }
 
 /*!
-    \property Database::error
+    \qmlproperty string Database::error
     The last error as a string if the last operation failed.
  */
 QString
@@ -302,6 +327,7 @@ Database::getDocumentContents(const QString& docId)
 
 
 /*!
+    \qmlmethod Variant Database::getDoc(string)
     Returns the contents of a document by \a docId in a form that QML recognizes
     as a Variant object, it's identical to Document::getContents() with the
     same \a docId.
@@ -480,7 +506,6 @@ void Database::updateSyncLog(bool insert, QString uid, QString generation, QStri
 
 /*!
  * \internal
- * \brief Database::updateDocRevisionNumber
  *
  * Whenever a document as added or modified it needs a new revision number.
  *
@@ -581,6 +606,7 @@ int Database::createNewTransaction(QString doc_id){
 }
 
 /*!
+    \qmlmethod string Database::putDoc(string)
     Updates the existing \a contents of the document identified by \a docId if
     there's no error.
     If no \a docId is given or \a docId is an empty string the \a contents will be
@@ -649,6 +675,7 @@ Database::putDoc(QVariant contents, const QString& docId)
 }
 
 /*!
+    \qmlmethod void Database::deleteDoc(string)
     Deletes the document identified by \a docId.
  */
 void
@@ -672,6 +699,7 @@ void Database::resetModel(){
 
 
 /*!
+    \qmlmethod list<string> Database::listDocs()
     Returns a list of all stored documents by their docId.
  */
 QList<QString>
@@ -699,7 +727,7 @@ Database::listDocs()
 }
 
 /*!
-    \property Database::path
+    \qmlproperty string Database::path
     A relative filename can be given to store the database in an app-specific
     writable folder. This is recommended as it ensures to work with confinement.
     If more control is needed absolute paths can be used.

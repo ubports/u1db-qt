@@ -32,15 +32,33 @@ QT_BEGIN_NAMESPACE_U1DB
 
 /*!
     \class Index
-    \inmodule U1Db
-    \ingroup modules
+    \inmodule U1db
+    \ingroup cpp
 
     \brief The Index class defines an index to be stored in the database and
     queried using Query. Changes in documents affected by the index also update
     the index in the database.
+*/
 
-    This is the declarative API equivalent of Database::putIndex() and
-    Database::getIndexExpressions().
+/*!
+    \qmltype Index
+    \instantiates Index
+    \inqmlmodule U1db 1.0
+    \ingroup modules
+
+    \brief An Index defines what fields can be filtered using Query.
+
+    Documents in the database will be included if they contain all fields in the expression.
+
+    \qml
+    Index {
+        database: myDatabase
+        name: 'colorIndex'
+        expression: [ 'color' ]
+    }
+    \endqml
+
+    \sa Query
 */
 
 /*!
@@ -71,7 +89,7 @@ Index::onDocChanged(const QString& docId, QVariant content)
 }
 
 /*!
-    \property Index::database
+    \qmlproperty Database Index::database
     Sets the Database to lookup documents from and store the index in. The
     dataInvalidated() signal will be emitted on all changes that could affect
     the index.
@@ -105,7 +123,7 @@ Index::getName()
 }
 
 /*!
-    \property Index::name
+    \qmlproperty string Index::name
     Sets the name used. Both an expression and a name must be specified
     for an index to be created.
  */
@@ -132,7 +150,7 @@ Index::getExpression()
 }
 
 /*!
-    \property Index::expression
+    \qmlproperty list<string> Index::expression
     Sets the expression used. Both an expression and a name must be specified
     for an index to be created.
 

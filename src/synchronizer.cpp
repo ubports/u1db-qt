@@ -33,10 +33,34 @@ QT_BEGIN_NAMESPACE_U1DB
 /*!
     \class Synchronizer
     \inmodule U1Db
-    \ingroup modules
+    \ingroup cpp
 
     \brief The Synchronizer class handles synchronizing between two databases.
+ */
 
+/*!
+    \qmltype Synchronizer
+    \instantiates Synchronizer
+    \inqmlmodule U1db 1.0
+    \ingroup modules
+
+    \brief Synchronizer handles synchronizing between two databases.
+
+    \qml
+        Synchronizer {
+            id: mySync
+            synchronize: false
+            source: myDatabase
+            targets: [ {
+                remote: true,
+                ip: "127.0.0.1",
+                port: 7777,
+                name: "example1.u1db",
+                resolve_to_source: true
+            } ]
+
+        }
+    \endqml
 */
 
 /*
@@ -49,20 +73,6 @@ QT_BEGIN_NAMESPACE_U1DB
     Create a new Synchronizer element, with an optional \a parent, usually by declaring it as a QML item.
 
     Synchronizer elements sync two databases together, a 'source' database and a remote or local 'target' database.
-
-    Example use in a QML application:
-
-    U1db.Synchronizer{
-        id: aSynchronizer
-        synchronize: false
-        source: aDatabase
-        targets: [{remote:true,
-        ip:"127.0.0.1",
-        port: 7777,
-        name:"example1.u1db",
-        resolve_to_source:true}]
-
-    }
 
     Short description of properties:
 
@@ -175,7 +185,8 @@ void Synchronizer::setSource(Database* source)
 
 
 /*!
- * \property Synchronizer::targets
+ * \qmlproperty Variant Synchronizer::targets
+ * \preliminary
  *
  * Sets meta-data for databases to be used during a synchronization session.
  *
@@ -226,7 +237,7 @@ void Synchronizer::setTargets(QVariant targets)
 }
 
 /*!
- * \property Synchronizer::synchronize
+ * \qmlproperty bool Synchronizer::synchronize
  */
 
 void Synchronizer::setSync(bool synchronize)
@@ -241,7 +252,7 @@ void Synchronizer::setSync(bool synchronize)
 
 
 /*!
- * \property Synchronizer::resolve_to_source
+ * \qmlproperty bool Synchronizer::resolve_to_source
  */
 
 void Synchronizer::setResolveToSource(bool resolve_to_source)
@@ -255,8 +266,6 @@ void Synchronizer::setResolveToSource(bool resolve_to_source)
 
 
 /*!
- * \fn void Synchronizer::setSyncOutput(QList<QVariant> sync_output)
- *
  * Sets the current value for the active session's \a sync_output.
  *
  */
@@ -271,7 +280,7 @@ void Synchronizer::setSyncOutput(QList<QVariant> sync_output)
 }
 
 /*!
- * \property Synchronizer::source
+ * \qmlproperty Database Synchronizer::source
  *
  *
  *  Returns a source Database.
@@ -329,7 +338,7 @@ bool Synchronizer::getResolveToSource(){
 }
 
 /*!
- * \property Synchronizer::sync_output
+ * \qmlproperty list<Variant> Synchronizer::sync_output
  * \brief Synchronizer::getSyncOutput
  *
  * Returns the output from a sync session. The list should contain numerous

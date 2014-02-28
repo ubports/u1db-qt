@@ -34,12 +34,42 @@ QT_BEGIN_NAMESPACE_U1DB
 /*!
     \class Query
     \inmodule U1db
-    \ingroup modules
+    \ingroup cpp
 
     \brief The Query class generates a filtered list of documents based on a query using the given Index.
 
     Query can be used as a QAbstractListModel, delegates will then have access to \a docId and \a contents
     analogous to the properties of Document.
+ */
+
+/*!
+    \qmltype Query
+    \instantiates Query
+    \inqmlmodule U1db 1.0
+    \ingroup modules
+
+    \brief Query filters documents based on the query and index.
+
+    In a ListView the Query can be used as a model.
+
+    \qml
+    ListView {
+        model: Query {
+            index: Index {
+                name: 'colorIndex'
+                expression: [ 'color' ]
+                database: myDatabase
+            }
+            query: [ 'blue' ]
+        }
+        delegate: ListItem.Subtitled {
+            text: docId
+            subText: contents.color
+        }
+    }
+    \endqml
+
+    \sa Index
 */
 
 /*!
@@ -335,7 +365,7 @@ bool Query::queryMap(QVariantMap map, QString value, QString field)
 }
 
 /*!
-    \property Query::index
+    \qmlproperty Index Query::index
     Sets the Index to use. The index must have a valid name and index expressions.
     If no query is set, the default is all results of the index.
  */
@@ -365,7 +395,7 @@ Query::getQuery()
 }
 
 /*!
-    \property Query::query
+    \qmlproperty Variant Query::query
     A query in one of the allowed forms:
     'value', ['value'] or [{'sub-field': 'value'}].
     The default is equivalent to '*'.
@@ -382,7 +412,7 @@ Query::setQuery(QVariant query)
 }
 
 /*!
-    \property Query::documents
+    \qmlproperty list<string> Query::documents
     The docId's of all matched documents.
  */
 QStringList
@@ -392,7 +422,7 @@ Query::getDocuments()
 }
 
 /*!
-    \property Query::results
+    \qmlproperty list<Variant> Query::results
     The results of the query as a list.
  */
 QList<QVariant>

@@ -33,12 +33,34 @@ QT_BEGIN_NAMESPACE_U1DB
 /*!
     \class Document
     \inmodule U1db
-    \ingroup modules
+    \ingroup cpp
 
     \brief The Document class proxies a single document stored in the Database.
+*/
+
+
+/*!
+    \qmltype Document
+    \instantiates Document
+    \inqmlmodule U1db 1.0
+    \ingroup modules
+
+    \brief Document proxies a single document stored in the Database.
 
     This is the declarative API equivalent of Database::putDoc() and
     Database::getDoc().
+
+    \qml
+    Document {
+        docId: 'myId'
+        defaults: {
+            color: 'blue'
+        }
+        create: true
+    }
+    \endqml
+
+    \sa Database
 */
 
 /*!
@@ -77,7 +99,7 @@ Document::onPathChanged(const QString& path)
 }
 
 /*!
-    \property Document::database
+    \qmlproperty Database Document::database
     The database is used to lookup the contents of the document, reflecting
     changes done to it and conversely changes are saved to the database.
  */
@@ -111,7 +133,7 @@ Document::getDocId()
 }
 
 /*!
-    \property Document::docId
+    \qmlproperty string Document::docId
     The docId can be that of an existing document in the database and
     will determine what getContents() returns.
     If no such documents exists, setDefaults() can be used to supply a preset.
@@ -139,7 +161,7 @@ Document::getCreate()
 }
 
 /*!
-    \property Document::create
+    \qmlproperty bool Document::create
     If create is true, docId is not empty and no document with the same docId
     exists, defaults will be used to store the document.
  */
@@ -163,7 +185,7 @@ Document::getDefaults()
 }
 
 /*!
-    \property Document::defaults
+    \qmlproperty Variant Document::defaults
     The default contents of the document, which are used only if
     create is true, docId is not empty and no document with the same
     docId exists in the database yet.
@@ -189,7 +211,7 @@ Document::getContents()
 }
 
 /*!
-    \property Document::contents
+    \qmlproperty Variant Document::contents
     Updates the contents of the document. A valid docId must be set.
  */
 void
