@@ -220,6 +220,8 @@ TestCase {
         // Results are also equivalent
         compare(defaultPhone.results.length, allPhoneKeywords.results.length , 'siete')
         compare(defaultPhone.results, allPhoneKeywords.results, 'seis')
+        // Results are whole contents
+        compare(defaultPhone.results[0], gents.getDoc(gents.listDocs()[0]))
     }
 
     function test_2_numbers () {
