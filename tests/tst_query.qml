@@ -53,6 +53,12 @@ Item {
         contents: { 'details': { 'name': 'spy', 'type': 'hide', 'colour': 'blue' } }
     }
 
+    U1db.Document {
+        database: gents
+        docId: 'G'
+        contents: { 'details': { 'name': 'kid', 'type': 'show', 'colour': 'green' } }
+    }
+
     U1db.Index {
         id: byPhone
         database: gents
@@ -143,6 +149,7 @@ Item {
         id: queryOne
         index: U1db.Index {
             database: gents
+            name: 'one'
             expression: [ 'details.type' ]
         }
         query: [ 'show' ]
@@ -152,6 +159,7 @@ Item {
         id: queryBoth
         index: U1db.Index {
             database: gents
+            name: 'both'
             expression: [ 'details.type', 'details.colour' ]
         }
         query: [ 'show', '*' ]
@@ -300,8 +308,8 @@ TestCase {
     }
 
     function test_5_fields () {
-        compare(queryOne.documents, {}, 'one field')
-        compare(queryBoth.documents, {}, 'two fields')
+        compare(queryOne.documents, ['G'], 'one field')
+        compare(queryBoth.documents, ['G'], 'two fields')
     }
 
     function test_6_definition () {
