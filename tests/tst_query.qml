@@ -308,7 +308,8 @@ TestCase {
         workaroundQueryAndWait(allHeroesWithType)
         compare(allHeroesWithType.documents, ['gokaiger', 'ooo'], 'ichi')
         workaroundQueryAndWait(allHeroesSeriesOnly)
-        compare(allHeroesWithType.documents, allHeroesSeriesOnly.documents, 'ni')
+        compare(allHeroesSeriesOnly.documents, ['gokaiger', 'ooo'], 'ni')
+        compare(allHeroesWithType.documents, allHeroesSeriesOnly.documents, 'doube-check')
         // Add a document with extra fields
         tokusatsu.putDoc(tokusatsuDocumentWizard.contents, tokusatsuDocumentWizard.docId)
         workaroundQueryAndWait(allHeroesWithType)
@@ -318,8 +319,7 @@ TestCase {
         // Add a document with mixed custom fields
         tokusatsu.putDoc(tokusatsuDocumentDino.contents, tokusatsuDocumentDino.docId)
         workaroundQueryAndWait(allHeroesWithType)
-        compare(allHeroesWithType.documents, ['gokaiger', 'ooo', 'wizard', 'dino'], 'go')
-        workaroundQueryAndWait(allHeroesSeriesOnly)
+        compare(allHeroesWithType.documents, ['dino', 'gokaiger', 'ooo', 'wizard'], 'go')
         compare(allHeroesWithType.documents, allHeroesSeriesOnly.documents, 'roku')
     }
 } }

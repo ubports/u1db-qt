@@ -135,10 +135,9 @@ void Query::generateQueryResults()
 
             j.next();
 
-            bool tmp_match = queryField(j.key(), j.value());
-
-            if(tmp_match == false){
+            if (!queryField(j.key(), j.value())) {
                 match = false;
+                break;
             }
 
         }
@@ -178,9 +177,6 @@ void Query::resetModel(){
     Query a single field.
  */
 bool Query::queryField(QString field, QVariant value){
-
-    bool match = false;
-
     QVariant query = getQuery();
     // * is the default if query is empty
     if (!query.isValid())
@@ -188,26 +184,18 @@ bool Query::queryField(QString field, QVariant value){
     QString typeName = query.typeName();
 
     if(typeName == "QString")
-    {
-        QString query_string = query.toString();
-        match = queryString(query_string, value);
-    }
+        return queryString(query.toString(), value);
     else if(typeName == "int")
-    {
-        QString query_string = query.toString();
-        match = queryString(query_string, value);
-    }
+        return queryString(query.toString(), value);
     else if(typeName == "QVariantList")
-    {
-        match = iterateQueryList(query, field, value);
-    }
+        return iterateQueryList(query, field, value);
     else
     {
         m_query = "";
         qWarning("u1db: Unexpected type %s for query", qPrintable(typeName));
     }
 
-    return match;
+    return true;
 
 }
 
@@ -217,9 +205,6 @@ bool Query::queryField(QString field, QVariant value){
  */
 bool Query::iterateQueryList(QVariant query, QString field, QVariant value)
 {
-
-    bool match = false;
-
     QList<QVariant> query_list = query.toList();
     QListIterator<QVariant> j(query_list);
 
@@ -231,21 +216,12 @@ bool Query::iterateQueryList(QVariant query, QString field, QVariant value)
 
         if(typeName == "QVariantMap")
         {
-            match = queryMap(j_value.toMap(), value.toString(), field);
-
-            if(match == true){
-                break;
-            }
-
+            if (!queryMap(j_value.toMap(), value.toString(), field))
+                return false;
         }
         else if(typeName == "QString"){
-
-            match = queryString(j_value.toString(), value);
-
-            if(match == true){
-                break;
-            }
-
+            if (!queryString(j_value.toString(), value))
+                return false;
         }
         else
         {
@@ -255,7 +231,23 @@ bool Query::iterateQueryList(QVariant query, QString field, QVariant value)
 
     }
 
-    return match;
+    return true;
+}
+
+/*!
+    \internal
+    Verify that query is an identical or wild card match.
+ */
+bool Query::queryMatchesValue(QString query, QString value)
+{
+    if (query == "*")
+        return true;
+    if (query == value)
+        return true;
+    if (!query.contains ("*"))
+       return false;
+    QString prefix(query.split("*")[0]);
+    return value.startsWith(prefix, Qt::CaseSensitive);
 }
 
 /*!
@@ -274,25 +266,7 @@ bool Query::queryString(QString query, QVariant value)
         return false;
     }
 
-    bool match = false;
-
-        if(query == "*"){
-            return true;
-        }
-        else if(query == value){
-            return true;
-        }
-        else if(query.contains("*")){
-            QStringList k_string_list = query.split("*");
-            QString k_string = k_string_list[0];
-            match = value.toString().startsWith(k_string,Qt::CaseSensitive);
-
-            return match;
-
-        }
-
-
-    return match;
+    return queryMatchesValue(query, value.toString());
 }
 
 /*!
@@ -301,9 +275,6 @@ bool Query::queryString(QString query, QVariant value)
  */
 bool Query::queryMap(QVariantMap map, QString value, QString field)
 {
-
-    bool match = false;
-
     QMapIterator<QString,QVariant> k(map);
 
     while(k.hasNext()){
@@ -315,23 +286,12 @@ bool Query::queryMap(QVariantMap map, QString value, QString field)
 
         if(field == k_key){
 
-            if(query == "*"){
-                return true;
-            }
-            else if(query == value){
-                return true;
-            }
-            else if(query.contains("*")){
-                QStringList k_string_list = query.split("*");
-                QString k_string = k_string_list[0];
-                match = value.startsWith(k_string,Qt::CaseSensitive);
-                return match;
-            }
-
+            if (!queryMatchesValue(query, value))
+                return false;
         }
     }
 
-    return match;
+    return true;
 }
 
 /*!
