@@ -157,6 +157,55 @@ Item {
         query: [ 'show', '*' ]
     }
 
+    U1db.Database {
+        id: tokusatsu
+    }
+
+    U1db.Document {
+        database: tokusatsu
+        docId: 'ooo'
+        contents: { 'series': 'ooo', 'type': 'rider' }
+    }
+
+    U1db.Document {
+        database: tokusatsu
+        docId: 'gokaiger'
+        contents: { 'series': 'gokaiger', 'type': 'sentai' }
+    }
+
+    U1db.Document {
+        id: tokusatsuDocumentWizard
+        docId: 'wizard'
+        contents: { 'series': 'wizard', 'type': 'rider',
+                    'transformations': ['Flame Style','Water Style'] }
+    }
+
+    U1db.Document {
+        id: tokusatsuDocumentDino
+        docId: 'dino'
+        contents: { 'series': 'zyuranger', 'scarf': false, 'type': 'sentai',
+                    'beasts': ['T-Rex', 'Mastodon'] }
+    }
+
+    U1db.Index {
+        id: bySeries
+        database: tokusatsu
+        name: 'by-series'
+        expression: ['series', 'type']
+    }
+
+    U1db.Query {
+        id: allHeroesWithType
+        index: bySeries
+        query: [{ 'series': '*' }, { 'type': '*' }]
+    }
+
+    U1db.Query {
+        id: allHeroesSeriesOnly
+        index: bySeries
+        query: [{ 'series': '*' }]
+    }
+
     SignalSpy {
         id: spyDocumentsChanged
         target: defaultPhone
@@ -253,6 +302,25 @@ TestCase {
     function test_5_fields () {
         compare(queryOne.documents, {}, 'one field')
         compare(queryBoth.documents, {}, 'two fields')
+    }
+
+    function test_6_definition () {
+        workaroundQueryAndWait(allHeroesWithType)
+        compare(allHeroesWithType.documents, ['gokaiger', 'ooo'], 'ichi')
+        workaroundQueryAndWait(allHeroesSeriesOnly)
+        compare(allHeroesWithType.documents, allHeroesSeriesOnly.documents, 'ni')
+        // Add a document with extra fields
+        tokusatsu.putDoc(tokusatsuDocumentWizard.contents, tokusatsuDocumentWizard.docId)
+        workaroundQueryAndWait(allHeroesWithType)
+        compare(allHeroesWithType.documents, ['gokaiger', 'ooo', 'wizard'], 'san')
+        workaroundQueryAndWait(allHeroesSeriesOnly)
+        compare(allHeroesWithType.documents, allHeroesSeriesOnly.documents, 'chi')
+        // Add a document with mixed custom fields
+        tokusatsu.putDoc(tokusatsuDocumentDino.contents, tokusatsuDocumentDino.docId)
+        workaroundQueryAndWait(allHeroesWithType)
+        compare(allHeroesWithType.documents, ['gokaiger', 'ooo', 'wizard', 'dino'], 'go')
+        workaroundQueryAndWait(allHeroesSeriesOnly)
+        compare(allHeroesWithType.documents, allHeroesSeriesOnly.documents, 'roku')
     }
 } }
 
