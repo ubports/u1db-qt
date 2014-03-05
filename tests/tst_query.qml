@@ -26,7 +26,6 @@ Item {
 
     U1db.Database {
         id: gents
-        path: 'aDatabaseU'
     }
 
     U1db.Document {
@@ -112,6 +111,12 @@ Item {
     U1db.Query {
         id: i12345Phone
         index: byPhone
+        query: [ { 'phone': 12345 } ]
+    }
+
+    U1db.Query {
+        id: i12345PhoneSimple
+        index: byPhone
         query: 12345
     }
 
@@ -123,6 +128,12 @@ Item {
 
     U1db.Query {
         id: ivankaAllNamePhone
+        index: byNamePhone
+        query: [ { name: 'Ivanka', phone: '*' } ]
+    }
+
+    U1db.Query {
+        id: ivankaAllNamePhoneSimple
         index: byNamePhone
         query: ['Ivanka', '*']
     }
@@ -146,6 +157,12 @@ Item {
     }
 
     U1db.Query {
+        id: toplevelQuerySimple
+        index: byDate
+        query: [ '2014*', 'basketball', 'linux' ]
+    }
+
+    U1db.Query {
         id: queryOne
         index: U1db.Index {
             database: gents
@@ -156,13 +173,23 @@ Item {
     }
 
     U1db.Query {
-        id: queryBoth
+        id: queryBothSimple
         index: U1db.Index {
             database: gents
             name: 'both'
             expression: [ 'details.type', 'details.colour' ]
         }
         query: [ 'show', '*' ]
+    }
+
+    U1db.Query {
+        id: queryBoth
+        index: U1db.Index {
+            database: gents
+            name: 'both'
+            expression: [ 'details.type', 'details.colour' ]
+        }
+        query: [ { type: 'show', colour: '*' } ]
     }
 
     U1db.Database {
@@ -235,7 +262,11 @@ TestCase {
         return A
     }
 
-    function compare (a, b, msg) {
+    function compareFail(a, b, msg) {
+        compare(a, b, msg, true)
+    }
+
+    function compare(a, b, msg, willFail) {
         /* Override built-in compare to:
            Match different JSON for identical values (number hash versus list)
            Produce readable output for all JSON values
@@ -244,8 +275,14 @@ TestCase {
             return
         var A = prettyJson(a), B = prettyJson(b)
         if (A != B) {
+            if (willFail) {
+                console.log('Expected failure: %1%2 != %3'.arg(msg ? msg + ': ' : '').arg(A).arg(B))
+                return
+            }
             fail('%5%1 != %2 (%3 != %4)'.arg(A).arg(B).arg(JSON.stringify(a)).arg(JSON.stringify(b)).arg(msg ? msg + ': ' : ''))
         }
+        if (willFail)
+            fail('Expected to fail, but passed: %5%1 != %2 (%3 != %4)'.arg(A).arg(B).arg(JSON.stringify(a)).arg(JSON.stringify(b)).arg(msg ? msg + ': ' : ''))
     }
 
     function workaroundQueryAndWait (buggyQuery) {
@@ -268,7 +305,6 @@ TestCase {
         compare(defaultPhone.documents, ['1', '_', 'a'], 'uno')
         compare(defaultPhone.results.length, 3, 'dos')
         compare(defaultPhone.results.length, defaultPhone.documents.length, 'puntos')
-        // FIXME: compare(defaultPhone.results, [], 'dos')
         // These queries are functionally equivalent
         compare(defaultPhone.documents, allPhone.documents, 'tres')
         compare(defaultPhone.documents, allPhoneList.documents, 'quatro')
@@ -286,18 +322,21 @@ TestCase {
         compare(s12345Phone.documents, ['1'], 'uno')
         // It's okay to mix strings and numerical values
         compare(s12345Phone.documents, i12345Phone.documents, 'dos')
+        compare(i12345PhoneSimple.documents, i12345Phone.documents, 'dos')
     }
 
     function test_3_wildcards () {
         // Trailing string wildcard
         compare(s1wildcardPhone.documents, ['1'], 'uno')
         // Last given field can use wildcards
-        // FIXME: compare(ivankaAllNamePhone.documents, ['_', 'a'], 'dos')
+        compareFail(ivankaAllNamePhoneSimple.documents, ['_', 'a'], 'dos')
+        compare(ivankaAllNamePhone.documents, ['_', 'a'], 'tres')
         // These queries are functionally equivalent
         workaroundQueryAndWait(ivankaAllNamePhoneKeywords)
         workaroundQueryAndWait(ivankaAllNamePhone)
-        // FIXME: compare(ivankaAllNamePhone.documents, ivankaAllNamePhoneKeywords.documents, 'tres')
+        compare(ivankaAllNamePhone.documents, ivankaAllNamePhoneKeywords.documents, 'tres')
         compare(toplevelQuery.documents, ['_'])
+        compareFail(toplevelQuerySimple.documents, ['_'], 'cinco')
     }
 
     function test_4_delete () {
@@ -309,6 +348,7 @@ TestCase {
 
     function test_5_fields () {
         compare(queryOne.documents, ['G'], 'one field')
+        compareFail(queryBothSimple.documents, ['G'], 'two fields')
         compare(queryBoth.documents, ['G'], 'two fields')
     }
 
