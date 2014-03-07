@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=AdvancedGame
+Exec=/usr/bin/qmlscene $@ /usr/share/AdvancedGame/AdvancedGame.qml
+Icon=qmlscene
+Terminal=false
+Type=Application
+X-Ubuntu-Touch=true
