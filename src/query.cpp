@@ -122,6 +122,34 @@ Query::onDataInvalidated()
 void Query::generateQueryResults()
 {
     QList<QVariantMap> results(m_index->getAllResults());
+
+    /* Convert "*" or 123 or "aa" into  a list */
+    /* Also convert ["aa", 123] into [{foo:"aa", bar:123}] */
+    QVariantList queryList(m_query.toList());
+    if (queryList.empty()) {
+        // * is the default if query is empty
+        if (!m_query.isValid())
+            queryList.append(QVariant(QString("*")));
+        else
+            queryList.append(m_query);
+    }
+    if (queryList.at(0).type() != QVariant::Map) {
+        QVariantList oldQueryList(queryList);
+        QListIterator<QVariant> j(oldQueryList);
+        QListIterator<QString> k(m_index->getExpression());
+        while(j.hasNext() && k.hasNext()) {
+            QVariant j_value = j.next();
+            QString k_value = k.next();
+            QVariantMap valueMap;
+            // Strip hierarchical components
+            if (k_value.contains("."))
+                valueMap.insert(k_value.split(".").last(), j_value);
+            else
+                valueMap.insert(k_value, j_value);
+            queryList.append(QVariant(valueMap));
+        }
+    }
+
     Q_FOREACH (QVariantMap mapIdResult, results) {
         QString docId((mapIdResult["docId"]).toString());
         QVariant result_variant(mapIdResult["result"]);
@@ -135,7 +163,7 @@ void Query::generateQueryResults()
 
             j.next();
 
-            if (!queryField(j.key(), j.value())) {
+            if (!iterateQueryList(queryList, j.key(), j.value())) {
                 match = false;
                 break;
             }
@@ -157,7 +185,6 @@ void Query::generateQueryResults()
 
     Q_EMIT documentsChanged(m_documents);
     Q_EMIT resultsChanged(m_results);
-
 }
 
 /*!
@@ -174,61 +201,22 @@ void Query::resetModel(){
 
 /*!
     \internal
-    Query a single field.
- */
-bool Query::queryField(QString field, QVariant value){
-    QVariant query = getQuery();
-    // * is the default if query is empty
-    if (!query.isValid())
-        query = QVariant(QString("*"));
-    QString typeName = query.typeName();
-
-    if(typeName == "QString")
-        return queryString(query.toString(), value);
-    else if(typeName == "int")
-        return queryString(query.toString(), value);
-    else if(typeName == "QVariantList")
-        return iterateQueryList(query, field, value);
-    else
-    {
-        m_query = "";
-        qWarning("u1db: Unexpected type %s for query", qPrintable(typeName));
-    }
-
-    return true;
-
-}
-
-/*!
-    \internal
     Loop through the query assuming it's a list.
+
+    For example:
+    queryList: { type: 'show' }
+    field: 'type'
+    value: 'show'
  */
-bool Query::iterateQueryList(QVariant query, QString field, QVariant value)
+bool Query::iterateQueryList(QVariantList queryList, QString field, QVariant value)
 {
-    QList<QVariant> query_list = query.toList();
-    QListIterator<QVariant> j(query_list);
+    QListIterator<QVariant> j(queryList);
 
     while (j.hasNext()) {
-
         QVariant j_value = j.next();
-
-        QString typeName = j_value.typeName();
-
-        if(typeName == "QVariantMap")
-        {
-            if (!queryMap(j_value.toMap(), value.toString(), field))
-                return false;
-        }
-        else if(typeName == "QString"){
-            if (!queryString(j_value.toString(), value))
-                return false;
-        }
-        else
-        {
-            m_query = "";
-            qWarning("u1db: Unexpected type %s for query", qPrintable(typeName));
-        }
-
+        QVariantMap valueMap(j_value.toMap());
+        if (!queryMap(valueMap, value.toString(), field))
+            return false;
     }
 
     return true;
@@ -272,6 +260,11 @@ bool Query::queryString(QString query, QVariant value)
 /*!
     \internal
     Loop through the given map of keys and queries.
+
+    For example:
+    map: { type: 'show' }
+    value: { 'show' }
+    field: 'type'
  */
 bool Query::queryMap(QVariantMap map, QString value, QString field)
 {
@@ -285,7 +278,6 @@ bool Query::queryMap(QVariantMap map, QString value, QString field)
         QString query = k_variant.toString();
 
         if(field == k_key){
-
             if (!queryMatchesValue(query, value))
                 return false;
         }

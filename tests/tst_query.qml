@@ -145,12 +145,6 @@ Item {
     }
 
     U1db.Query {
-        id: wrongQuery
-        index: byNamePhone
-        query: [{ 'name': 'Ivanka', 'phone': '*' }]
-    }
-
-    U1db.Query {
         id: toplevelQuery
         index: byDate
         query: [{ 'date': '2014*', 'sports': 'basketball', 'software': 'linux' }]
@@ -176,7 +170,7 @@ Item {
         id: queryBothSimple
         index: U1db.Index {
             database: gents
-            name: 'both'
+            name: 'bothSimple'
             expression: [ 'details.type', 'details.colour' ]
         }
         query: [ 'show', '*' ]
@@ -291,14 +285,6 @@ TestCase {
         spyDocumentsChanged.wait();
     }
 
-    function test_0_wrongUse () {
-        workaroundQueryAndWait(wrongQuery)
-        ignoreWarning('u1db: Unexpected type QVariantMap for query')
-        wrongQuery.query = { 'name': 'Ivanka' }
-        ignoreWarning('u1db: Unexpected type QObject* for query')
-        wrongQuery.query = defaultPhone
-    }
-
     function test_1_defaults () {
         // We should get all documents
         workaroundQueryAndWait(defaultPhone)
@@ -322,21 +308,21 @@ TestCase {
         compare(s12345Phone.documents, ['1'], 'uno')
         // It's okay to mix strings and numerical values
         compare(s12345Phone.documents, i12345Phone.documents, 'dos')
-        compare(i12345PhoneSimple.documents, i12345Phone.documents, 'dos')
+        compare(i12345PhoneSimple.documents, i12345Phone.documents, 'tres')
     }
 
     function test_3_wildcards () {
         // Trailing string wildcard
         compare(s1wildcardPhone.documents, ['1'], 'uno')
         // Last given field can use wildcards
-        compareFail(ivankaAllNamePhoneSimple.documents, ['_', 'a'], 'dos')
+        compare(ivankaAllNamePhoneSimple.documents, ['_', 'a'], 'dos')
         compare(ivankaAllNamePhone.documents, ['_', 'a'], 'tres')
         // These queries are functionally equivalent
         workaroundQueryAndWait(ivankaAllNamePhoneKeywords)
         workaroundQueryAndWait(ivankaAllNamePhone)
         compare(ivankaAllNamePhone.documents, ivankaAllNamePhoneKeywords.documents, 'tres')
         compare(toplevelQuery.documents, ['_'])
-        compareFail(toplevelQuerySimple.documents, ['_'], 'cinco')
+        compare(toplevelQuerySimple.documents, ['_'], 'cinco')
     }
 
     function test_4_delete () {
@@ -348,8 +334,8 @@ TestCase {
 
     function test_5_fields () {
         compare(queryOne.documents, ['G'], 'one field')
-        compareFail(queryBothSimple.documents, ['G'], 'two fields')
         compare(queryBoth.documents, ['G'], 'two fields')
+        compare(queryBothSimple.documents, ['G'], 'two fields simple')
     }
 
     function test_6_definition () {
