@@ -6,6 +6,9 @@ Get the source:
 Build dependencies to have:
     ubuntu-sdk-libs-dev, dbus-test-runner, qtdeclarative5-test-plugin
 
+    All of these can also be installed with one command:
+    sudo apt-get build-dep u1db-qt
+
 Build it:
     mkdir _build; cd _build; cmake ..
     make
