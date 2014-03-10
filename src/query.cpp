@@ -122,6 +122,34 @@ Query::onDataInvalidated()
 void Query::generateQueryResults()
 {
     QList<QVariantMap> results(m_index->getAllResults());
+
+    /* Convert "*" or 123 or "aa" into  a list */
+    /* Also convert ["aa", 123] into [{foo:"aa", bar:123}] */
+    QVariantList queryList(m_query.toList());
+    if (queryList.empty()) {
+        // * is the default if query is empty
+        if (!m_query.isValid())
+            queryList.append(QVariant(QString("*")));
+        else
+            queryList.append(m_query);
+    }
+    if (queryList.at(0).type() != QVariant::Map) {
+        QVariantList oldQueryList(queryList);
+        QListIterator<QVariant> j(oldQueryList);
+        QListIterator<QString> k(m_index->getExpression());
+        while(j.hasNext() && k.hasNext()) {
+            QVariant j_value = j.next();
+            QString k_value = k.next();
+            QVariantMap valueMap;
+            // Strip hierarchical components
+            if (k_value.contains("."))
+                valueMap.insert(k_value.split(".").last(), j_value);
+            else
+                valueMap.insert(k_value, j_value);
+            queryList.append(QVariant(valueMap));
+        }
+    }
+
     Q_FOREACH (QVariantMap mapIdResult, results) {
         QString docId((mapIdResult["docId"]).toString());
         QVariant result_variant(mapIdResult["result"]);
@@ -135,10 +163,9 @@ void Query::generateQueryResults()
 
             j.next();
 
-            bool tmp_match = queryField(j.key(), j.value());
-
-            if(tmp_match == false){
+            if (!iterateQueryList(queryList, j.key(), j.value())) {
                 match = false;
+                break;
             }
 
         }
@@ -158,7 +185,6 @@ void Query::generateQueryResults()
 
     Q_EMIT documentsChanged(m_documents);
     Q_EMIT resultsChanged(m_results);
-
 }
 
 /*!
@@ -175,87 +201,41 @@ void Query::resetModel(){
 
 /*!
     \internal
-    Query a single field.
+    Loop through the query assuming it's a list.
+
+    For example:
+    queryList: { type: 'show' }
+    field: 'type'
+    value: 'show'
  */
-bool Query::queryField(QString field, QVariant value){
+bool Query::iterateQueryList(QVariantList queryList, QString field, QVariant value)
+{
+    QListIterator<QVariant> j(queryList);
 
-    bool match = false;
-
-    QVariant query = getQuery();
-    // * is the default if query is empty
-    if (!query.isValid())
-        query = QVariant(QString("*"));
-    QString typeName = query.typeName();
-
-    if(typeName == "QString")
-    {
-        QString query_string = query.toString();
-        match = queryString(query_string, value);
-    }
-    else if(typeName == "int")
-    {
-        QString query_string = query.toString();
-        match = queryString(query_string, value);
-    }
-    else if(typeName == "QVariantList")
-    {
-        match = iterateQueryList(query, field, value);
-    }
-    else
-    {
-        m_query = "";
-        qWarning("u1db: Unexpected type %s for query", qPrintable(typeName));
+    while (j.hasNext()) {
+        QVariant j_value = j.next();
+        QVariantMap valueMap(j_value.toMap());
+        if (!queryMap(valueMap, value.toString(), field))
+            return false;
     }
 
-    return match;
-
+    return true;
 }
 
 /*!
     \internal
-    Loop through the query assuming it's a list.
+    Verify that query is an identical or wild card match.
  */
-bool Query::iterateQueryList(QVariant query, QString field, QVariant value)
+bool Query::queryMatchesValue(QString query, QString value)
 {
-
-    bool match = false;
-
-    QList<QVariant> query_list = query.toList();
-    QListIterator<QVariant> j(query_list);
-
-    while (j.hasNext()) {
-
-        QVariant j_value = j.next();
-
-        QString typeName = j_value.typeName();
-
-        if(typeName == "QVariantMap")
-        {
-            match = queryMap(j_value.toMap(), value.toString(), field);
-
-            if(match == true){
-                break;
-            }
-
-        }
-        else if(typeName == "QString"){
-
-            match = queryString(j_value.toString(), value);
-
-            if(match == true){
-                break;
-            }
-
-        }
-        else
-        {
-            m_query = "";
-            qWarning("u1db: Unexpected type %s for query", qPrintable(typeName));
-        }
-
-    }
-
-    return match;
+    if (query == "*")
+        return true;
+    if (query == value)
+        return true;
+    if (!query.contains ("*"))
+       return false;
+    QString prefix(query.split("*")[0]);
+    return value.startsWith(prefix, Qt::CaseSensitive);
 }
 
 /*!
@@ -274,36 +254,20 @@ bool Query::queryString(QString query, QVariant value)
         return false;
     }
 
-    bool match = false;
-
-        if(query == "*"){
-            return true;
-        }
-        else if(query == value){
-            return true;
-        }
-        else if(query.contains("*")){
-            QStringList k_string_list = query.split("*");
-            QString k_string = k_string_list[0];
-            match = value.toString().startsWith(k_string,Qt::CaseSensitive);
-
-            return match;
-
-        }
-
-
-    return match;
+    return queryMatchesValue(query, value.toString());
 }
 
 /*!
     \internal
     Loop through the given map of keys and queries.
+
+    For example:
+    map: { type: 'show' }
+    value: { 'show' }
+    field: 'type'
  */
 bool Query::queryMap(QVariantMap map, QString value, QString field)
 {
-
-    bool match = false;
-
     QMapIterator<QString,QVariant> k(map);
 
     while(k.hasNext()){
@@ -314,24 +278,12 @@ bool Query::queryMap(QVariantMap map, QString value, QString field)
         QString query = k_variant.toString();
 
         if(field == k_key){
-
-            if(query == "*"){
-                return true;
-            }
-            else if(query == value){
-                return true;
-            }
-            else if(query.contains("*")){
-                QStringList k_string_list = query.split("*");
-                QString k_string = k_string_list[0];
-                match = value.startsWith(k_string,Qt::CaseSensitive);
-                return match;
-            }
-
+            if (!queryMatchesValue(query, value))
+                return false;
         }
     }
 
-    return match;
+    return true;
 }
 
 /*!

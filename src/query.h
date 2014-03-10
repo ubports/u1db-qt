@@ -68,8 +68,10 @@ private:
 
     void onDataInvalidated();
 
+    bool debug();
     void generateQueryResults();
-    bool iterateQueryList(QVariant query, QString field, QVariant value);
+    bool iterateQueryList(QVariantList list, QString field, QVariant value);
+    bool queryMatchesValue(QString query, QString value);
     bool queryString(QString query, QVariant value);
     bool queryMap(QVariantMap map, QString value, QString field);
     bool queryField(QString field, QVariant value);
