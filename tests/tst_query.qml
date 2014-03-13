@@ -299,8 +299,11 @@ TestCase {
         // Results are also equivalent
         compare(defaultPhone.results.length, allPhoneKeywords.results.length , 'siete')
         compare(defaultPhone.results, allPhoneKeywords.results, 'seis')
-        // Results are whole contents
-        compare(defaultPhone.results[0], gents.getDoc(gents.listDocs()[0]))
+        // Results are lists of matching index fields with their values
+        var firstDocId = gents.listDocs()[0]
+        compare(defaultPhone.documents[0], firstDocId)
+        var firstContents = gents.getDoc(firstDocId)
+        compare(defaultPhone.results[0], {"phone": firstContents.gents[0].phone})
     }
 
     function test_2_numbers () {
