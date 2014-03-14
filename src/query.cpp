@@ -175,7 +175,7 @@ void Query::generateQueryResults()
             if (!m_documents.contains(docId) && result_variant.isValid())
             {
                 m_documents.append(docId);
-                m_results.append(m_index->getDatabase()->getDocUnchecked(docId));
+                m_results.append(result);
             }
         }
 
