@@ -1,3 +1,47 @@
+u1db-qt (0.1.5+14.04.20140313-0ubuntu1) trusty; urgency=low
+
+  [ CI bot ]
+  * No change rebuild against Qt 5.2.1.
+
+  [ Christian Dywan ]
+  * Adopt xvfb.sh script from ui toolkit to run tests
+  * Sort out build warnings and make them always fatal.
+  * Implement Database.removeDoc method and use it in unit test
+    Functionally this is equivalent to replacing the doc with an empty
+    one. (LP: #1243395)
+  * Use new-style qmlrunner log option to enable stdout.
+  * Query improvements and more advanced example. (LP: #1271977,
+    #1271972, #1266478)
+  * Store whole document contents in the results and unit test that.
+    (LP: #1271973)
+  * Reverse query logic to check non-matching and internally convert
+    between query syntaxes. (LP: #1284194, #1214538, #1215898)
+  * Revert r113 and update unit test to verify previous behavior
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 13 Mar 2014 23:12:40 +0000
+
+u1db-qt (0.1.5+14.04.20140306-0ubuntu1) trusty; urgency=low
+
+  [ CI bot ]
+  * No change rebuild against Qt 5.2.1.
+
+  [ Ubuntu daily release ]
+  * New rebuild forced
+
+  [ Christian Dywan ]
+  * Adopt xvfb.sh script from ui toolkit to run tests
+  * Sort out build warnings and make them always fatal.
+  * Implement Database.removeDoc method and use it in unit test
+    Functionally this is equivalent to replacing the doc with an empty
+    one. (LP: #1243395)
+  * Use new-style qmlrunner log option to enable stdout.
+  * Query improvements and more advanced example. (LP: #1271977,
+    #1271972, #1266478)
+  * Store whole document contents in the results and unit test that.
+    (LP: #1271973)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Thu, 06 Mar 2014 08:25:22 +0000
+
 u1db-qt (0.1.5+13.10.20130916-0ubuntu1) saucy; urgency=low
 
   [ Christian Dywan ]
@@ -66,19 +110,19 @@ u1db-qt (0.1.5) quantal; urgency=low
 u1db-qt (0.1.4) quantal; urgency=low
 
   * Add qch file for QtCreator to -dev package
- 
+
  -- Christian Dywan <christian.dywan@canonical.com>  Wed, 02 May 2013 14:21:33  -0700
 
 u1db-qt (0.1.3) quantal; urgency=low
 
   * Add QtCreator Application templates and plugins.qmltypes to -dev package
- 
+
  -- Christian Dywan <christian.dywan@canonical.com>  Wed, 01 May 2013 10:40:08  -0700
 
 u1db-qt (0.1.2) quantal; urgency=low
 
   * Documentation packages -doc and -examples
- 
+
  -- Christian Dywan <christian.dywan@canonical.com>  Tue, 23 Apr 2013 12:58:11  +0100
 
 u1db-qt (0.1.1-0ubuntu1) quantal; urgency=low
@@ -86,7 +130,7 @@ u1db-qt (0.1.1-0ubuntu1) quantal; urgency=low
   * Added .install files
   * Corrected dependencies
   * Drop obsolete -DWITHQT5=1 flag
- 
+
  -- Christian Dywan <christian.dywan@canonical.com>  Wed, 27 Mar 2013 12:37:06  +0100
 
 u1db-qt (0.1.1-0ubuntu0) quantal; urgency=low
@@ -97,5 +141,5 @@ u1db-qt (0.1.1-0ubuntu0) quantal; urgency=low
   * API subject to change
   * API not feature complete
   * Basic functionality is available, but does not yet meet the API specification and may still contain bugs
- 
+
  -- Kevin Wright <kevin.wright@canonical.com>  Tue, 12 Mar 2013 12:15:00  +0100
