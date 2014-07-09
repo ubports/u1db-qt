@@ -134,6 +134,11 @@ Database::initializeIfNeeded(const QString& path)
             QFile file(":/dbschema.sql");
             if (file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
+                if(!m_db.transaction())
+                {
+                    return setError(QString("Failed to start transaction:\n%1").arg(m_db.lastError().text()));
+                }
+
                 while (!file.atEnd())
                 {
                     QByteArray line = file.readLine();
@@ -151,6 +156,11 @@ Database::initializeIfNeeded(const QString& path)
                 // Double-check
                 if (query.boundValue(0).toString() != getReplicaUid())
                     return setError(QString("Invalid replica uid: %1").arg(query.boundValue(0).toString()));
+
+                if (!m_db.commit())
+                {
+                    return setError(QString("Failed commit:\n%1").arg(m_db.lastError().text()));
+                }
             }
             else
                 return setError(QString("Failed to read internal schema: FileError %1").arg(file.error()));
