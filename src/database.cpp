@@ -40,13 +40,16 @@ class ScopedTransaction
 {
 public:
     ScopedTransaction(QSqlDatabase &db) :
-            m_db(db), m_transaction(false)
+            m_db(db),
+            m_transaction(false)
     {
         m_transaction = m_db.transaction();
     }
 
-    ~ScopedTransaction() {
-        if (m_transaction) {
+    ~ScopedTransaction()
+    {
+        if (m_transaction)
+        {
             m_db.commit();
         }
     }
