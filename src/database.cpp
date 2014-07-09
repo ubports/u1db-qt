@@ -603,6 +603,11 @@ Database::putDoc(QVariant contents, const QString& docId)
     if (!initializeIfNeeded())
         return "";
 
+    if(!m_db.transaction())
+    {
+        return setError(QString("Failed to start transaction:\n%1").arg(m_db.lastError().text())) ? "" : "";
+    }
+
     QString newOrEmptyDocId(docId);
     QVariant oldDoc = newOrEmptyDocId.isEmpty() ? QVariant() : getDocUnchecked(newOrEmptyDocId);
 
@@ -644,6 +649,11 @@ Database::putDoc(QVariant contents, const QString& docId)
             return setError(QString("Failed to put document %1: %2\n%3").arg(docId).arg(query.lastError().text()).arg(query.lastQuery())) ? "" : "";
 
         createNewTransaction(newOrEmptyDocId);
+    }
+
+    if (!m_db.commit())
+    {
+        return setError(QString("Failed commit:\n%1").arg(m_db.lastError().text())) ? "" : "";
     }
 
     beginResetModel();
