@@ -1,3 +1,9 @@
+u1db-qt (0.1.5+14.04.20140313-0ubuntu2) trusty; urgency=medium
+
+  * No-change rebuild for shlib changes in qtbase and qtdeclarative.
+
+ -- Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>  Mon, 14 Apr 2014 13:45:06 -0300
+
 u1db-qt (0.1.5+14.04.20140313-0ubuntu1) trusty; urgency=low
 
   [ CI bot ]
