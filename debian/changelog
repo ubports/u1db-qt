@@ -1,3 +1,25 @@
+u1db-qt (0.1.5+14.10.20140716-0ubuntu1) utopic; urgency=low
+
+  [ Pete Woods ]
+  * Improve database init performance by adding transactions
+
+  [ Christian Dywan ]
+  * Adopt xvfb.sh script from ui toolkit to run tests
+  * Sort out build warnings and make them always fatal.
+  * Implement Database.removeDoc method and use it in unit test
+    Functionally this is equivalent to replacing the doc with an empty
+    one. (LP: #1243395)
+  * Use new-style qmlrunner log option to enable stdout.
+  * Query improvements and more advanced example. (LP: #1271977,
+    #1271972, #1266478)
+  * Store whole document contents in the results and unit test that.
+    (LP: #1271973)
+  * Reverse query logic to check non-matching and internally convert
+    between query syntaxes. (LP: #1284194, #1214538, #1215898)
+  * Revert r113 and update unit test to verify previous behavior
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Wed, 16 Jul 2014 07:52:34 +0000
+
 u1db-qt (0.1.5+14.04.20140313-0ubuntu2) trusty; urgency=medium
 
   * No-change rebuild for shlib changes in qtbase and qtdeclarative.
