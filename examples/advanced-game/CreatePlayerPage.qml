@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.0
+import QtQuick 2.2
 import Ubuntu.Components 1.1
 import U1db 1.0 as U1db
 
@@ -27,11 +27,11 @@ Page {
     visible: false
     title: i18n.tr("Create Player")
 
-    actions: [
+    head.actions: [
         Action {
             id: savePlayerAction
             text: i18n.tr("Save Player")
-            iconSource: "image://theme/save"
+            iconName: "save"
             onTriggered: {
                 appDb.putDoc({ "username": userName.text, "userlevel": userlevel.text, "userclass": userClass.selectedIndex})
                 pageStack.pop()
@@ -47,7 +47,7 @@ Page {
         Column {
             width: parent.width
             spacing: units.gu(1)
-            Label { text: "Username" }
+            Label { text: i18n.tr("Username") }
             TextField {
                 id: userName
                 placeholderText: "Username"
@@ -58,7 +58,7 @@ Page {
         Column {
             width: parent.width
             spacing: units.gu(1)
-            Label { text: "User Level" }
+            Label { text: i18n.tr("User Level") }
             TextField {
                 id: userlevel
                 placeholderText: "User Level"
@@ -69,15 +69,6 @@ Page {
         OptionSelector {
             id: userClass
             model: ["Foot Soldier", "Archer", "Giant", "Wizard", "Demolisher"]
-        }
-    }
-
-    tools: ToolbarItems {
-        id: toolbarSettings
-
-        ToolbarButton {
-            id: addPlayer
-            action: savePlayerAction
         }
     }
 }

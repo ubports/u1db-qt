@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.0
+import QtQuick 2.2
 import Ubuntu.Components 1.1
 
 // Import U1db to access its functions
@@ -40,11 +40,11 @@ MainView {
         path: "playerDatabase"
     }
 
-    // Common Toolbar action available to all pages
+    // Common Action available to all pages
     Action {
         id: addPlayerAction
         text: i18n.tr("Add Player")
-        iconSource: "image://theme/add"
+        iconName: "add"
         onTriggered: pagestack.push(Qt.resolvedUrl("CreatePlayerPage.qml"))
     }
 
@@ -55,7 +55,7 @@ MainView {
 
         Page {
             id: homePage
-            title: "Advanced Game :P"
+            title: i18n.tr("Advanced Game")
 
             head.actions: [
                 addPlayerAction
@@ -68,13 +68,13 @@ MainView {
 
                 Button {
                     width: parent.width
-                    text: "List Players"
+                    text: i18n.tr("List Players")
                     onClicked: pagestack.push(Qt.resolvedUrl("ListPlayers.qml"))
                 }
 
                 Button {
                     width: parent.width
-                    text: "Filter Players"
+                    text: i18n.tr("Filter Players")
                     onClicked: pagestack.push(Qt.resolvedUrl("FilterPlayers.qml"))
                 }
             }
