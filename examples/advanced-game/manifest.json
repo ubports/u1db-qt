@@ -1,7 +1,7 @@
 {
     "architecture": "all",
     "description": "description of AdvancedGame",
-    "framework": "ubuntu-sdk-13.10",
+    "framework": "ubuntu-sdk-14.10-qml-dev3",
     "hooks": {
         "AdvancedGame": {
             "apparmor": "AdvancedGame.json",
