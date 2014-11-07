@@ -33,29 +33,41 @@ class U1DBDatabaseTest : public QObject
 private Q_SLOTS:
     void initTestCase()
     {
-    }
-
-    void synchronizedTest()
-    {
         while(false)
             qApp->processEvents();
+    }
 
+    void testCanSetPath()
+    {
         Database db;
         QCOMPARE(db.getPath(), QString(""));
         QSignalSpy modelReset(&db, SIGNAL(pathChanged(const QString&)));
         QTemporaryFile file;
         db.setPath(file.fileName());
         QCOMPARE(db.getPath(), file.fileName());
+    }
 
+    void testCanSetIndex()
+    {
+        Database db;
         Index index;
         index.setDatabase(&db);
-        index.setName("py-phone-number");
-        index.setExpression(QStringList("managers.phone_number"));
+        index.setName("py-name-phone");
+        index.setExpression(QStringList() << "gents.name" << "gents.phone");
+    }
+
+    void testCanSetQuery()
+    {
+        Database db;
+        Index index;
+        index.setDatabase(&db);
+        index.setName("by-date");
+        index.setExpression(QStringList() << "date" << "sports" << "software");
 
         Query query;
         query.setIndex(&index);
-        query.setQuery("*");
-     }
+        query.setQuery(QStringList() << "2014*" << "basketball" << "linux");
+    }
 
     void cleanupTestCase()
     {
