@@ -20,7 +20,7 @@ target_link_libraries(test-database
     ${U1DB_QT_LIBNAME}
     )
 set_target_properties(test-database PROPERTIES COMPILE_FLAGS -fPIC)
-add_test(NAME test-database COMMAND "dbus-test-runner" "--task" "${CMAKE_CURRENT_BINARY_DIR}/test-database" "-p" "-xunitxml" "-p" "-o" "-p" "test-database-xunit.xml")
+add_test(NAME test-database COMMAND "dbus-test-runner" "--task" "${CMAKE_CURRENT_BINARY_DIR}/test-database" "-p" "-xunitxml" "-p" "-o" "-p" "test-database-xunit.xml" "-p" "-o" "-p" "-,txt")
 set_property(TEST test-database PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=.")
 set_property(TEST test-database PROPERTY ENVIRONMENT "QT_QPA_PLATFORM=minimal")
 add_dependencies(check test-database)
