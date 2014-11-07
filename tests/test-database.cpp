@@ -47,6 +47,19 @@ private Q_SLOTS:
         QCOMPARE(db.getPath(), file.fileName());
     }
 
+    void testNonExistingParentFolder()
+    {
+        Database db;
+        QTemporaryFile file("spamXXXXXX");
+        file.setAutoRemove(false);
+        QCOMPARE(file.open(), true);
+        QString subfolder(file.fileName() + "/eggs");
+        QFile::remove(file.fileName());
+        db.setPath(subfolder);
+        QCOMPARE(db.getPath(), subfolder);
+        QVERIFY(db.lastError().isEmpty());
+    }
+
     void testCanSetIndex()
     {
         Database db;
