@@ -145,11 +145,16 @@ Database::initializeIfNeeded(const QString& path)
         QString absolutePath(QDir(dataPath).absoluteFilePath(path));
         QString parent(QFileInfo(absolutePath).dir().path());
         if (!QDir().mkpath(parent))
-            qWarning() << "Failed to make data folder" << parent;
+            setError(QString("Failed to make data folder %1").arg(parent));
         m_db.setDatabaseName(absolutePath);
     }
     else
-    m_db.setDatabaseName(path);
+    {
+        QDir parent(QFileInfo(path).dir());
+        if (!parent.mkpath(parent.path()))
+            setError(QString("Failed to make parent folder %1").arg(parent.path()));
+        m_db.setDatabaseName(path);
+    }
 
     if (!m_db.open())
         return setError(QString("Failed to open %1: %2").arg(path).arg(m_db.lastError().text()));
