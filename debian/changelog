@@ -1,3 +1,10 @@
+u1db-qt (0.1.5+15.04.20141111~rtm-0ubuntu1) 14.09; urgency=low
+
+  [ Christian Dywan ]
+  * Create parent folder for full database path (LP: #1390166)
+
+ -- Ubuntu daily release <ps-jenkins@lists.canonical.com>  Tue, 11 Nov 2014 15:27:42 +0000
+
 u1db-qt (0.1.5+14.10.20140716-0ubuntu1) utopic; urgency=low
 
   [ Pete Woods ]
