@@ -34,6 +34,32 @@
 
 QT_BEGIN_NAMESPACE_U1DB
 
+namespace
+{
+class ScopedTransaction
+{
+public:
+    ScopedTransaction(QSqlDatabase &db) :
+            m_db(db),
+            m_transaction(false)
+    {
+        m_transaction = m_db.transaction();
+    }
+
+    ~ScopedTransaction()
+    {
+        if (m_transaction)
+        {
+            m_db.commit();
+        }
+    }
+
+    QSqlDatabase &m_db;
+
+    bool m_transaction;
+};
+}
+
 /*!
     \class Database
     \inmodule U1Db
@@ -144,11 +170,16 @@ Database::initializeIfNeeded(const QString& path)
         QString absolutePath(QDir(dataPath).absoluteFilePath(path));
         QString parent(QFileInfo(absolutePath).dir().path());
         if (!QDir().mkpath(parent))
-            qWarning() << "Failed to make data folder" << parent;
+            setError(QString("Failed to make data folder %1").arg(parent));
         m_db.setDatabaseName(absolutePath);
     }
     else
-    m_db.setDatabaseName(path);
+    {
+        QDir parent(QFileInfo(path).dir());
+        if (!parent.mkpath(parent.path()))
+            setError(QString("Failed to make parent folder %1").arg(parent.path()));
+        m_db.setDatabaseName(path);
+    }
 
     if (!m_db.open())
         return setError(QString("Failed to open %1: %2").arg(path).arg(m_db.lastError().text()));
@@ -159,6 +190,8 @@ Database::initializeIfNeeded(const QString& path)
             QFile file(":/dbschema.sql");
             if (file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
+                ScopedTransaction t(m_db);
+
                 while (!file.atEnd())
                 {
                     QByteArray line = file.readLine();
@@ -619,6 +652,8 @@ Database::putDoc(QVariant contents, const QString& docId)
     if (!initializeIfNeeded())
         return "";
 
+    ScopedTransaction t(m_db);
+
     QString newOrEmptyDocId(docId);
     QVariant oldDoc = newOrEmptyDocId.isEmpty() ? QVariant() : getDocUnchecked(newOrEmptyDocId);
 
@@ -777,6 +812,8 @@ Database::putIndex(const QString& indexName, QStringList expressions)
     if (!initializeIfNeeded())
         return QString("Database isn't ready");
 
+    ScopedTransaction t(m_db);
+
     QStringList results = getIndexExpressions(indexName);
     bool changed = false;
     Q_FOREACH (QString expression, expressions)
@@ -786,15 +823,24 @@ Database::putIndex(const QString& indexName, QStringList expressions)
         return QString("Index conflicts with existing index");
 
     QSqlQuery query(m_db.exec());
+    query.prepare("INSERT INTO index_definitions VALUES (:indexName, :offset, :field)");
+
+    QVariantList indexNameData;
+    QVariantList offsetData;
+    QVariantList fieldData;
     for (int i = 0; i < expressions.count(); ++i)
     {
-        query.prepare("INSERT INTO index_definitions VALUES (:indexName, :offset, :field)");
-        query.bindValue(":indexName", indexName);
-        query.bindValue(":offset", i);
-        query.bindValue(":field", expressions.at(i));
-        if (!query.exec())
-            return QString("Failed to insert index definition: %1\n%2").arg(m_db.lastError().text()).arg(query.lastQuery());
+        indexNameData << indexName;
+        offsetData << i;
+        fieldData << expressions.at(i);
     }
+    query.addBindValue(indexNameData);
+    query.addBindValue(offsetData);
+    query.addBindValue(fieldData);
+
+    if (!query.execBatch())
+        return QString("Failed to insert index definition: %1\n%2").arg(m_db.lastError().text()).arg(query.lastQuery());
+
     return QString();
 }
 
