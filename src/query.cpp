@@ -17,13 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
-#include <QSqlQuery>
-#include <QFile>
-#include <QSqlError>
-#include <QUuid>
 #include <QStringList>
-#include <QJsonDocument>
 
 #include "query.h"
 #include "database.h"

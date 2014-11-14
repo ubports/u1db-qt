@@ -21,7 +21,6 @@
 #define U1DB_DOCUMENT_H
 
 #include <QtCore/QObject>
-#include <QSqlDatabase>
 #include <QVariant>
 
 #include "database.h"

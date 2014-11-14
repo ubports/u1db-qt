@@ -21,7 +21,6 @@
 #define U1DB_INDEX_H
 
 #include <QtCore/QObject>
-#include <QSqlDatabase>
 #include <QStringList>
 
 #include "database.h"
