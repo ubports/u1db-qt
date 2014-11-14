@@ -134,11 +134,10 @@ Database::setError(const QString& error)
 }
 
 /*!
-    \fn QString Database::lastError()
+    \qmlproperty string Database::error
     The last error as a string if the last operation failed.
  */
 /*!
-    \qmlproperty string Database::error
     The last error as a string if the last operation failed.
  */
 QString
@@ -363,16 +362,15 @@ Database::getDocumentContents(const QString& docId)
 
 
 /*!
- * \fn QVariant Database::getDoc(const QString& docId)
- *  Returns the contents of a document by \a docId in a form that QML recognizes
- *  as a Variant object, it's identical to Document::getContents() with the
- *  same \a docId.
- */
-/*!
     \qmlmethod Variant Database::getDoc(string)
     Returns the contents of a document by \a docId in a form that QML recognizes
     as a Variant object, it's identical to Document::getContents() with the
     same \a docId.
+ */
+/*!
+ *  Returns the contents of a document by \a docId in a form that QML recognizes
+ *  as a Variant object, it's identical to Document::getContents() with the
+ *  same \a docId.
  */
 QVariant
 Database::getDoc(const QString& docId)
@@ -648,7 +646,7 @@ int Database::createNewTransaction(QString doc_id){
 }
 
 /*!
-    \fn QString Database::putDoc(QVariant contents, const QString& docId)
+    \qmlmethod string Database::putDoc(var, string)
     Updates the existing \a contents of the document identified by \a docId if
     there's no error.
     If no \a docId is given or \a docId is an empty string the \a contents will be
@@ -656,7 +654,6 @@ int Database::createNewTransaction(QString doc_id){
     Returns the new revision of the document, or -1 on failure.
  */
 /*!
-    \qmlmethod string Database::putDoc(var, string)
     Updates the existing \a contents of the document identified by \a docId if
     there's no error.
     If no \a docId is given or \a docId is an empty string the \a contents will be
@@ -727,11 +724,10 @@ Database::putDoc(QVariant contents, const QString& docId)
 }
 
 /*!
-    \fn void Database::deleteDoc(const QString& docId)
+    \qmlmethod void Database::deleteDoc(string)
     Deletes the document identified by \a docId.
  */
 /*!
-    \qmlmethod void Database::deleteDoc(string)
     Deletes the document identified by \a docId.
  */
 void
@@ -755,11 +751,10 @@ void Database::resetModel(){
 
 
 /*!
-    \fn QList<QString> Database::listDocs()
+    \qmlmethod list<string> Database::listDocs()
     Returns a list of all stored documents by their docId.
  */
 /*!
-    \qmlmethod list<string> Database::listDocs()
     Returns a list of all stored documents by their docId.
  */
 QList<QString>
@@ -787,14 +782,13 @@ Database::listDocs()
 }
 
 /*!
-    \fn void Database::setPath(const QString& path)
+    \qmlproperty string Database::path
     A relative \a path can be given to store the database in an app-specific
     writable folder. This is recommended as it ensures to work with confinement.
     If more control is needed absolute paths can be used.
     By default everything is stored in memory.
  */
 /*!
-    \qmlproperty string Database::path
     A relative \a path can be given to store the database in an app-specific
     writable folder. This is recommended as it ensures to work with confinement.
     If more control is needed absolute paths can be used.
@@ -816,10 +810,7 @@ Database::setPath(const QString& path)
 }
 
 /*!
- * \fn QString Database::getPath()
- *
  * Returns the path of the database.
- *
  */
 QString
 Database::getPath()

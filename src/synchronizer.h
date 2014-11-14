@@ -21,11 +21,8 @@
 #define U1DB_SYNCHRONIZER_H
 
 #include <QtCore/QObject>
-#include <QSqlDatabase>
 #include <QVariant>
-#include <QMetaType>
 #include <QtNetwork>
-#include <QNetworkAccessManager>
 
 
 #include "database.h"
@@ -37,13 +34,18 @@ QT_BEGIN_NAMESPACE_U1DB
 class Q_DECL_EXPORT Synchronizer : public QAbstractListModel {
     Q_OBJECT
 #ifdef Q_QDOC
+    /*! source */
     Q_PROPERTY(Database* source READ getSource WRITE setSource NOTIFY sourceChanged)   
 #else
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) source READ getSource WRITE setSource NOTIFY sourceChanged)  
 #endif
+    /*! synchronize */
     Q_PROPERTY(bool synchronize READ getSync WRITE setSync NOTIFY syncChanged)
+    /*! resolve_to_source */
     Q_PROPERTY(bool resolve_to_source READ getResolveToSource WRITE setResolveToSource NOTIFY resolveToSourceChanged)
+    /*! targets */
     Q_PROPERTY(QVariant targets READ getTargets WRITE setTargets NOTIFY targetsChanged)
+    /*! sync_output */
     Q_PROPERTY(QList<QVariant> sync_output READ getSyncOutput NOTIFY syncOutputChanged)
 
 public:

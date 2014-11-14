@@ -117,6 +117,9 @@ Query::rowCount(const QModelIndex & parent) const
     return m_results.count();
 }
 
+/*!
+    FIXME
+ */
 Index*
 Query::getIndex()
 {
@@ -312,8 +315,11 @@ bool Query::queryMap(QVariantMap map, QString value, QString field)
 
 /*!
     \qmlproperty Index Query::index
-    Sets the Index to use. The index must have a valid name and index expressions.
+    Sets the Index to use. \a index must have a valid name and index expressions.
     If no query is set, the default is all results of the index.
+ */
+/*!
+    FIXME \a index
  */
 void
 Query::setIndex(Index* index)
@@ -329,11 +335,12 @@ Query::setIndex(Index* index)
     }
     Q_EMIT indexChanged(index);
 
-
     onDataInvalidated();
-
 }
 
+/*!
+    FIXME
+ */
 QVariant
 Query::getQuery()
 {
@@ -345,6 +352,9 @@ Query::getQuery()
     A query in one of the allowed forms:
     'value', ['value'] or [{'sub-field': 'value'}].
     The default is equivalent to '*'.
+ */
+/*!
+    FIXME \a query
  */
 void
 Query::setQuery(QVariant query)
@@ -361,6 +371,9 @@ Query::setQuery(QVariant query)
     \qmlproperty list<string> Query::documents
     The docId's of all matched documents.
  */
+/*!
+    FIXME
+ */
 QStringList
 Query::getDocuments()
 {
@@ -370,6 +383,9 @@ Query::getDocuments()
 /*!
     \qmlproperty list<Variant> Query::results
     The results of the query as a list.
+ */
+/*!
+    FIXME
  */
 QList<QVariant>
 Query::getResults()

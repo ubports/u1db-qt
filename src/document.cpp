@@ -64,6 +64,9 @@ Document::Document(QObject *parent) :
 {
 }
 
+/*!
+   Returns the \l Database.
+ */
 Database*
 Document::getDatabase()
 {
@@ -91,8 +94,7 @@ Document::onPathChanged(const QString& path)
 }
 
 /*!
-    \qmlproperty Database Document::database
-    The database is used to lookup the contents of the document, reflecting
+    The \a database is used to lookup the contents of the document, reflecting
     changes done to it and conversely changes are saved to the database.
  */
 void
@@ -118,6 +120,9 @@ Document::setDatabase(Database* database)
     Q_EMIT databaseChanged(database);
 }
 
+/*!
+   Returns the docId.
+ */
 QString
 Document::getDocId()
 {
@@ -127,6 +132,11 @@ Document::getDocId()
 /*!
     \qmlproperty string Document::docId
     The docId can be that of an existing document in the database and
+    will determine what getContents() returns.
+    If no such documents exists, setDefaults() can be used to supply a preset.
+ */
+/*!
+    The \a docId can be that of an existing document in the database and
     will determine what getContents() returns.
     If no such documents exists, setDefaults() can be used to supply a preset.
  */
@@ -146,6 +156,9 @@ Document::setDocId(const QString& docId)
     }
 }
 
+/*!
+    Returns whether the document will be newly created if it doesn't exist.
+ */
 bool
 Document::getCreate()
 {
@@ -154,7 +167,11 @@ Document::getCreate()
 
 /*!
     \qmlproperty bool Document::create
-    If create is true, docId is not empty and no document with the same docId
+    If \a create is true, docId is not empty and no document with the same docId
+    exists, defaults will be used to store the document.
+ */
+/*!
+    If \a create is true, docId is not empty and no document with the same docId
     exists, defaults will be used to store the document.
  */
 void
@@ -170,6 +187,10 @@ Document::setCreate(bool create)
         m_database->putDoc(m_defaults, m_docId);
 }
 
+/*!
+    Returns the defaults to be used when the document is newly created
+    because it doesn't exist, if create is true.
+ */
 QVariant
 Document::getDefaults()
 {
@@ -177,11 +198,17 @@ Document::getDefaults()
 }
 
 /*!
-    \qmlproperty Variant Document::defaults
+    \qmlproperty Variant Document::content
     The default contents of the document, which are used only if
     create is true, docId is not empty and no document with the same
     docId exists in the database yet.
-    If the defaults change, it's up to the API user to handle it.
+    If the \a defaults change, it's up to the API user to handle it.
+ */
+/*!
+    The default contents of the document, which are used only if
+    create is true, docId is not empty and no document with the same
+    docId exists in the database yet.
+    If the \a defaults change, it's up to the API user to handle it.
  */
 void
 Document::setDefaults(QVariant defaults)
@@ -196,6 +223,9 @@ Document::setDefaults(QVariant defaults)
         m_database->putDoc(m_defaults, m_docId);
 }
 
+/*!
+    Returns the current contents of the document.
+ */
 QVariant
 Document::getContents()
 {
@@ -204,7 +234,10 @@ Document::getContents()
 
 /*!
     \qmlproperty Variant Document::contents
-    Updates the contents of the document. A valid docId must be set.
+    Updates the \a contents of the document. A valid docId must be set.
+ */
+/*!
+    Updates the \a contents of the document. A valid docId must be set.
  */
 void
 Document::setContents(QVariant contents)

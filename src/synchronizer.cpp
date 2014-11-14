@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
 #include <QSqlQuery>
 #include <QFile>
 #include <QSqlError>
@@ -162,12 +161,8 @@ Synchronizer::roleNames() const
     return roles;
 }
 
-
 /*!
-
-
-    Sets the source database.
-
+    Sets the \a source database.
  */
 void Synchronizer::setSource(Database* source)
 {
@@ -183,7 +178,6 @@ void Synchronizer::setSource(Database* source)
     Q_EMIT sourceChanged(source);
 }
 
-
 /*!
  * \qmlproperty Variant Synchronizer::targets
  * \preliminary
@@ -193,6 +187,7 @@ void Synchronizer::setSource(Database* source)
  * The QVariant is a list that can contain definitions for more than one database
  * to be used as a target. For example:
  *
+ * \code
  * targets: [{remote:true},
  *  {remote:true,
  *  ip:"127.0.0.1",
@@ -200,6 +195,7 @@ void Synchronizer::setSource(Database* source)
  *  name:"example1.u1db",
  *  resolve_to_source:true},
  *  {remote:"OK"}]
+ * \endcode
  *
  * The above example defines three databases. Two of the three definitions in the
  * example are invalid, the first ({remote:true}) and the third ({remote:"OK"}),
@@ -208,11 +204,13 @@ void Synchronizer::setSource(Database* source)
  * The second definition is a fully defined and valid definition for a local to
  * remote synchronization of two databases:
  *
+ * \code
  * {remote:true,
  *  ip:"127.0.0.1",
  *  port: 7777,
  *  name:"example1.u1db",
  *  resolve_to_source:true}
+ * \endcode
  *
  * 'remote' determines whether the database is on disk or located on a server.
  * 'ip' and 'port' for a server are used only when 'remote' is set to true
@@ -220,9 +218,10 @@ void Synchronizer::setSource(Database* source)
  *  Note: If 'remote' is false this is the relative/absolute file location.
  * 'resolve_to_source' determines whether to resolve conflicts automatically
  * in favor of the source (aka local) database's values or the target's.
- *
  */
-
+/*!
+ * FIXME \a targets
+ */
 void Synchronizer::setTargets(QVariant targets)
 {
 
@@ -238,8 +237,11 @@ void Synchronizer::setTargets(QVariant targets)
 
 /*!
  * \qmlproperty bool Synchronizer::synchronize
+ * FIXME
  */
-
+/*!
+ * FIXME \a synchronize
+ */
 void Synchronizer::setSync(bool synchronize)
 {
 
@@ -253,8 +255,14 @@ void Synchronizer::setSync(bool synchronize)
 
 /*!
  * \qmlproperty bool Synchronizer::resolve_to_source
+ *
+ * If true, conflicts during sync will be resolved in favor of the content
+ * from the source database.
  */
-
+/*!
+ * If \a resolve_to_source is true, conflicts during sync will be resolved in favor
+ * of the content from the source database.
+ */
 void Synchronizer::setResolveToSource(bool resolve_to_source)
 {
      if (m_resolve_to_source == resolve_to_source)
@@ -282,9 +290,10 @@ void Synchronizer::setSyncOutput(QList<QVariant> sync_output)
 /*!
  * \qmlproperty Database Synchronizer::source
  *
- *
- *  Returns a source Database.
- *
+ *  Returns the source \l Database.
+ */
+/*!
+    Returns the source \l Database.
  */
 Database* Synchronizer::getSource()
 {
@@ -292,54 +301,36 @@ Database* Synchronizer::getSource()
 }
 
 /*!
- * \brief Synchronizer::getTargets
- *
- *
  *  Returns meta-data for all target databases.
- *
  */
-
 QVariant Synchronizer::getTargets()
 {
      return m_targets;
 }
 
 /*!
- * \brief Synchronizer::getSync
- *
- *
  * Returns the current value of synchronize. If true then the synchronize
  * session is initiated.
  *
  * This should probaby always be set to false on application start up.
  * The application developer should use some trigger to switch it to true
  * when needed (e.g. button click).
- *
  */
-
 bool Synchronizer::getSync()
 {
      return m_synchronize;
 }
 
 /*!
- * \brief Synchronizer::getResolveToSource
- *
- *
- * If set to true, any document conflicts created during a sync session
- * will be resolved in favor of the content from the source database. If false
- * the content from the target database will replace the document content in
- * the source database.
- *
+ * Returns \b true if conflicts during sync will be resolved in favor of the content
+ * from the source database.
  */
-
 bool Synchronizer::getResolveToSource(){
     return m_resolve_to_source;
 }
 
 /*!
  * \qmlproperty list<Variant> Synchronizer::sync_output
- * \brief Synchronizer::getSyncOutput
  *
  * Returns the output from a sync session. The list should contain numerous
  * QVariantMaps, each of which will have various meta-data with informative
@@ -352,19 +343,18 @@ bool Synchronizer::getResolveToSource(){
  * The information can be used in any number of ways, such as on screen within an app,
  * testing, console output, logs and more. This is designed to be flexible enough that
  * the app developer can decide themselves how to best use the data.
- *
  */
-
+/*!
+ * FIXME
+ */
 QList<QVariant> Synchronizer::getSyncOutput(){
     return m_sync_output;
 }
 
 /*
-
  Below this line represents the class' more unique functionality.
  In other words, methods that do more than simply modify/retrieve
  an element's property values.
-
 */
 
 
@@ -372,7 +362,6 @@ QList<QVariant> Synchronizer::getSyncOutput(){
  * \brief Synchronizer::onSyncChanged
  *
  * The synchroization process begins here.
- *
  */
 
 void Synchronizer::onSyncChanged(bool synchronize){
@@ -455,12 +444,10 @@ emitted after the model has been reset.
  * \internal
  * \brief Synchronizer::getValidTargets
  *
- *
  * This method confirms that each sync target definition is valid, based
  * on predefined criteria contained in the validator and mandatory lists.
  *
  */
-
 QList<QVariant> Synchronizer::getValidTargets(QMap<QString,QString>validator, QList<QString>mandatory){
 
     QList<QVariant> sync_targets;
@@ -1027,7 +1014,7 @@ QString Synchronizer::getUidFromLocalDb(QString dbFileName)
                 return dbUid;
             }
             else{
-                qDebug() << query.lastError().text();
+                qWarning("u1db: %s", qPrintable(query.lastError().text()));
                 db.close();
                 return dbUid;
             }

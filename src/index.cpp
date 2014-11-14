@@ -64,6 +64,9 @@ Index::Index(QObject *parent) :
 {
 }
 
+/*!
+    Returns the \l Database to lookup documents from and store the index in.
+ */
 Database*
 Index::getDatabase()
 {
@@ -85,6 +88,11 @@ Index::onDocChanged(const QString& docId, QVariant content)
 /*!
     \qmlproperty Database Index::database
     Sets the Database to lookup documents from and store the index in. The
+    dataInvalidated() signal will be emitted on all changes that could affect
+    the index.
+ */
+/*!
+    Sets the \a database to lookup documents from and store the index in. The
     dataInvalidated() signal will be emitted on all changes that could affect
     the index.
  */
@@ -110,6 +118,9 @@ Index::setDatabase(Database* database)
 
 }
 
+/*!
+    Returns the name of the index. Both name and expression must be specified.
+ */
 QString
 Index::getName()
 {
@@ -119,6 +130,10 @@ Index::getName()
 /*!
     \qmlproperty string Index::name
     Sets the name used. Both an expression and a name must be specified
+    for an index to be created.
+ */
+/*!
+    Sets the \a name used. Both an expression and a name must be specified
     for an index to be created.
  */
 void
@@ -137,6 +152,9 @@ Index::setName(const QString& name)
     Q_EMIT nameChanged(name);
 }
 
+/*!
+    Returns the expression of the index. Both name and expression must be specified.
+ */
 QStringList
 Index::getExpression()
 {
@@ -149,7 +167,12 @@ Index::getExpression()
     for an index to be created.
 
     Also starts the process of creating the Index result list, which can then be queried or populate the Query model as is.
+ */
+/*!
+    Sets the \a expression used. Both an expression and a name must be specified
+    for an index to be created.
 
+    Also starts the process of creating the Index result list, which can then be queried or populate the Query model as is.
  */
 void
 Index::setExpression(QStringList expression)
@@ -201,7 +224,6 @@ void Index::generateIndexResults()
 /*!
    \internal
  */
-
 QList<QVariantMap> Index::getAllResults(){
     generateIndexResults();
     return m_results;
@@ -217,7 +239,6 @@ QList<QVariantMap> Index::getAllResults(){
  */
 QStringList Index::appendResultsFromMap(QString docId, QStringList fieldsList, QVariantMap current_section, QString current_field)
 {
-
     QMapIterator<QString, QVariant> i(current_section);
 
     QString original_field = current_field;
@@ -271,8 +292,6 @@ QStringList Index::appendResultsFromMap(QString docId, QStringList fieldsList, Q
  *This recursive method is used in conjuntion with Index::appendResultsFromMap, to aid in iterating through a document when an embedded list is found.
  *
  */
-
-
 QStringList Index::getFieldsFromList(QString docId, QStringList fieldsList, QVariantList current_section, QString current_field)
 {
 

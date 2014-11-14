@@ -30,11 +30,14 @@ QT_BEGIN_NAMESPACE_U1DB
 class Q_DECL_EXPORT Index : public QObject {
     Q_OBJECT
 #ifdef Q_QDOC
+    /*! database */
     Q_PROPERTY(Database* database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
 #else
     Q_PROPERTY(QT_PREPEND_NAMESPACE_U1DB(Database*) database READ getDatabase WRITE setDatabase NOTIFY databaseChanged)
 #endif
+    /*! name */
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
+    /*! expression */
     Q_PROPERTY(QStringList expression READ getExpression WRITE setExpression NOTIFY expressionChanged)
 public:
     Index(QObject* parent = 0);
@@ -48,8 +51,17 @@ public:
     QList<QVariantMap> getAllResults();
 
 Q_SIGNALS:
+    /*!
+        The database changed.
+     */
     void databaseChanged(Database* database);
+    /*!
+        The index name changed.
+     */
     void nameChanged(const QString& name);
+    /*!
+        The index expression changed.
+     */
     void expressionChanged(QVariant expression);
     /*!
         The database, an indexed document or the expressions changed.
