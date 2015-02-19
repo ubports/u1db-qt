@@ -626,6 +626,9 @@ Database::putDoc(QVariant contents, const QString& docId)
     if (!initializeIfNeeded())
         return "";
 
+    if (contents.canConvert<QVariantMap>())
+        contents = contents.value<QVariantMap>();
+
     ScopedTransaction t(m_db);
 
     QString newOrEmptyDocId(docId);
