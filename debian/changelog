@@ -1,3 +1,10 @@
+u1db-qt (0.1.5+15.04.20150220-0ubuntu1) vivid; urgency=medium
+
+  [ Albert Astals Cid ]
+  * Make tests pass with Qt 5.4 (LP: #1423473)
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Fri, 20 Feb 2015 10:26:14 +0000
+
 u1db-qt (0.1.5+15.04.20141111~rtm-0ubuntu1) 14.09; urgency=low
 
   [ Christian Dywan ]
