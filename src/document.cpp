@@ -172,6 +172,9 @@ Document::getDefaults()
 void
 Document::setDefaults(QVariant defaults)
 {
+    if (defaults.canConvert<QVariantMap>())
+        defaults = defaults.value<QVariantMap>();
+
     if (m_defaults == defaults)
         return;
 
@@ -195,6 +198,9 @@ Document::getContents()
 void
 Document::setContents(QVariant contents)
 {
+    if (contents.canConvert<QVariantMap>())
+        contents = contents.value<QVariantMap>();
+
     if (m_contents == contents)
         return;
 
