@@ -36,7 +36,7 @@ MainView {
     
     U1db.Database {
         id: aDatabase
-        path: "aDatabase1"
+        path: "file:///tmp/aDatabase1.db";
     }
     
     /*!

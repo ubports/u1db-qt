@@ -82,6 +82,7 @@ private:
     QString m_error;
 
     QString getReplicaUid();
+    QString sanitizePath(const QString& path);
     bool isInitialized();
     bool initializeIfNeeded(const QString& path=":memory:");
     bool setError(const QString& error);

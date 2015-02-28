@@ -24,6 +24,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QSqlError>
+#include <QUrl>
 #include <QUuid>
 #include <QStringList>
 #include <QJsonDocument>
@@ -82,6 +83,19 @@ Database::getReplicaUid()
     if (!query.lastError().isValid() && query.next())
         return query.value(0).toString();
     return setError(QString("Failed to get replica UID: %1\n%2").arg(query.lastError().text()).arg(query.lastQuery())) ? QString() : QString();
+}
+
+/*!
+    Sanitize path
+ */
+QString Database::sanitizePath(const QString &path)
+{
+    QUrl url(path);
+
+    if (url.isValid() && url.isLocalFile())
+        return url.path();
+
+    return path;
 }
 
 /*!
@@ -746,16 +760,18 @@ Database::listDocs()
 void
 Database::setPath(const QString& path)
 {
-    if (m_path == path)
+    const QString& parsed_path = sanitizePath(path);
+
+    if (m_path == parsed_path)
         return;
 
     beginResetModel();
     m_db.close();
-    initializeIfNeeded(path);
+    initializeIfNeeded(parsed_path);
     endResetModel();
 
-    m_path = path;
-    Q_EMIT pathChanged(path);
+    m_path = parsed_path;
+    Q_EMIT pathChanged(m_path);
 }
 
 /*!

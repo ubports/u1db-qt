@@ -47,6 +47,16 @@ private Q_SLOTS:
         QCOMPARE(db.getPath(), file.fileName());
     }
 
+    void testCanSetPathUsingQUrl()
+    {
+        Database db;
+        QCOMPARE(db.getPath(), QString(""));
+        QSignalSpy modelReset(&db, SIGNAL(pathChanged(const QString&)));
+        QTemporaryFile file;
+        db.setPath(QUrl::fromLocalFile(file.fileName()).toString());
+        QCOMPARE(db.getPath(), file.fileName());
+    }
+
     void testNonExistingParentFolder()
     {
         Database db;
