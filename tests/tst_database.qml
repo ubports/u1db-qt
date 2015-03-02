@@ -127,13 +127,12 @@ TestCase {
             myDatabase.putDoc({'foo': 'bar'} ,'dl' + Number(i).toLocaleString())
         myDatabase.path = ":memory:"
         spyPathChanged.wait()
-        compare(myDatabase.listDocs(), [])
-        compare(myList.count, 0)
+        compare(myList.count, 2)
         myDatabase.first_row_loaded = false
         myDatabase.last_row_loaded = false
         myDatabase.path = path
         spyPathChanged.wait()
-        compare(myList.count, 100)
+        compare(myList.count, 102)
         spyDocLoaded.wait()
         // FIXME compare(myDatabase.first_row_loaded, true)
         // FIXME compare(myDatabase.last_row_loaded, false)
