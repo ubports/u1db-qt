@@ -71,6 +71,13 @@ Document::onPathChanged(const QString& path)
 {
     if (!m_docId.isEmpty())
     {
+        if (m_create && m_defaults.isValid())
+        {
+            // Make sure we create defaults on new path
+            m_create = false;
+            setCreate(true);
+        }
+
         m_contents = m_database->getDocUnchecked(m_docId);
         Q_EMIT contentsChanged(m_contents);
     }
