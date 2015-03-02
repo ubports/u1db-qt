@@ -36,7 +36,7 @@ MainView {
 
     U1db.Database {
         id: aDatabase
-        path: "aDatabase2b"
+        path: Qt.resolvedUrl("aDatabase2b")
     }
     
     /*!

@@ -27,7 +27,7 @@ MainView {
 
         U1db.Database {
             id: aDatabase
-            path: "aDatabase5"
+            path: Qt.resolvedUrl("aDatabase5")
         }
 
        U1db.Document {
