@@ -78,6 +78,15 @@ Document::onPathChanged(const QString& path)
             setCreate(true);
         }
 
+        if (m_contents.isValid() && m_database && !m_docId.isEmpty())
+        {
+            if (!m_database->getDocUnchecked(m_docId).isValid())
+            {
+                // Put current contents on new database
+                m_database->putDoc(m_contents, m_docId);
+            }
+        }
+
         m_contents = m_database->getDocUnchecked(m_docId);
         Q_EMIT contentsChanged(m_contents);
     }
