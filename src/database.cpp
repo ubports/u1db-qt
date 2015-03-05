@@ -174,7 +174,7 @@ Database::initializeIfNeeded(const QString& path)
     m_db.setDatabaseName(path);
 
     if (!m_db.open())
-        return setError(QString("Failed to open %1: %2").arg(path).arg(m_db.lastError().text()));
+        return setError(QString("Failed to open '%1`: %2").arg(path).arg(m_db.lastError().text()));
     if (!isInitialized())
     {
         if (!isInitialized())

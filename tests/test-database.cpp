@@ -43,6 +43,7 @@ private Q_SLOTS:
         QCOMPARE(db.getPath(), QString(""));
         QSignalSpy modelReset(&db, SIGNAL(pathChanged(const QString&)));
         QTemporaryFile file;
+        QCOMPARE(file.open(), true);
         db.setPath(file.fileName());
         QCOMPARE(db.getPath(), file.fileName());
     }
@@ -53,8 +54,10 @@ private Q_SLOTS:
         QCOMPARE(db.getPath(), QString(""));
         QSignalSpy modelReset(&db, SIGNAL(pathChanged(const QString&)));
         QTemporaryFile file;
-        db.setPath(QUrl::fromLocalFile(file.fileName()).toString());
-        QCOMPARE(db.getPath(), file.fileName());
+        QCOMPARE(file.open(), true);
+        QString url = QUrl::fromLocalFile(file.fileName()).toString();
+        db.setPath(url);
+        QCOMPARE(db.getPath(), url);
     }
 
     void testNonExistingParentFolder()
