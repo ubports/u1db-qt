@@ -46,6 +46,21 @@ private Q_SLOTS:
         QCOMPARE(file.open(), true);
         db.setPath(file.fileName());
         QCOMPARE(db.getPath(), file.fileName());
+        QVERIFY(db.lastError().isEmpty());
+    }
+
+    void testCanSetEmptyPath()
+    {
+        Database db;
+        QCOMPARE(db.getPath(), QString());
+        QSignalSpy modelReset(&db, SIGNAL(pathChanged(const QString&)));
+        QTemporaryFile file;
+        QCOMPARE(file.open(), true);
+        db.setPath(file.fileName());
+        QCOMPARE(db.getPath(), file.fileName());
+        db.setPath("");
+        QCOMPARE(db.getPath(), QString());
+        QVERIFY(db.lastError().isEmpty());
     }
 
     void testCanSetPathUsingQUrl()

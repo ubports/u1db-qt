@@ -95,6 +95,9 @@ QString Database::sanitizePath(const QString& path)
     if (path == Database::MEMORY_PATH)
         return path;
 
+    if (!path.count())
+        return Database::MEMORY_PATH;
+
     QUrl url(path);
 
     if (url.isValid() && url.isLocalFile())
