@@ -35,6 +35,8 @@
 
 QT_BEGIN_NAMESPACE_U1DB
 
+const QString Database::MEMORY_PATH = ":memory:";
+
 namespace
 {
 class ScopedTransaction
@@ -90,7 +92,7 @@ Database::getReplicaUid()
  */
 QString Database::sanitizePath(const QString& path)
 {
-    if (path == ":memory:")
+    if (path == Database::MEMORY_PATH)
         return path;
 
     QUrl url(path);
@@ -164,7 +166,7 @@ Database::initializeIfNeeded(const QString& path)
     if (!m_db.isValid())
         return setError("QSqlDatabase error");
 
-    if (path != ":memory:")
+    if (path != Database::MEMORY_PATH)
     {
         QDir parent(QFileInfo(path).dir());
         if (!parent.mkpath(parent.path()))
