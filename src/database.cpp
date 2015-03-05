@@ -88,12 +88,22 @@ Database::getReplicaUid()
 /*!
     Sanitize path
  */
-QString Database::sanitizePath(const QString &path)
+QString Database::sanitizePath(const QString& path)
 {
+    if (path == ":memory:")
+        return path;
+
     QUrl url(path);
 
     if (url.isValid() && url.isLocalFile())
+    {
         return url.path();
+    }
+    else if (QDir::isRelativePath(path))
+    {
+        QString dataPath(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+        return QDir(dataPath).absoluteFilePath(path);
+    }
 
     return path;
 }
@@ -154,21 +164,14 @@ Database::initializeIfNeeded(const QString& path)
     if (!m_db.isValid())
         return setError("QSqlDatabase error");
 
-    if (path != ":memory:" && QDir::isRelativePath(path)) {
-        QString dataPath(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
-        QString absolutePath(QDir(dataPath).absoluteFilePath(path));
-        QString parent(QFileInfo(absolutePath).dir().path());
-        if (!QDir().mkpath(parent))
-            setError(QString("Failed to make data folder %1").arg(parent));
-        m_db.setDatabaseName(absolutePath);
-    }
-    else
+    if (path != ":memory:")
     {
         QDir parent(QFileInfo(path).dir());
         if (!parent.mkpath(parent.path()))
             setError(QString("Failed to make parent folder %1").arg(parent.path()));
-        m_db.setDatabaseName(path);
     }
+
+    m_db.setDatabaseName(path);
 
     if (!m_db.open())
         return setError(QString("Failed to open %1: %2").arg(path).arg(m_db.lastError().text()));
@@ -760,17 +763,15 @@ Database::listDocs()
 void
 Database::setPath(const QString& path)
 {
-    const QString& parsed_path = sanitizePath(path);
-
-    if (m_path == parsed_path)
+    if (m_path == path)
         return;
 
     beginResetModel();
     m_db.close();
-    initializeIfNeeded(parsed_path);
+    initializeIfNeeded(sanitizePath(path));
     endResetModel();
 
-    m_path = parsed_path;
+    m_path = path;
     Q_EMIT pathChanged(m_path);
 }
 
