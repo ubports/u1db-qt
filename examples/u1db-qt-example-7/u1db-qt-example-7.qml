@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Canonical, Ltd.
+ * Copyright (C) 2015 Canonical, Ltd.
  *
  * Authors:
  *  Marco Trevisan <marco.trevisan@canonical.com>
@@ -25,47 +25,47 @@ MainView {
     width: units.gu(45)
     height: units.gu(80)
 
-        U1db.Database {
-            id: aDatabase
-        }
+    U1db.Database {
+        id: aDatabase
+    }
 
-       U1db.Document {
-            database: aDatabase
-            docId: "department"
-            contents: {"department": "department of redundancy department",
-                       "managers": [
-                            {"name": "Mary", "phone_number": "12345"},
-                            {"name": "Katherine"},
-                            {"name": "Rob", "phone_number": "54321"}
-                        ]
-                      }
-      }
+   U1db.Document {
+        database: aDatabase
+        docId: "department"
+        contents: {"department": "department of redundancy department",
+                   "managers": [
+                        {"name": "Mary", "phone_number": "12345"},
+                        {"name": "Katherine"},
+                        {"name": "Rob", "phone_number": "54321"}
+                    ]
+                  }
+  }
 
-       U1db.Index{
-           database: aDatabase
-           id: by_phonenumber
-           expression: ["managers.phone_number"]
-       }
+   U1db.Index{
+       database: aDatabase
+       id: by_phonenumber
+       expression: ["managers.phone_number"]
+   }
 
-       U1db.Query{
-           id: aQuery
-           index: by_phonenumber
-       }
+   U1db.Query{
+       id: aQuery
+       index: by_phonenumber
+   }
 
-        Tabs {
-            id: tabs
+    Tabs {
+        id: tabs
 
-            Tab {
-                title: i18n.tr("Hello U1Db!")
+        Tab {
+            title: i18n.tr("Hello U1Db!")
 
-                page: Page {
-                    id: helloPage
+            page: Page {
+                id: helloPage
 
-                    ListView {
-                        anchors.fill: parent
-                        model: aQuery
-                        delegate: Text {
-                            text: "(" + index + ") " + contents.phone_number
+                ListView {
+                    anchors.fill: parent
+                    model: aQuery
+                    delegate: Text {
+                        text: "(" + index + ") " + JSON.stringify(contents)
                     }
                 }
             }
