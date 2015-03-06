@@ -172,9 +172,11 @@ void Query::generateQueryResults()
 
         if(match == true){
             // Results must be unique and not empty aka deleted
-            if (!m_documents.contains(docId) && result_variant.isValid())
+            if (result_variant.isValid())
             {
-                m_documents.append(docId);
+                if (!m_documents.contains(docId))
+                    m_documents.append(docId);
+
                 m_results.append(result);
             }
         }
