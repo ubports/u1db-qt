@@ -785,14 +785,14 @@ Database::listDocs()
     \qmlproperty string Database::path
     A relative \a path can be given to store the database in an app-specific
     writable folder. This is recommended as it ensures to work with confinement.
-    If more control is needed absolute paths can be used.
-    By default everything is stored in memory.
+    If more control is needed absolute paths or local file URIs can be used.
+    By default or if the path is empty everything is stored in memory.
  */
 /*!
     A relative \a path can be given to store the database in an app-specific
     writable folder. This is recommended as it ensures to work with confinement.
-    If more control is needed absolute paths can be used.
-    By default everything is stored in memory.
+    If more control is needed absolute paths or local file URIs can be used.
+    By default or if the path is empty everything is stored in memory.
  */
 void
 Database::setPath(const QString& path)
