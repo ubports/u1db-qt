@@ -31,7 +31,9 @@ QT_BEGIN_NAMESPACE_U1DB
 
 class Q_DECL_EXPORT Database : public QAbstractListModel {
     Q_OBJECT
+    /*! path */
     Q_PROPERTY(QString path READ getPath WRITE setPath NOTIFY pathChanged)
+    /*! error */
     Q_PROPERTY(QString error READ lastError NOTIFY errorChanged)
 public:
     Database(QObject* parent = 0);
@@ -65,7 +67,15 @@ public:
     QMap<QString,QVariant> getSyncLogInfo(QMap<QString,QVariant> lastSyncInformation, QString uid, QString prefix);
 
 Q_SIGNALS:
+    /*!
+        \signal Database::pathChanged
+        The database path changed - the empty string means it's in-memory only.
+     */
     void pathChanged(const QString& path);
+    /*!
+        \signal Database::errorChanged
+        An error occurred. Use lastError() to check it.
+     */
     void errorChanged(const QString& error);
     /*!
         A document's contents were modified.

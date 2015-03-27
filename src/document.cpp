@@ -17,14 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
-#include <QSqlQuery>
-#include <QFile>
-#include <QSqlError>
-#include <QUuid>
-#include <QStringList>
-#include <QJsonDocument>
-
 #include "document.h"
 #include "private.h"
 
@@ -33,12 +25,34 @@ QT_BEGIN_NAMESPACE_U1DB
 /*!
     \class Document
     \inmodule U1db
-    \ingroup modules
+    \ingroup cpp
 
     \brief The Document class proxies a single document stored in the Database.
+*/
+
+
+/*!
+    \qmltype Document
+    \instantiates Document
+    \inqmlmodule U1db 1.0
+    \ingroup modules
+
+    \brief Document proxies a single document stored in the Database.
 
     This is the declarative API equivalent of Database::putDoc() and
     Database::getDoc().
+
+    \qml
+    Document {
+        docId: 'myId'
+        defaults: {
+            color: 'blue'
+        }
+        create: true
+    }
+    \endqml
+
+    \sa Database
 */
 
 /*!
@@ -50,6 +64,9 @@ Document::Document(QObject *parent) :
 {
 }
 
+/*!
+   Returns the \l Database.
+ */
 Database*
 Document::getDatabase()
 {
@@ -77,8 +94,7 @@ Document::onPathChanged(const QString& path)
 }
 
 /*!
-    \property Document::database
-    The database is used to lookup the contents of the document, reflecting
+    The \a database is used to lookup the contents of the document, reflecting
     changes done to it and conversely changes are saved to the database.
  */
 void
@@ -104,6 +120,9 @@ Document::setDatabase(Database* database)
     Q_EMIT databaseChanged(database);
 }
 
+/*!
+   Returns the docId.
+ */
 QString
 Document::getDocId()
 {
@@ -111,8 +130,13 @@ Document::getDocId()
 }
 
 /*!
-    \property Document::docId
+    \qmlproperty string Document::docId
     The docId can be that of an existing document in the database and
+    will determine what getContents() returns.
+    If no such documents exists, setDefaults() can be used to supply a preset.
+ */
+/*!
+    The \a docId can be that of an existing document in the database and
     will determine what getContents() returns.
     If no such documents exists, setDefaults() can be used to supply a preset.
  */
@@ -132,6 +156,9 @@ Document::setDocId(const QString& docId)
     }
 }
 
+/*!
+    Returns whether the document will be newly created if it doesn't exist.
+ */
 bool
 Document::getCreate()
 {
@@ -139,8 +166,12 @@ Document::getCreate()
 }
 
 /*!
-    \property Document::create
-    If create is true, docId is not empty and no document with the same docId
+    \qmlproperty bool Document::create
+    If \a create is true, docId is not empty and no document with the same docId
+    exists, defaults will be used to store the document.
+ */
+/*!
+    If \a create is true, docId is not empty and no document with the same docId
     exists, defaults will be used to store the document.
  */
 void
@@ -156,6 +187,10 @@ Document::setCreate(bool create)
         m_database->putDoc(m_defaults, m_docId);
 }
 
+/*!
+    Returns the defaults to be used when the document is newly created
+    because it doesn't exist, if create is true.
+ */
 QVariant
 Document::getDefaults()
 {
@@ -163,11 +198,17 @@ Document::getDefaults()
 }
 
 /*!
-    \property Document::defaults
+    \qmlproperty Variant Document::content
     The default contents of the document, which are used only if
     create is true, docId is not empty and no document with the same
     docId exists in the database yet.
-    If the defaults change, it's up to the API user to handle it.
+    If the \a defaults change, it's up to the API user to handle it.
+ */
+/*!
+    The default contents of the document, which are used only if
+    create is true, docId is not empty and no document with the same
+    docId exists in the database yet.
+    If the \a defaults change, it's up to the API user to handle it.
  */
 void
 Document::setDefaults(QVariant defaults)
@@ -185,6 +226,9 @@ Document::setDefaults(QVariant defaults)
         m_database->putDoc(m_defaults, m_docId);
 }
 
+/*!
+    Returns the current contents of the document.
+ */
 QVariant
 Document::getContents()
 {
@@ -192,8 +236,11 @@ Document::getContents()
 }
 
 /*!
-    \property Document::contents
-    Updates the contents of the document. A valid docId must be set.
+    \qmlproperty Variant Document::contents
+    Updates the \a contents of the document. A valid docId must be set.
+ */
+/*!
+    Updates the \a contents of the document. A valid docId must be set.
  */
 void
 Document::setContents(QVariant contents)

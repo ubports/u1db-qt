@@ -17,13 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
-#include <QSqlQuery>
-#include <QFile>
-#include <QSqlError>
-#include <QUuid>
 #include <QStringList>
-#include <QJsonDocument>
 
 #include "query.h"
 #include "database.h"
@@ -34,12 +28,42 @@ QT_BEGIN_NAMESPACE_U1DB
 /*!
     \class Query
     \inmodule U1db
-    \ingroup modules
+    \ingroup cpp
 
     \brief The Query class generates a filtered list of documents based on a query using the given Index.
 
     Query can be used as a QAbstractListModel, delegates will then have access to \a docId and \a contents
     analogous to the properties of Document.
+ */
+
+/*!
+    \qmltype Query
+    \instantiates Query
+    \inqmlmodule U1db 1.0
+    \ingroup modules
+
+    \brief Query filters documents based on the query and index.
+
+    In a ListView the Query can be used as a model.
+
+    \qml
+    ListView {
+        model: Query {
+            index: Index {
+                name: 'colorIndex'
+                expression: [ 'color' ]
+                database: myDatabase
+            }
+            query: [ 'blue' ]
+        }
+        delegate: ListItem.Subtitled {
+            text: docId
+            subText: contents.color
+        }
+    }
+    \endqml
+
+    \sa Index
 */
 
 /*!
@@ -93,6 +117,9 @@ Query::rowCount(const QModelIndex & parent) const
     return m_results.count();
 }
 
+/*!
+    FIXME
+ */
 Index*
 Query::getIndex()
 {
@@ -287,9 +314,12 @@ bool Query::queryMap(QVariantMap map, QString value, QString field)
 }
 
 /*!
-    \property Query::index
-    Sets the Index to use. The index must have a valid name and index expressions.
+    \qmlproperty Index Query::index
+    Sets the Index to use. \a index must have a valid name and index expressions.
     If no query is set, the default is all results of the index.
+ */
+/*!
+    FIXME \a index
  */
 void
 Query::setIndex(Index* index)
@@ -305,11 +335,12 @@ Query::setIndex(Index* index)
     }
     Q_EMIT indexChanged(index);
 
-
     onDataInvalidated();
-
 }
 
+/*!
+    FIXME
+ */
 QVariant
 Query::getQuery()
 {
@@ -317,10 +348,13 @@ Query::getQuery()
 }
 
 /*!
-    \property Query::query
+    \qmlproperty Variant Query::query
     A query in one of the allowed forms:
     'value', ['value'] or [{'sub-field': 'value'}].
     The default is equivalent to '*'.
+ */
+/*!
+    FIXME \a query
  */
 void
 Query::setQuery(QVariant query)
@@ -334,8 +368,11 @@ Query::setQuery(QVariant query)
 }
 
 /*!
-    \property Query::documents
+    \qmlproperty list<string> Query::documents
     The docId's of all matched documents.
+ */
+/*!
+    FIXME
  */
 QStringList
 Query::getDocuments()
@@ -344,8 +381,11 @@ Query::getDocuments()
 }
 
 /*!
-    \property Query::results
+    \qmlproperty list<Variant> Query::results
     The results of the query as a list.
+ */
+/*!
+    FIXME
  */
 QList<QVariant>
 Query::getResults()
