@@ -76,6 +76,7 @@ Index::getDatabase()
 void
 Index::onPathChanged(const QString& path)
 {
+    m_database->putIndex(m_name, m_expression);
     Q_EMIT dataInvalidated();
 }
 

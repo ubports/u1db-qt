@@ -35,7 +35,7 @@ MainView {
     
     U1db.Database {
         id: aDatabase
-        path: "aDatabase2"
+        path: Qt.resolvedUrl("aDatabase2")
     }
         
     Timer {
