@@ -87,13 +87,16 @@ Q_SIGNALS:
     void docLoaded(const QString& docId, QVariant content) const;
 private:
     //Q_DISABLE_COPY(Database)
+    static const QString MEMORY_PATH;
+
     QString m_path;
     QSqlDatabase m_db;
     QString m_error;
 
     QString getReplicaUid();
+    QString sanitizePath(const QString& path);
     bool isInitialized();
-    bool initializeIfNeeded(const QString& path=":memory:");
+    bool initializeIfNeeded(const QString& path=Database::MEMORY_PATH);
     bool setError(const QString& error);
     QString getDocIdByRow(int row) const;
 
