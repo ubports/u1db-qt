@@ -1,3 +1,25 @@
+u1db-qt (0.1.5+15.10.20150826.1-0ubuntu1) wily; urgency=medium
+
+  [ CI Train Bot ]
+  * New rebuild forced.
+
+  [ Christian Dywan ]
+  * Add new advanced-game example
+  * Mention BUILD_DOC flag in HACKING file
+
+  [ Marco Trevisan (Treviño) ]
+  * Database: support parsing of URI paths using something such as
+    "file://"+ path (LP: #1426180)
+  * Document: ensure defaults and contents are set when database path
+    changes (LP: #1426178)
+  * Query: allow adding more than one result for each doc, allowing
+    indexing subfields of objects in a list (LP: #1322156)
+
+  [ Nekhelesh Ramananthan ]
+  * Add new advanced-game example
+
+ -- CI Train Bot <ci-train-bot@canonical.com>  Wed, 26 Aug 2015 16:34:30 +0000
+
 u1db-qt (0.1.5+15.04.20150327-0ubuntu1) vivid; urgency=medium
 
   [ Christian Dywan ]
