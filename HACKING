@@ -1,21 +1,38 @@
 *** Building and installing ***
 
-cmake .; make
-sudo make install
+Get the source:
+    bzr branch lp:u1db-qt
 
-*** Test from the build folder ***
+Build dependencies to have:
+    ubuntu-sdk-libs-dev, dbus-test-runner, qtdeclarative5-test-plugin
 
-qmlscene -I ./modules examples/u1db-qt-example-1.qml
-qmltestrunner -import ./modules
-make check
+    All of these can also be installed with one command:
+    sudo apt-get build-dep u1db-qt
 
-*** Run reference test cases ***
+Build it:
+    mkdir _build; cd _build; cmake ..
+    make
+    sudo make install
 
-make
-env PYTHONPATH=/path/to/u1db ./tests/test-upstream.py
+Build docs:
+    make doc
 
-*** Use U1DB Python API to check sqlite compatiblity ***
+Unit tests:
+    make check
 
-python -c "import u1db;db=u1db.open('pDb',create=False);print(db.get_all_docs());print(db.list_indexes())"
-python -c "import u1db;db=u1db.open('pDb',create=True);db.create_index('by-phone', 'gents.phone');doc3 = db.create_doc({'gents': [ {'name': 'Mary', 'phone': '12345'}, {'name': 'Peter', 'phone': '54321'} ]})"
+Note: both docs and tests must pass for branches proposed for merging.
+
+*** Further debugging and testing ***
+
+By hand:
+    qmlscene -I ./modules examples/u1db-qt-example-1.qml
+    qmltestrunner -import ./modules
+
+Partial upstream test case support:
+    make
+    env PYTHONPATH=/path/to/u1db ./tests/test-upstream.py
+
+Use Python U1Db for testing:
+    python -c "import u1db;db=u1db.open('pDb',create=False);print(db.get_all_docs());print(db.list_indexes())"
+    python -c "import u1db;db=u1db.open('pDb',create=True);db.create_index('by-phone', 'gents.phone');doc3 = db.create_doc({'gents': [ {'name': 'Mary', 'phone': '12345'}, {'name': 'Peter', 'phone': '54321'} ]})"
 
