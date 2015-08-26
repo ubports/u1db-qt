@@ -21,6 +21,7 @@
 #include <QObject>
 
 #include "database.h"
+#include "document.h"
 #include "index.h"
 #include "query.h"
 
@@ -108,6 +109,46 @@ private Q_SLOTS:
         Query query;
         query.setIndex(&index);
         query.setQuery(QStringList() << "2014*" << "basketball" << "linux");
+    }
+
+    void testSingleDocumentQuery()
+    {
+        const char * json = "{\"department\": \"department of redundancy department\"," \
+                            " \"managers\": [" \
+                            "    {\"name\": \"Mary\", \"phone_number\": \"12345\"}," \
+                            "    {\"name\": \"Katherine\"}," \
+                            "    {\"name\": \"Rob\", \"phone_number\": [\"54321\"]}" \
+                            "  ]" \
+                            "}";
+        Database db;
+        Document doc;
+        doc.setDocId("department");
+        doc.setDatabase(&db);
+        doc.setContents(QJsonDocument::fromJson(QByteArray(json)).toVariant());
+
+        Index index;
+        index.setDatabase(&db);
+        index.setName("by-phone-number");
+        index.setExpression(QStringList() << "managers.phone_number");
+
+        Query query;
+        query.setIndex(&index);
+
+        QCOMPARE(query.getDocuments().size(), 1);
+        QCOMPARE(query.getDocuments().front(), QString("department"));
+
+        QList<QVariant> expected_numbers;
+        Q_FOREACH (QVariant manager, doc.getContents().toMap()["managers"].toList())
+        {
+            QVariantMap man = manager.toMap();
+            if (man.keys().contains("phone_number"))
+            {
+                man.remove("name");
+                expected_numbers.append(man);
+            }
+        }
+
+        QCOMPARE(query.getResults(), expected_numbers);
     }
 
     void cleanupTestCase()
