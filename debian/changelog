@@ -1,3 +1,9 @@
+u1db-qt (0.1.6+ubports) xenial; urgency=medium
+
+  * Imported to UBports
+
+ -- UBports auto importer <infra@ubports.com>  Mon, 16 Apr 2018 13:33:42 +0200
+
 u1db-qt (0.1.5+15.10.20150826.1-0ubuntu1) wily; urgency=medium
 
   [ CI Train Bot ]
