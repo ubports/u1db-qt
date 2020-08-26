@@ -3,6 +3,7 @@ add_custom_target(check COMMAND "env" "CTEST_OUTPUT_ON_FAILURE=1" "${CMAKE_CTEST
 find_package(Qt5Test REQUIRED)
 
 add_test(NAME plugintest COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/strict-qmltestrunner.sh" "-import" "../modules" "-o" "plugintest-xunit.xml,xunitxml" "-o" "-,txt" "-input" "${CMAKE_CURRENT_SOURCE_DIR}")
+set_property(TEST plugintest PROPERTY ENVIRONMENT "XDG_DATA_HOME=/tmp/plugintest")
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
