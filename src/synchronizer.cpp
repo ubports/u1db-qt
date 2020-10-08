@@ -1099,7 +1099,7 @@ void Synchronizer::postDataFromClientToRemoteServer(Database *source, QUrl postU
     postString.append("{\"last_known_generation\": ");
     postString.append(QByteArray::number(source_replica_generation));
     postString.append(", \"last_known_trans_id\": \"");
-    postString.append(source_replica_transaction_id);
+    postString.append(source_replica_transaction_id.toUtf8());
     postString.append("\"}");
 
     QList<QString> transactions = m_source->listTransactionsSince(source_replica_generation);
@@ -1113,7 +1113,7 @@ void Synchronizer::postDataFromClientToRemoteServer(Database *source, QUrl postU
         content = content.replace("\n","");
         content = content.replace("\"","\\\"");
 
-        postString.append(",\r\n{\"content\": \""+content+"\",\"rev\": \""+m_source->getCurrentDocRevisionNumber(transactionData[1])+"\", \"id\": \""+transactionData[1]+"\",\"trans_id\": \""+transactionData[2]+"\",\"gen\": "+transactionData[0]+"}");
+        postString.append(QString(",\r\n{\"content\": \""+content+"\",\"rev\": \""+m_source->getCurrentDocRevisionNumber(transactionData[1])+"\", \"id\": \""+transactionData[1]+"\",\"trans_id\": \""+transactionData[2]+"\",\"gen\": "+transactionData[0]+"}").toUtf8());
 
     }
 
